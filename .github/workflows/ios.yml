@@ -1,0 +1,199 @@
+# 地球Online · iOS：构建、单元测试、模拟器截图。
+# 只在手动触发时运行（Actions → iOS (地球Online) → Run workflow）——macOS 分钟数很贵，绝不在 push / PR 上跑。
+name: iOS (地球Online)
+
+on:
+  workflow_dispatch:
+    inputs:
+      screenshots:
+        description: "Take simulator screenshots (traveling / planning / empty, dark, en, ja, iPhone Duo if available)"
+        type: boolean
+        default: true
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ios:
+    # macos-26 自带 Xcode 26。若这个镜像还不可用，改成 macos-latest（下面「选 Xcode」一步会退回到机器上最新的 Xcode）。
+    runs-on: macos-26
+    timeout-minutes: 75
+    defaults:
+      run:
+        shell: bash
+    env:
+      APP_DIR: 地球Online/app
+      IOS_DIR: 地球Online/app/ios
+      BUNDLE_ID: app.earthonline.ios
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: 地球Online/app/package-lock.json
+
+      - name: Build the world layer (web/dist)
+        working-directory: ${{ env.APP_DIR }}
+        run: npm ci && npm run build
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Select the newest Xcode
+        run: |
+          set -euo pipefail
+          echo "Installed Xcodes:"; ls -d /Applications/Xcode*.app || true
+          XCODE="$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1 || true)"
+          if [ -z "${XCODE}" ]; then XCODE="$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"; fi
+          echo "Using ${XCODE}"
+          sudo xcode-select -s "${XCODE}/Contents/Developer"
+          xcodebuild -version
+          xcrun simctl list runtimes
+
+      - name: Generate the Xcode project
+        working-directory: ${{ env.IOS_DIR }}
+        run: xcodegen generate
+
+      - name: Pick an iPhone simulator
+        run: |
+          set -euo pipefail
+          read -r UDID NAME < <(xcrun simctl list devices available -j | python3 -c '
+          import json, re, sys
+          devices = json.load(sys.stdin)["devices"]
+          best = None
+          for runtime, devs in devices.items():
+              m = re.search(r"iOS-(\d+)-(\d+)", runtime)
+              if not m:
+                  continue
+              version = (int(m.group(1)), int(m.group(2)))
+              for d in devs:
+                  name = d["name"]
+                  if not d.get("isAvailable", True) or not name.startswith("iPhone") or "Duo" in name:
+                      continue
+                  key = (version, "Pro" in name and "Max" not in name, name)
+                  if best is None or key > best[0]:
+                      best = (key, d["udid"], name)
+          print(best[1] + " " + best[2].replace(" ", "_")) if best else print("")
+          ')
+          if [ -z "${UDID:-}" ]; then echo "No iPhone simulator found"; xcrun simctl list devices; exit 1; fi
+          echo "SIM_UDID=${UDID}" >> "$GITHUB_ENV"
+          echo "SIM_NAME=${NAME}" >> "$GITHUB_ENV"
+          echo "Simulator: ${NAME} (${UDID})"
+
+      - name: Build for testing
+        working-directory: ${{ env.IOS_DIR }}
+        run: |
+          mkdir -p build
+          if ! xcodebuild build-for-testing \
+            -project EarthOnline.xcodeproj -scheme EarthOnline -configuration Debug \
+            -destination "platform=iOS Simulator,id=${SIM_UDID}" \
+            -derivedDataPath build CODE_SIGNING_ALLOWED=NO > build/xcodebuild-build.log 2>&1; then
+            grep -E "error:" build/xcodebuild-build.log | head -80 || true
+            tail -60 build/xcodebuild-build.log
+            exit 1
+          fi
+          grep -E "warning:" build/xcodebuild-build.log | grep -v "/DerivedData/\|/build/" | sort -u | head -80 || true
+          test -d build/Build/Products/Debug-iphonesimulator/EarthOnline.app
+
+      - name: Unit tests
+        working-directory: ${{ env.IOS_DIR }}
+        run: |
+          mkdir -p build
+          STATUS=0
+          xcodebuild test-without-building \
+            -project EarthOnline.xcodeproj -scheme EarthOnline -configuration Debug \
+            -destination "platform=iOS Simulator,id=${SIM_UDID}" \
+            -derivedDataPath build -resultBundlePath build/Tests.xcresult > build/xcodebuild-test.log 2>&1 || STATUS=$?
+          grep -E "Test Case .* (passed|failed)|error:|Executed" build/xcodebuild-test.log || true
+          exit $STATUS
+
+      - name: Screenshots (iPhone)
+        if: ${{ inputs.screenshots }}
+        working-directory: ${{ env.IOS_DIR }}
+        run: |
+          set -euo pipefail
+          APP=build/Build/Products/Debug-iphonesimulator/EarthOnline.app
+          OUT=screenshots; mkdir -p "$OUT"
+          xcrun simctl boot "${SIM_UDID}" 2>/dev/null || true
+          xcrun simctl bootstatus "${SIM_UDID}" -b
+          xcrun simctl status_bar "${SIM_UDID}" override --time 9:41 --batteryState charged --batteryLevel 100 --wifiBars 3 --cellularBars 4 || true
+          xcrun simctl install "${SIM_UDID}" "$APP"
+          shoot () {  # $1 = file name, rest = launch arguments
+            local name="$1"; shift
+            xcrun simctl launch --terminate-running-process "${SIM_UDID}" "${BUNDLE_ID}" "$@"
+            sleep 14   # 世界层（three.js）首帧 + 地球飞入动画
+            xcrun simctl io "${SIM_UDID}" screenshot "$OUT/${name}.png"
+          }
+          for state in traveling planning empty; do
+            shoot "iphone-${state}" -screenshotState "${state}"
+          done
+          xcrun simctl ui "${SIM_UDID}" appearance dark || true
+          shoot "iphone-traveling-dark" -screenshotState traveling
+          xcrun simctl ui "${SIM_UDID}" appearance light || true
+          shoot "iphone-traveling-en" -screenshotState traveling -AppleLanguages "(en)" -AppleLocale en_US
+          shoot "iphone-planning-ja" -screenshotState planning -AppleLanguages "(ja)" -AppleLocale ja_JP
+          xcrun simctl terminate "${SIM_UDID}" "${BUNDLE_ID}" || true
+
+      - name: Screenshots (iPhone Duo, optional)
+        if: ${{ inputs.screenshots }}
+        working-directory: ${{ env.IOS_DIR }}
+        run: |
+          set -uo pipefail
+          DUO_TYPE="$(xcrun simctl list devicetypes | grep -i "iPhone Duo" | head -1 | sed -E 's/.*\((com\.apple[^)]*)\).*/\1/' || true)"
+          if [ -z "${DUO_TYPE}" ]; then
+            echo "No iPhone Duo simulator on this Xcode; skipping."
+            exit 0
+          fi
+          RUNTIME="$(xcrun simctl list runtimes -j | python3 -c '
+          import json, sys
+          rts = [r for r in json.load(sys.stdin)["runtimes"] if r.get("isAvailable") and r.get("platform", "iOS") == "iOS"]
+          rts.sort(key=lambda r: [int(x) for x in r["version"].split(".")])
+          print(rts[-1]["identifier"] if rts else "")
+          ')"
+          DUO="$(xcrun simctl create "EarthOnline Duo" "${DUO_TYPE}" "${RUNTIME}")" || { echo "Couldn't create a Duo simulator; skipping."; exit 0; }
+          APP=build/Build/Products/Debug-iphonesimulator/EarthOnline.app
+          OUT=screenshots; mkdir -p "$OUT"
+          xcrun simctl boot "$DUO" && xcrun simctl bootstatus "$DUO" -b
+          xcrun simctl install "$DUO" "$APP"
+          shoot_duo () {
+            local name="$1"; shift
+            xcrun simctl launch --terminate-running-process "$DUO" "${BUNDLE_ID}" "$@" || return 0
+            sleep 14
+            xcrun simctl io "$DUO" screenshot "$OUT/${name}.png" || true
+          }
+          # 折叠 / 展开：simctl 的命令名以正式 Xcode 为准，这里按常见写法试，失败就只拍默认状态
+          shoot_duo "duo-default-traveling" -screenshotState traveling
+          for fold in folded unfolded; do
+            if xcrun simctl help 2>/dev/null | grep -qi "fold\|hinge"; then
+              (xcrun simctl fold "$DUO" "$fold" 2>/dev/null || xcrun simctl hinge "$DUO" "$fold" 2>/dev/null) && sleep 3 \
+                && shoot_duo "duo-${fold}-traveling" -screenshotState traveling \
+                && shoot_duo "duo-${fold}-empty" -screenshotState empty \
+                || echo "Fold control '${fold}' not available; skipped."
+            else
+              echo "simctl has no fold / hinge command; only the default posture was captured."
+              break
+            fi
+          done
+          xcrun simctl shutdown "$DUO" || true
+          xcrun simctl delete "$DUO" || true
+
+      - name: Upload screenshots
+        if: ${{ always() && inputs.screenshots }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: earthonline-ios-screenshots
+          path: ${{ env.IOS_DIR }}/screenshots/*.png
+          if-no-files-found: warn
+
+      - name: Upload logs and test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: earthonline-ios-build-logs
+          path: |
+            ${{ env.IOS_DIR }}/build/*.log
+            ${{ env.IOS_DIR }}/build/Tests.xcresult
+          if-no-files-found: ignore

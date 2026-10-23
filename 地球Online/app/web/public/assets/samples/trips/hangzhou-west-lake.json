@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "0.3",
+  "id": "sample-hangzhou-west-lake",
+  "title": "杭州西湖两日",
+  "destination": "杭州",
+  "startDate": "2026-09-26",
+  "endDate": "2026-09-27",
+  "theme": "红叶古都",
+  "seed": 2766934512,
+  "status": "traveling",
+  "days": [
+    {
+      "index": 1,
+      "date": "2026-09-26",
+      "title": "高铁到杭州，环湖走一圈",
+      "city": "geo",
+      "lodging": "湖滨",
+      "entries": [
+        {"id":"d1-e0","type":"transport","mode":"rail","label":"高铁，上海虹桥到杭州东","durationMinutes":50,"distanceKm":159},
+        {"id":"d1-e1","type":"place","name":"杭州东站","category":"station","plannedStart":"08:55","stayMinutes":10,"geo":{"lat":30.2906,"lng":120.2127}},
+        {"id":"d1-e2","type":"transport","mode":"subway","label":"地铁 1 号线到龙翔桥","durationMinutes":25,"distanceKm":9},
+        {"id":"d1-e3","type":"place","name":"湖滨的酒店","category":"hotel","stayMinutes":15,"notes":"寄存行李","geo":{"lat":30.259,"lng":120.164}},
+        {"id":"d1-e4","type":"transport","mode":"walk","label":"步行","durationMinutes":20,"distanceKm":1.5},
+        {"id":"d1-e5","type":"place","name":"断桥","category":"sight","stayMinutes":20,"notes":"周末人挤人，9 点半前到","visited":true,"visitedAt":"2026-09-26T02:15:00.000Z","geo":{"lat":30.2593,"lng":120.151}},
+        {"id":"d1-e6","type":"transport","mode":"walk","label":"沿白堤走","durationMinutes":15,"distanceKm":1},
+        {"id":"d1-e7","type":"place","name":"孤山","category":"sight","stayMinutes":45,"notes":"西泠印社在山上","visited":true,"visitedAt":"2026-09-26T02:50:00.000Z","geo":{"lat":30.2555,"lng":120.1437}},
+        {"id":"d1-e8","type":"transport","mode":"walk","label":"步行","durationMinutes":5,"distanceKm":0.3},
+        {"id":"d1-e9","type":"place","name":"楼外楼","category":"food","plannedStart":"11:40","stayMinutes":75,"notes":"午饭：西湖醋鱼、龙井虾仁、东坡肉；要等位","visited":true,"visitedAt":"2026-09-26T03:50:00.000Z","geo":{"lat":30.2548,"lng":120.1453}},
+        {"id":"d1-e10","type":"transport","mode":"walk","label":"步行","durationMinutes":20,"distanceKm":1.6},
+        {"id":"d1-e11","type":"place","name":"苏堤","category":"sight","stayMinutes":60,"notes":"从北往南走完 2.8 公里，一共六座桥","visited":true,"visitedAt":"2026-09-26T05:25:00.000Z","geo":{"lat":30.244,"lng":120.141}},
+        {"id":"d1-e12","type":"transport","mode":"walk","label":"步行","durationMinutes":20,"distanceKm":1.3},
+        {"id":"d1-e13","type":"place","name":"花港观鱼","category":"sight","stayMinutes":30,"visited":true,"visitedAt":"2026-09-26T06:45:00.000Z","geo":{"lat":30.233,"lng":120.142}},
+        {"id":"d1-e14","type":"transport","mode":"walk","label":"步行","durationMinutes":15,"distanceKm":1.1},
+        {"id":"d1-e15","type":"place","name":"雷峰塔","category":"sight","plannedStart":"16:30","stayMinutes":60,"notes":"登塔看日落，门票 40 元","visited":true,"visitedAt":"2026-09-26T08:40:00.000Z","geo":{"lat":30.2311,"lng":120.1487}},
+        {"id":"d1-e16","type":"transport","mode":"walk","label":"步行","durationMinutes":5,"distanceKm":0.4},
+        {"id":"d1-e17","type":"place","name":"雷峰塔游船码头","category":"port","stayMinutes":10,"geo":{"lat":30.2335,"lng":120.152}},
+        {"id":"d1-e18","type":"transport","mode":"ship","label":"西湖游船回湖滨","durationMinutes":30,"distanceKm":4},
+        {"id":"d1-e19","type":"place","name":"湖滨游船码头","category":"port","stayMinutes":10,"geo":{"lat":30.256,"lng":120.162}},
+        {"id":"d1-e20","type":"transport","mode":"walk","label":"步行","durationMinutes":5,"distanceKm":0.3},
+        {"id":"d1-e21","type":"place","name":"西湖音乐喷泉","category":"sight","plannedStart":"19:00","stayMinutes":30,"notes":"周末晚上 19 点和 20 点各一场","visited":true,"visitedAt":"2026-09-26T11:10:00.000Z","geo":{"lat":30.2575,"lng":120.1625}},
+        {"id":"d1-e22","type":"transport","mode":"walk","label":"步行回酒店","durationMinutes":5,"distanceKm":0.4},
+        {"id":"d1-e23","type":"place","name":"湖滨的酒店","category":"hotel","geo":{"lat":30.259,"lng":120.164}}
+      ]
+    },
+    {
+      "index": 2,
+      "date": "2026-09-27",
+      "title": "灵隐寺和龙井村，傍晚回上海",
+      "city": "geo",
+      "entries": [
+        {"id":"d2-e0","type":"place","name":"湖滨的酒店","category":"hotel","plannedStart":"07:30","stayMinutes":5,"notes":"退房，行李寄存","geo":{"lat":30.259,"lng":120.164}},
+        {"id":"d2-e1","type":"transport","mode":"bus","label":"7 路公交到灵隐","durationMinutes":35,"distanceKm":8},
+        {"id":"d2-e2","type":"place","name":"飞来峰","category":"sight","plannedStart":"08:15","stayMinutes":45,"notes":"先买飞来峰景区的票，看石窟造像","visited":true,"visitedAt":"2026-09-27T00:25:00.000Z","geo":{"lat":30.2395,"lng":120.103}},
+        {"id":"d2-e3","type":"transport","mode":"walk","label":"步行","durationMinutes":5,"distanceKm":0.3},
+        {"id":"d2-e4","type":"place","name":"灵隐寺","category":"sight","stayMinutes":90,"notes":"进寺还要另买香花券","visited":true,"visitedAt":"2026-09-27T01:15:00.000Z","geo":{"lat":30.2403,"lng":120.1016}},
+        {"id":"d2-e5","type":"transport","mode":"taxi","label":"打车去龙井村","durationMinutes":15,"distanceKm":5},
+        {"id":"d2-e6","type":"place","name":"龙井村","category":"sight","stayMinutes":90,"notes":"在茶农家喝新茶，买茶先尝再称","visited":true,"visitedAt":"2026-09-27T03:00:00.000Z","geo":{"lat":30.2223,"lng":120.1263}},
+        {"id":"d2-e7","type":"transport","mode":"walk","label":"沿九溪十八涧走下山","durationMinutes":80,"distanceKm":5},
+        {"id":"d2-e8","type":"place","name":"九溪十八涧","category":"sight","stayMinutes":20,"visited":true,"visitedAt":"2026-09-27T05:50:00.000Z","geo":{"lat":30.208,"lng":120.125}},
+        {"id":"d2-e9","type":"transport","mode":"taxi","label":"打车","durationMinutes":25,"distanceKm":12},
+        {"id":"d2-e10","type":"place","name":"河坊街","category":"sight","stayMinutes":60,"notes":"人太多，没逛","geo":{"lat":30.2442,"lng":120.169}},
+        {"id":"d2-e11","type":"transport","mode":"taxi","label":"打车回酒店取行李","durationMinutes":10,"distanceKm":2.5},
+        {"id":"d2-e12","type":"place","name":"湖滨的酒店","category":"hotel","plannedStart":"16:00","stayMinutes":15,"geo":{"lat":30.259,"lng":120.164}},
+        {"id":"d2-e13","type":"transport","mode":"subway","label":"地铁 1 号线到杭州东站","durationMinutes":25,"distanceKm":9},
+        {"id":"d2-e14","type":"place","name":"杭州东站","category":"station","plannedStart":"17:00","stayMinutes":30,"geo":{"lat":30.2906,"lng":120.2127}},
+        {"id":"d2-e15","type":"transport","mode":"rail","label":"高铁回上海虹桥","durationMinutes":55,"distanceKm":159}
+      ]
+    }
+  ],
+  "createdAt": "2026-09-20T09:00:00.000Z",
+  "updatedAt": "2026-09-27T11:30:00.000Z"
+}

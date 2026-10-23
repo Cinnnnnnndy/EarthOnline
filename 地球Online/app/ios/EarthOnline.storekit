@@ -1,0 +1,130 @@
+{
+  "identifier" : "5E0C7A1D",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "18.0",
+      "familyShareable" : true,
+      "internalID" : "6740000003",
+      "localizations" : [
+        {
+          "description" : "更多名胜有专门做的模型。",
+          "displayName" : "名胜扩展包",
+          "locale" : "zh_Hans"
+        },
+        {
+          "description" : "Hand-made models for more famous landmarks.",
+          "displayName" : "Landmark Pack",
+          "locale" : "en_US"
+        },
+        {
+          "description" : "有名なランドマークの専用モデルを追加。",
+          "displayName" : "名所パック",
+          "locale" : "ja"
+        }
+      ],
+      "productID" : "app.earthonline.pack.landmarks",
+      "referenceName" : "Landmark Pack",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_failTransactionsEnabled" : false,
+    "_locale" : "zh_Hans",
+    "_storefront" : "CHN",
+    "_storeKitErrors" : [
+
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "21500001",
+      "localizations" : [
+
+      ],
+      "name" : "地球Online Pro",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "128.0",
+          "familyShareable" : true,
+          "groupNumber" : 1,
+          "internalID" : "6740000001",
+          "introductoryOffer" : {
+            "internalID" : "6740000011",
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P1W"
+          },
+          "localizations" : [
+            {
+              "description" : "不限数量的旅程、云端规划、iCloud 同步、高清长图与扩展包。",
+              "displayName" : "地球Online Pro（年）",
+              "locale" : "zh_Hans"
+            },
+            {
+              "description" : "Unlimited trips, cloud planning, iCloud sync, HD export and packs.",
+              "displayName" : "Earth Online Pro (Yearly)",
+              "locale" : "en_US"
+            },
+            {
+              "description" : "旅行の数は無制限、クラウド計画、iCloud 同期、高画質書き出しと拡張パック。",
+              "displayName" : "地球Online Pro（年額）",
+              "locale" : "ja"
+            }
+          ],
+          "productID" : "app.earthonline.pro.yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Pro Yearly",
+          "subscriptionGroupID" : "21500001",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "18.0",
+          "familyShareable" : true,
+          "groupNumber" : 2,
+          "internalID" : "6740000002",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "不限数量的旅程、云端规划、iCloud 同步、高清长图与扩展包。",
+              "displayName" : "地球Online Pro（月）",
+              "locale" : "zh_Hans"
+            },
+            {
+              "description" : "Unlimited trips, cloud planning, iCloud sync, HD export and packs.",
+              "displayName" : "Earth Online Pro (Monthly)",
+              "locale" : "en_US"
+            },
+            {
+              "description" : "旅行の数は無制限、クラウド計画、iCloud 同期、高画質書き出しと拡張パック。",
+              "displayName" : "地球Online Pro（月額）",
+              "locale" : "ja"
+            }
+          ],
+          "productID" : "app.earthonline.pro.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Pro Monthly",
+          "subscriptionGroupID" : "21500001",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

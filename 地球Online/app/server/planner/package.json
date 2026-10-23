@@ -1,0 +1,21 @@
+{
+  "name": "earth-online-planner",
+  "version": "0.1.0",
+  "private": true,
+  "description": "地球Online 行程规划服务：POST /v1/plan，用 Claude 把一段对话变成行程草稿（spec 0.3）",
+  "type": "module",
+  "engines": { "node": ">=22.6" },
+  "scripts": {
+    "start": "node --experimental-strip-types src/main.ts",
+    "offline": "node --experimental-strip-types src/main.ts --offline",
+    "test": "node --experimental-strip-types --test \"src/**/*.test.ts\"",
+    "typecheck": "tsc --noEmit -p ."
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.130.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.4",
+    "typescript": "^5.9.0"
+  }
+}

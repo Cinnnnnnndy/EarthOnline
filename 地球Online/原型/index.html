@@ -1,0 +1,601 @@
+<title>地球Online · 关西七日</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap">
+<style>
+/* 布局：像素微缩世界铺满整台展开的折叠机（√2:1）；行程面板、翻页、控制、捏人全部是悬浮在世界之上的纸片，不做分割 */
+:root{
+  --bg:#e9e1d1; --paper:#f6efe1; --paper-2:#ece2cd; --paper-3:#dfd2b8; --ink:#2e2628; --ink-2:#6e625c; --ink-3:#a2958a;
+  --accent:#c8503e; --accent-2:#3f6fb0; --gold:#e0b34a; --frame:#211c1d; --frame-2:#3a3234; --ok:#3f8f5a;
+  --chip:rgba(246,239,225,.94); --chip-ink:#2e2628; --chip-ink-2:#6e625c; --chip-2:rgba(236,226,205,.96);
+  --font-display:"DotGothic16","PingFang SC","HarmonyOS Sans SC","Noto Sans SC",system-ui,sans-serif;
+  --font-body:"PingFang SC","HarmonyOS Sans SC","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#1b1715; --paper:#2b2521; --paper-2:#342d28; --paper-3:#3f362f; --ink:#efe6d6; --ink-2:#c2b4a2; --ink-3:#8b7d70;
+  --accent:#e56b58; --accent-2:#7aa4dc; --gold:#e6c060; --frame:#0d0b0b; --frame-2:#2a2426; --ok:#6fbf86; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#1b1715; --paper:#2b2521; --paper-2:#342d28; --paper-3:#3f362f; --ink:#efe6d6; --ink-2:#c2b4a2; --ink-3:#8b7d70;
+  --accent:#e56b58; --accent-2:#7aa4dc; --gold:#e6c060; --frame:#0d0b0b; --frame-2:#2a2426; --ok:#6fbf86; color-scheme:dark }
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:14px;line-height:1.45}
+*{box-sizing:border-box}
+button{font:inherit;color:inherit;background:var(--chip-2);border:2px solid var(--chip-ink);border-radius:6px;padding:5px 10px;cursor:pointer;color:var(--chip-ink)}
+button:hover{filter:brightness(.96)} button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.stage{max-width:1280px;margin:0 auto;padding-block:18px;padding-inline:16px;display:flex;flex-direction:column;gap:12px}
+.device{position:relative;width:100%;aspect-ratio:1.414;max-width:100%;background:var(--frame);border-radius:22px;padding:12px;box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden}
+.world{position:absolute;inset:12px;border-radius:12px;overflow:hidden;background:#e6dcc4}
+#map{position:absolute;inset:0;width:100%;height:100%;display:block;image-rendering:pixelated;image-rendering:crisp-edges}
+.crease{position:absolute;top:0;bottom:0;left:50%;width:14px;transform:translateX(-50%);background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.10),rgba(0,0,0,0));pointer-events:none}
+/* 悬浮纸片 */
+.chip{position:absolute;background:var(--chip);color:var(--chip-ink);border:2px solid var(--chip-ink);border-radius:8px;box-shadow:0 3px 0 rgba(46,38,40,.55);padding:8px 10px}
+.daychip{left:14px;top:14px;display:flex;align-items:center;gap:8px;max-width:min(46%,420px)}
+.daychip .brand{font-family:var(--font-display);font-size:11px;letter-spacing:.14em;color:var(--chip-ink-2)}
+.daychip .t{font-weight:700;font-size:16px;line-height:1.15}
+.daychip .arrow{padding:2px 8px;font-size:16px;line-height:1}
+.pages{display:flex;gap:4px;margin-left:4px;flex-wrap:wrap}
+.pg{width:22px;height:22px;border-radius:4px;border:2px solid var(--chip-ink);font-family:var(--font-display);font-size:12px;display:grid;place-items:center;cursor:pointer;background:transparent;padding:0}
+.pg.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.hudchip{right:14px;top:14px;font-size:12.5px;max-width:44%;text-align:left;display:flex;flex-direction:column;gap:2px;min-width:200px}
+.hudchip .k{font-size:11px;letter-spacing:.12em;color:var(--chip-ink-2);font-family:var(--font-display)}
+.hudchip .v{font-weight:700;font-size:15px}
+.hudchip .w{color:var(--chip-ink-2)}
+.hudchip b{font-family:var(--font-display);letter-spacing:.04em}
+/* 行程面板（任务卷轴）：停靠在右侧，不跨折痕 */
+.quest{position:absolute;right:14px;top:104px;width:min(330px,42%);max-height:calc(100% - 184px);display:flex;flex-direction:column;background:var(--chip);color:var(--chip-ink);border:2px solid var(--chip-ink);border-radius:8px;box-shadow:0 4px 0 rgba(46,38,40,.55);overflow:hidden}
+.quest[hidden]{display:none}
+.quest header{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:2px solid var(--chip-ink);font-weight:700}
+.quest header .m{font-weight:500;font-size:12px;color:var(--chip-ink-2);flex:1;min-width:0}
+.quest header button{padding:2px 8px;font-size:12px}
+.quest footer{padding:6px 10px;font-size:11.5px;color:var(--chip-ink-2);border-top:1px solid rgba(46,38,40,.25)}
+.entries{list-style:none;margin:0;padding:8px;display:flex;flex-direction:column;gap:5px;overflow:auto;flex:1;min-height:0}
+.entry{display:grid;grid-template-columns:24px 1fr auto;align-items:center;gap:8px;padding:6px 8px;border:2px solid transparent;border-radius:6px;background:var(--chip-2);color:var(--chip-ink)}
+.entry.place{cursor:pointer;border-color:rgba(46,38,40,.25);box-shadow:0 2px 0 rgba(46,38,40,.25)}
+.entry.place:hover{border-color:var(--accent)}
+.entry.transport{background:transparent;margin-inline:10px;padding-block:2px;color:var(--chip-ink-2);font-size:12px}
+.entry.lodging{border-color:var(--accent-2);box-shadow:0 2px 0 var(--accent-2)}
+.entry.current{border-color:var(--gold);box-shadow:0 2px 0 var(--gold);background:rgba(255,255,255,.55)}
+.entry.done .name{color:var(--chip-ink-2)}
+.entry .ic{width:20px;height:20px;border-radius:4px;display:grid;place-items:center;font-size:11px;font-family:var(--font-display);color:#fff;background:var(--accent)}
+.entry.lodging .ic{background:var(--accent-2)} .entry.transport .ic{background:transparent;color:var(--ink-3);font-size:13px}
+.entry .name{font-weight:600;font-size:13px} .entry.transport .name{font-weight:500}
+.entry .st{font-size:11px;color:var(--chip-ink-2);font-family:var(--font-display);letter-spacing:.04em;white-space:nowrap;text-align:right}
+.entry .st b{display:block;font-size:13px;color:var(--chip-ink);font-weight:700}
+.entry.done .st{color:var(--ok)}
+.questtab{position:absolute;right:14px;top:104px;writing-mode:vertical-rl;padding:10px 6px;letter-spacing:.2em}
+.questtab[hidden]{display:none}
+/* 底部：小人芯片 + 控制 */
+.herochip{left:14px;bottom:14px;display:flex;align-items:center;gap:8px;padding:6px 10px 6px 6px;cursor:pointer}
+.herochip canvas{image-rendering:pixelated;image-rendering:crisp-edges;width:32px;height:40px}
+.cg .herochip canvas,.cg .cover canvas,.cg .avatar canvas{image-rendering:auto}
+.herochip .n{font-size:13px;font-weight:600} .herochip .s{font-size:11px;color:var(--chip-ink-2)}
+.ctrls{position:absolute;right:14px;bottom:14px;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.ctrls button{background:var(--chip);font-size:12.5px;box-shadow:0 3px 0 rgba(46,38,40,.55)}
+/* 捏人面板：悬浮在左下 */
+.avatar{position:absolute;left:14px;bottom:70px;width:min(420px,60%);max-height:calc(100% - 150px);overflow:auto;background:var(--chip);color:var(--chip-ink);border:2px solid var(--chip-ink);border-radius:8px;box-shadow:0 4px 0 rgba(46,38,40,.55);padding:12px;display:flex;flex-direction:column;gap:10px}
+.avatar[hidden]{display:none}
+.avatar h3{margin:0;font-size:16px} .avatar .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:6px 10px}
+.avatar label{display:flex;flex-direction:column;gap:2px;font-size:12px;color:var(--chip-ink-2)}
+.avatar select{font:inherit;padding:4px 6px;border:2px solid var(--chip-ink);border-radius:6px;background:var(--chip-2);color:var(--chip-ink)}
+.avatar .preview{display:flex;align-items:flex-end;gap:12px;padding:8px;background:var(--chip-2);border-radius:8px}
+.avatar canvas{image-rendering:pixelated;image-rendering:crisp-edges}
+.toast{position:absolute;left:50%;bottom:64px;transform:translateX(-50%);background:#2e2628;color:#f6efe1;padding:8px 14px;border-radius:8px;font-size:13px;border:2px solid var(--gold);white-space:nowrap;transition:opacity .25s;pointer-events:none}
+/* 封面 */
+.cover{position:absolute;inset:12px;border-radius:12px;background:#a84e42;color:#f6ecd6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transform-origin:left center;transition:transform .7s cubic-bezier(.4,0,.2,1),opacity .4s;border:10px solid #8e3f36;box-shadow:inset 0 0 0 4px var(--gold)}
+.cover.open{transform:perspective(1600px) rotateY(-150deg);opacity:0;pointer-events:none}
+.cover[hidden]{display:none}
+.cover .t{font-family:var(--font-display);font-size:clamp(34px,6vw,72px);letter-spacing:.08em;margin:0}
+.cover .s{color:var(--gold);font-size:16px;letter-spacing:.2em} .cover .d{font-family:var(--font-display);font-size:14px;opacity:.9}
+.cover .stats{font-size:13px;opacity:.9;text-align:center}
+.cover canvas{image-rendering:pixelated;image-rendering:crisp-edges;margin-block:6px}
+.note{margin:0;font-size:12px;color:var(--ink-2);max-width:72ch}
+.flipfx{animation:flipfx .38s ease-in-out} @keyframes flipfx{0%{opacity:1}50%{opacity:.25;filter:brightness(1.3)}100%{opacity:1}}
+/* 现代像素：半透明卡片 + 背景模糊 + 柔和阴影，无黑边，系统字体 */
+.modern{--font-display:var(--font-body);--card:rgba(255,252,247,.86);--card-ink:#2b2624;--card-ink-2:#6e625c;--card-shadow:0 10px 28px rgba(40,28,18,.18);--accent:#d9634f;--accent-2:#4d7fc0;--gold:#e2b04f;--device:#16120f;--world:#e9dfcb;--cover-a:#d47d68;--cover-b:#a8493d;--cover-c:#7f342e;--cover-title:#f6ecd6;--cover-sub:#e6c060}
+.modern.pal-sea{--bg:#e4edf5;--ink:#1f2a37;--ink-2:#5b6b7c;--card:rgba(255,255,255,.88);--card-ink:#1f2a37;--card-ink-2:#5b6b7c;--card-shadow:0 10px 28px rgba(20,40,70,.16);--accent:#ff6f4d;--accent-2:#1e88c7;--gold:#f5b942;--device:#0f1a26;--world:#cfe3f2;--cover-a:#3aa0e0;--cover-b:#1b5f9e;--cover-c:#0f3a66;--cover-title:#ffffff;--cover-sub:#ffd23f}
+.modern.pal-dusk{--bg:#efe2e6;--ink:#3a2a34;--ink-2:#7a6270;--card:rgba(255,247,242,.88);--card-ink:#3a2a34;--card-ink-2:#7a6270;--card-shadow:0 10px 28px rgba(70,30,60,.18);--accent:#e4572e;--accent-2:#6a4c93;--gold:#f2b134;--device:#1a1216;--world:#e9d3d8;--cover-a:#f0a06a;--cover-b:#b05a78;--cover-c:#5a3b7a;--cover-title:#fff3e6;--cover-sub:#ffd98a}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .modern.pal-sea, .modern.pal-sea:root:not([data-theme="light"]){--bg:#101820} }
+.modern .device{background:var(--device)}
+.modern .world{background:var(--world)}
+.modern .chip,.modern .quest,.modern .avatar,.modern .ctrls button,.modern .questtab{background:var(--card);color:var(--card-ink);border:1px solid rgba(255,255,255,.75);border-radius:14px;box-shadow:var(--card-shadow),inset 0 1px 0 rgba(255,255,255,.7);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.modern .ctrls button{border-radius:999px;padding:6px 12px}
+.modern .daychip .brand{letter-spacing:.1em;font-size:10.5px}
+.modern .daychip .arrow{border:none;background:rgba(43,38,36,.06);border-radius:999px;box-shadow:none}
+.modern .pg{border:none;background:rgba(43,38,36,.07);border-radius:999px;font-family:var(--font-body);font-weight:600}
+.modern .pg.active{background:var(--accent);color:#fff}
+.modern .quest header{border-bottom:1px solid rgba(43,38,36,.1)} .modern .quest header button{border:none;background:rgba(43,38,36,.06);border-radius:999px;box-shadow:none}
+.modern .quest footer{border-top:1px solid rgba(43,38,36,.08)}
+.modern .entry{border-radius:10px;background:rgba(43,38,36,.045);border-color:transparent;box-shadow:none}
+.modern .entry.place{border:1px solid rgba(43,38,36,.08)} .modern .entry.lodging{border:1px solid rgba(63,111,176,.45)}
+.modern .entry.current{background:rgba(255,255,255,.95);border-color:var(--gold);box-shadow:0 6px 16px rgba(226,176,79,.35)}
+.modern .entry .ic{border-radius:999px;font-family:var(--font-body);font-weight:700;background:var(--accent)} .modern .entry.lodging .ic{background:var(--accent-2)}
+.modern .entry.lodging{border-color:var(--accent-2)}
+.modern .entry .st{font-family:var(--font-body);color:var(--card-ink-2)} .modern .entry .st b{color:var(--card-ink)} .modern .hudchip .k{font-family:var(--font-body);letter-spacing:.14em;color:var(--card-ink-2)} .modern .hudchip .w,.modern .daychip .brand,.modern .quest header .m,.modern .quest footer,.modern .herochip .s,.modern .entry.transport{color:var(--card-ink-2)}
+.modern .herochip{border-radius:999px;padding-right:14px}
+.modern .avatar select{border:1px solid rgba(43,38,36,.15);border-radius:10px;background:rgba(255,255,255,.7)}
+.modern .avatar .preview{background:rgba(43,38,36,.05);border-radius:12px}
+.modern button.primary{background:var(--accent);border:none;color:#fff;box-shadow:0 6px 16px rgba(0,0,0,.18)}
+.modern .toast{background:rgba(43,38,36,.9);border:none;border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.modern .cover{background:radial-gradient(120% 90% at 30% 20%,var(--cover-a),var(--cover-b) 55%,var(--cover-c));color:var(--cover-title);border:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35),inset 0 0 0 6px rgba(255,255,255,.10)}
+.modern .cover .s{color:var(--cover-sub)}
+.modern .cover .t{font-weight:800;letter-spacing:.02em} .modern .cover .d{font-family:var(--font-body)}
+.modern .crease{background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.07),rgba(0,0,0,0))}
+@media (prefers-reduced-motion: reduce){.cover{transition:none}.flipfx{animation:none}.toast{transition:none}}
+@media (max-width: 860px){
+  .device{aspect-ratio:3/4;padding:8px} .world{inset:8px} .cover{inset:8px}
+  .crease{display:none}
+  .daychip{max-width:calc(100% - 28px);flex-wrap:wrap} .daychip .pages{width:100%;margin-left:0} .hudchip{top:auto;bottom:118px;left:14px;right:auto;max-width:78%;min-width:0}
+  .quest{left:10px;right:10px;top:auto;bottom:66px;width:auto;max-height:42%}
+  .questtab{writing-mode:horizontal-tb;top:auto;bottom:66px;right:10px;padding:6px 10px;letter-spacing:.1em}
+  .avatar{left:10px;right:10px;width:auto;bottom:66px;max-height:60%}
+}
+</style>
+
+<div class="stage">
+  <div class="device" id="device">
+    <div class="world">
+      <canvas id="map" aria-label="当天的像素微缩世界"></canvas>
+      <div class="crease" aria-hidden="true"></div>
+      <div class="chip daychip">
+        <button class="arrow" id="btnPrev" type="button" aria-label="上一天">‹</button>
+        <div style="min-width:0"><div class="brand">地球Online · 关西七日</div><div class="t"><span id="dayEyebrow">DAY 01</span> · <span id="dayTitle">大阪 · 抵达</span></div></div>
+        <button class="arrow" id="btnNext" type="button" aria-label="下一天">›</button>
+        <div class="pages" id="tabs"></div>
+      </div>
+      <div class="chip hudchip"><span class="k" id="hudK">下一站</span><span class="v" id="hudV"></span><span class="w" id="hudW"></span></div>
+      <aside class="quest" id="quest">
+        <header><span>今日行程</span><span class="m" id="dayMeta"></span><button id="btnQuest" type="button">收起</button></header>
+        <ol class="entries" id="entries"></ol>
+        <footer>点任一站，小人直接走到那一站；到站自动打卡</footer>
+      </aside>
+      <button class="chip questtab" id="questTab" type="button" hidden>行程</button>
+      <button class="chip herochip" id="btnAvatar" type="button"><canvas id="heroChip" width="16" height="20"></canvas><span><span class="n">捏人</span><br><span class="s">自定义小人</span></span></button>
+      <div class="ctrls">
+        <button id="btnPlay" type="button">⏸ 暂停</button>
+        <button id="btnCam" type="button">全景</button>
+        <button id="btnZoom" type="button">2×</button>
+        <button id="btnRestart" type="button">↺ 重走今天</button>
+        <button id="btnStyle" type="button">风格：现代</button>
+        <button id="btnPal" type="button">色调：清朗海天</button>
+      </div>
+      <div class="avatar" id="avatarPanel" hidden>
+        <h3>捏人</h3>
+        <div class="preview"><canvas id="avPreview" width="64" height="80"></canvas><canvas id="avPreview2" width="64" height="80"></canvas><div style="font-size:12px;color:var(--chip-ink-2)">16 × 20 px · 每个部件是可换色的图层</div></div>
+        <div class="grid" id="avGrid"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button id="btnAvDone" type="button" class="primary">完成</button><button id="btnAvRandom" type="button">随机一个</button><button id="btnAvReset" type="button">恢复默认</button></div>
+      </div>
+      <div class="toast" id="toast" style="opacity:0"></div>
+    </div>
+    <div class="cover" id="cover">
+      <p class="t" id="coverTitle">关西七日</p>
+      <div class="s" id="coverSub">大阪 · 京都 · 奈良 · 神户</div>
+      <div class="d" id="coverDates">2026.11.14 – 11.20</div>
+      <canvas id="coverHero" width="128" height="160"></canvas>
+      <div class="stats" id="coverStats"></div>
+      <button class="primary" id="btnOpen" type="button" style="margin-top:8px">翻开这本书</button>
+    </div>
+  </div>
+  <p class="note">像素微缩世界铺满整台展开的 Pura X Max / iPhone Duo（√2:1），行程面板、翻页、控制、捏人都是悬浮在世界之上的纸片，停靠在折痕两侧。画风已定为世界风 CG（参照《潜水员戴夫》新画风，原型里只是矢量近似）；右下「色调」在清朗海天（默认）、暖阳纸张、暮色琥珀间切换，「风格」可切回现代像素、经典像素对照。镜头默认跟随小人放大，「全景」看整天；点行程里任一站，小人走到那一站；到站自动打卡。手机上行程面板变成底部抽屉。示例数据：关西七日，一格约 250 米。</p>
+</div>
+
+<script src="data.js"></script>
+<script>
+(function(){
+  const B = window.BOOK, PR = B.proj, SP = B.sprite, TRIP = B.trip;
+  const $ = id => document.getElementById(id);
+  const rgb = c => `rgb(${c[0]},${c[1]},${c[2]})`;
+  const shade = (c, d) => c.map(v => Math.max(0, Math.min(255, v + d)));
+  const P = (u, v, z = 0) => [PR.OX + (u - v) * (PR.TW / 2), PR.OY + (u + v) * (PR.TH / 2) - z * PR.LZ];
+
+  // ---------- 图 ----------
+  const imgs = {}, imgsCG = {};
+  for (const k in B.cities) { const im = new Image(); im.src = B.cities[k].img; imgs[k] = im; imgsCG[k] = {};
+    const cg = B.cities[k].imgCG; if (cg && typeof cg === 'object') for (const pk in cg) { const ic = new Image(); ic.src = cg[pk]; imgsCG[k][pk] = ic; } }
+
+  // ---------- 状态 ----------
+  const FEMALE_DEFAULT = { skin: 0, hair: 'bun', hairc: 1, top: 6, pants: 2, shoes: 2, hat: 'straw', hatc: 2, acc: 'none' };
+  const state = { day: 0, playing: true, cam: 'follow', zoom: 2, t: 0, done: new Set(), pauseUntil: 0, finished: false, cfg: Object.assign({}, SP.default, FEMALE_DEFAULT), camX: 0, camY: 0, camInit: false, toastUntil: 0, style: 'cg' };
+  try { const st = localStorage.getItem('style'); if (st === 'classic' || st === 'modern' || st === 'cg') state.style = st; } catch (e) {}
+  const isModern = () => state.style !== 'classic';      // 现代像素与 CG 共用现代 UI 与后期
+  const isCG = () => state.style === 'cg';
+  const STYLE_NAME = { modern: '现代像素', cg: '3D CG', classic: '经典像素' };
+  const PAL = {
+    sea:  { name: '清朗海天', fill: '#cfe3f2', soft: 'rgba(210,235,255,.12)', vig: 'rgba(20,50,90,.26)', leaves: ['#ff8a5c', '#ffb257', '#ff6f4d', '#ffd23f', '#ffffff'] },
+    warm: { name: '暖阳纸张', fill: '#e9dfcb', soft: 'rgba(255,190,130,.14)', vig: 'rgba(60,40,26,.30)', leaves: ['#d9634f', '#e08a4a', '#c94b3c', '#f0b25a', '#b8402f'] },
+    dusk: { name: '暮色琥珀', fill: '#e9d3d8', soft: 'rgba(255,170,110,.16)', vig: 'rgba(70,30,60,.32)', leaves: ['#f2b134', '#e4572e', '#ffd98a', '#c0506a', '#ffffff'] },
+  };
+  state.pal = 'sea';
+  try { const pk = localStorage.getItem('pal'); if (pk in PAL) state.pal = pk; } catch (e) {}
+  function applyPal() { for (const k in PAL) document.body.classList.toggle('pal-' + k, k === state.pal); const b = $('btnPal'); if (b) b.textContent = '色调：' + PAL[state.pal].name; leaves.length = 0; }
+  let started = false;
+  function applyStyle() { document.body.classList.toggle('modern', isModern()); document.body.classList.toggle('cg', isCG()); const b = $('btnStyle'); if (b) b.textContent = '风格：' + STYLE_NAME[state.style]; applyPal(); if (started) { renderChip(); renderCover(); } }
+  try { const saved = JSON.parse(localStorage.getItem('avatar') || 'null'); if (saved && saved.hair in SP.HAIR) state.cfg = Object.assign({}, SP.default, saved); } catch (e) {}
+
+  // ---------- 像素小人 ----------
+  const cache = new Map();
+  function colors(cfg) {
+    const hat = SP.HATC[cfg.hatc];
+    return { S: SP.SKIN[cfg.skin], h: SP.SKIN[cfg.skin], e: SP.fixed.e, b: SP.fixed.b, T: SP.TOPC[cfg.top], P: SP.PANTC[cfg.pants], F: SP.SHOEC[cfg.shoes],
+             H: SP.HAIRC[cfg.hairc], C: hat, c: shade(hat, -40), G: SP.fixed.G, R: SP.fixed.R, K: SP.fixed.K, L: SP.fixed.L };
+  }
+  function sprite(cfg, dir, frame) {
+    const key = JSON.stringify([cfg, dir, frame]);
+    if (cache.has(key)) return cache.get(key);
+    const mirror = dir === 'left', d = mirror ? 'right' : dir;
+    const cv = document.createElement('canvas'); cv.width = SP.W; cv.height = SP.H;
+    const c = cv.getContext('2d'); const col = colors(cfg);
+    const rows = SP.BODY[d].slice(); SP.LEGS[d][frame].forEach((r, i) => rows[17 + i] = r);
+    const layers = [];
+    for (const name of SP.ORDER[d]) {
+      if (name === 'body') layers.push(Object.fromEntries(rows.map((r, i) => [i, r])));
+      else if (name === 'acc') layers.push((cfg.acc !== 'backpack' || d !== 'right') ? SP.ACC[cfg.acc][d] : {});
+      else if (name === 'acc_back') layers.push(cfg.acc === 'backpack' ? SP.ACC[cfg.acc][d] : {});
+      else if (name === 'hair') layers.push(SP.HAIR[cfg.hair][d]);
+      else if (name === 'hat') layers.push(SP.HAT[cfg.hat][d]);
+    }
+    const bob = SP.BOB[frame];
+    for (const layer of layers) for (const y in layer) { const row = layer[y]; for (let x = 0; x < row.length; x++) { const ch = row[x]; if (ch === '.') continue; c.fillStyle = rgb(col[ch]); c.fillRect(x, +y + bob, 1, 1); } }
+    let out = cv;
+    if (mirror) { out = document.createElement('canvas'); out.width = SP.W; out.height = SP.H; const oc = out.getContext('2d'); oc.translate(SP.W, 0); oc.scale(-1, 1); oc.drawImage(cv, 0, 0); }
+    cache.set(key, out); return out;
+  }
+
+  // ---------- 当天数据 ----------
+  const day = () => TRIP.days[state.day];
+  function loadDay(i, snap) {
+    state.day = i; state.t = 0; state.finished = false; state.done = new Set();
+    for (const s of day().stops) if (s.arrive === 0) state.done.add(s.arrive);
+    state.pauseUntil = performance.now() + 700; state.camInit = false;
+    renderLeft(); renderTabs(); if (snap) draw();
+  }
+  function segmentAt(t) { const segs = day().segments; return segs.find(s => s.end > t) || segs[segs.length - 1]; }
+  function nextStop() { return day().stops.find(s => !state.done.has(s.arrive)); }
+  function heroPos() {
+    const path = day().path; const i = Math.min(Math.floor(state.t), path.length - 1); const f = state.t - i;
+    const a = path[i], b = path[Math.min(i + 1, path.length - 1)];
+    const pa = P(a[0] + .5, a[1] + .5), pb = P(b[0] + .5, b[1] + .5);
+    let dir = day().heroDir;
+    const dx = b[0] - a[0], dy = b[1] - a[1];
+    if (dx > 0) dir = 'right'; else if (dx < 0) dir = 'left'; else if (dy > 0) dir = 'front'; else if (dy < 0) dir = 'back';
+    return { x: pa[0] + (pb[0] - pa[0]) * f, y: pa[1] + (pb[1] - pa[1]) * f, dir };
+  }
+
+  // ---------- 左页 ----------
+  function renderLeft() {
+    const d = day();
+    $('dayEyebrow').textContent = `DAY ${String(d.index).padStart(2, '0')}`;
+    $('dayTitle').textContent = d.title;
+    const city = B.cities[d.city].name;
+    $('dayMeta').textContent = `${d.date.replace(/-/g, '.')} · ${city} · ${d.stops.length} 站` + (d.lodging ? ` · 住 ${d.lodging.name.replace(' · 酒店', '')}` : ' · 回程');
+    const ol = $('entries'); ol.innerHTML = '';
+    let k = 0; const ns = nextStop(); const paused = performance.now() < state.pauseUntil; const moving = ns && !paused && !state.finished;
+    // 下一站是第几个 place 条目 → 它前面连续的 transport 条目就是「正在走」的那段
+    const nsOrder = ns ? d.stops.indexOf(ns) : -1;
+    let placeSeen = 0, nsEntry = -1;
+    d.entries.forEach((e, idx) => { if (e.type === 'place') { if (placeSeen === nsOrder) nsEntry = idx; placeSeen++; } });
+    let travelStart = nsEntry; while (travelStart > 0 && d.entries[travelStart - 1].type === 'transport') travelStart--;
+    d.entries.forEach((e, idx) => {
+      const li = document.createElement('li'); li.className = 'entry ' + e.type;
+      if (e.type === 'place') {
+        const s = d.stops[k++]; const done = state.done.has(s.arrive);
+        li.classList.toggle('done', done);
+        li.classList.toggle('current', done && paused && Math.round(state.t) === s.arrive);
+        li.innerHTML = `<span class="ic">${k}</span><span class="name">${e.name}</span><span class="st"><b>${s.time || ''}</b>${done ? '已打卡' : '待打卡'}</span>`;
+        li.addEventListener('click', () => jumpTo(s));
+      } else if (e.type === 'transport') {
+        li.classList.toggle('current', !!(moving && nsEntry >= 0 && idx >= travelStart && idx < nsEntry));
+        const ic = /JR|近铁|新干线|南海|新快速|关空/.test(e.mode) ? '🚃' : /地铁/.test(e.mode) ? '🚇' : /巴士/.test(e.mode) ? '🚌' : '🚶';
+        li.innerHTML = `<span class="ic">${ic}</span><span class="name">${e.mode}</span><span class="st">${e.duration || ''}</span>`;
+      } else {
+        li.classList.toggle('current', state.finished || (!ns && !paused));
+        li.innerHTML = `<span class="ic">住</span><span class="name">${e.name}</span><span class="st">${state.finished ? '已到' : ''}</span>`;
+      }
+      ol.appendChild(li);
+    });
+  }
+  function renderTabs() {
+    const box = $('tabs'); box.innerHTML = '';
+    const c = document.createElement('button'); c.type = 'button'; c.className = 'pg'; c.textContent = '封'; c.title = '回到封面'; c.addEventListener('click', () => showCover(true)); box.appendChild(c);
+    TRIP.days.forEach((d, i) => { const t = document.createElement('button'); t.type = 'button'; t.className = 'pg' + (i === state.day ? ' active' : ''); t.textContent = String(i + 1); t.title = d.title; t.addEventListener('click', () => flipTo(i)); box.appendChild(t); });
+  }
+  function flipTo(i) {
+    if (i === state.day) return;
+    const w = $('map'); w.classList.remove('flipfx'); void w.offsetWidth; w.classList.add('flipfx');
+    setTimeout(() => loadDay(i, true), 180);
+  }
+  function jumpTo(s) {
+    for (const o of day().stops) if (o.arrive <= s.arrive) state.done.add(o.arrive);
+    state.t = s.arrive; state.finished = false; state.pauseUntil = performance.now() + 1200; state.camInit = false; toast('到达 · ' + s.short); renderLeft();
+  }
+
+  // ---------- 右页：画 ----------
+  const canvas = $('map'), mctx = canvas.getContext('2d');
+  const wc = document.createElement('canvas'), wctx = wc.getContext('2d');   // 现代模式：世界先画到离屏，再做移轴与分级
+  let ctx = mctx;
+  let vw = 0, vh = 0, dpr = 1;
+  function resize() { const r = canvas.getBoundingClientRect(); dpr = Math.min(window.devicePixelRatio || 1, 2); vw = Math.max(1, Math.round(r.width)); vh = Math.max(1, Math.round(r.height)); canvas.width = vw * dpr; canvas.height = vh * dpr; wc.width = canvas.width; wc.height = canvas.height; }
+  // 红叶粒子（屏幕空间）
+  const leaves = [];
+  function seedLeaves() { leaves.length = 0; const LEAF_COLS = PAL[state.pal].leaves; for (let i = 0; i < 34; i++) leaves.push({ x: Math.random() * vw, y: Math.random() * vh, vy: 14 + Math.random() * 22, vx: 6 + Math.random() * 10, ph: Math.random() * 6.28, sz: 2 + Math.random() * 2.5, c: LEAF_COLS[i % LEAF_COLS.length], rot: Math.random() * 6.28 }); }
+  function drawLeaves(dt) {
+    if (!leaves.length || Math.abs(leaves.length && 0)) seedLeaves();
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    for (const l of leaves) { l.ph += dt * 1.6; l.y += l.vy * dt; l.x += (l.vx + Math.sin(l.ph) * 18) * dt; l.rot += dt * 2; if (l.y > vh + 6) { l.y = -6; l.x = Math.random() * vw; } if (l.x > vw + 6) l.x = -6;
+      ctx.save(); ctx.translate(l.x, l.y); ctx.rotate(l.rot); ctx.globalAlpha = .85; ctx.fillStyle = l.c; ctx.fillRect(-l.sz / 2, -l.sz / 2, l.sz, l.sz * .7); ctx.restore(); }
+    ctx.globalAlpha = 1;
+  }
+  const cgc = c => { const [r, g, b] = c; const l = .3 * r + .59 * g + .11 * b; const q = v => Math.max(0, Math.min(255, Math.round(((l + (v - l) * 1.12) - 128) * 1.06 + 128))); return `rgb(${Math.min(255, q(r) + 4)},${q(g) + 2},${q(b)})`; };
+  const shd = (c, d) => { const [r, g, b] = c; return `rgb(${Math.max(0, Math.min(255, r + d))},${Math.max(0, Math.min(255, g + d))},${Math.max(0, Math.min(255, b + d))})`; };
+  function rr(c, x, y, w, h, r) { roundRect(c, x, y, w, h, Math.min(r, h / 2, w / 2)); c.fill(); }
+  function el(c, x, y, rx, ry) { c.beginPath(); c.ellipse(x, y, rx, ry, 0, 0, 6.283); c.fill(); }
+  function drawChibi(c, cx, cy, cfg, dir, frame, u = .8) {
+    const skin = cgc(SP.SKIN[cfg.skin]), hair = cgc(SP.HAIRC[cfg.hairc]), top = cgc(SP.TOPC[cfg.top]), pants = cgc(SP.PANTC[cfg.pants]), shoe = cgc(SP.SHOEC[cfg.shoes]);
+    const bob = frame === 2 ? -1 : 0; cy += bob; const flip = dir === 'left' ? -1 : 1;
+    c.fillStyle = 'rgba(40,28,18,.22)'; el(c, cx, cy + 1, 13 * u, 4 * u);
+    const step = frame === 1 ? 2 : frame === 3 ? -2 : 0;
+    for (const [i, dx] of [[0, -4.5], [1, 4.5]]) { const dy = i === 0 ? step : -step; c.fillStyle = pants; rr(c, cx + (dx - 3) * u, cy - 12 * u + dy, 6 * u, 11 * u, 3 * u); c.fillStyle = shoe; el(c, cx + dx * u, cy - 1.5 * u + dy, 3.6 * u, 2.5 * u); }
+    c.fillStyle = top; rr(c, cx - 11.5 * u, cy - 26 * u, 23 * u, 17 * u, 7 * u); c.fillStyle = shd(SP.TOPC[cfg.top], 18); rr(c, cx - 11.5 * u, cy - 26 * u, 23 * u, 6 * u, 7 * u);
+    for (const dx of [-12.5, 12.5]) { c.fillStyle = top; rr(c, cx + (dx - 2.5) * u, cy - 24 * u, 5 * u, 12 * u, 2.5 * u); c.fillStyle = skin; el(c, cx + dx * u, cy - 11.5 * u, 2.5 * u, 2.5 * u); }
+    if (cfg.acc === 'backpack') { c.fillStyle = cgc([110, 80, 52]); rr(c, cx - 13.5 * u * flip - (flip < 0 ? 5.5 * u : 0), cy - 25 * u, 5.5 * u, 12 * u, 3 * u); }
+    if (cfg.acc === 'scarf') { c.fillStyle = cgc([214, 70, 60]); rr(c, cx - 11 * u, cy - 29 * u, 22 * u, 6 * u, 3 * u); }
+    const r = 15 * u, hc = cy - 34 * u;
+    c.fillStyle = skin; el(c, cx, hc, r, r);
+    c.fillStyle = hair; c.beginPath(); c.ellipse(cx, hc - r * .1, r * 1.05, r, 0, Math.PI, 2 * Math.PI); c.fill();
+    for (const dx of [-9, -3, 3, 9]) el(c, cx + dx * u, hc - 7 * u, 4 * u, 5 * u);
+    if (cfg.hair === 'bun') for (const dx of [-13, 13]) el(c, cx + dx * u, hc - 12.5 * u, 4.5 * u, 4.5 * u);
+    if (cfg.hair === 'long' || cfg.hair === 'bun') { rr(c, cx - r * 1.02, hc - 2 * u, r * .47, (cfg.hair === 'bun' ? 12 : 16) * u, 4 * u); rr(c, cx + r * .55, hc - 2 * u, r * .47, (cfg.hair === 'bun' ? 12 : 16) * u, 4 * u); }
+    if (cfg.hair === 'curly') { for (const dx of [-14, 14]) el(c, cx + dx * u, hc - 2 * u, 5 * u, 6 * u); }
+    if (cfg.hat !== 'none') { const hat = cgc(SP.HATC[cfg.hatc]); c.fillStyle = hat;
+      if (cfg.hat === 'cap') { c.beginPath(); c.ellipse(cx, hc - r * .29, r * 1.08, r * .89, 0, Math.PI, 2 * Math.PI); c.fill(); c.fillStyle = shd(SP.HATC[cfg.hatc], -20); rr(c, cx - r * .2 * flip - (flip < 0 ? r * 1.35 : 0), hc - r * .34, r * 1.55, r * .26, 3 * u); }
+      else if (cfg.hat === 'beanie') { c.beginPath(); c.ellipse(cx, hc - r * .25, r * 1.08, r * .95, 0, Math.PI, 2 * Math.PI); c.fill(); c.fillStyle = shd(SP.HATC[cfg.hatc], -25); rr(c, cx - r * 1.06, hc - r * .4, r * 2.12, r * .3, 2 * u); }
+      else { el(c, cx, hc - r * .3, r * 1.7, r * .25); c.fillStyle = shd(SP.HATC[cfg.hatc], 10); c.beginPath(); c.ellipse(cx, hc - r * .52, r * .95, r * .72, 0, Math.PI, 2 * Math.PI); c.fill(); } }
+    for (const dx of [-5.5, 5.5]) { c.fillStyle = '#fff'; el(c, cx + dx * u, hc + 1.5 * u, 2.6 * u, 3 * u); c.fillStyle = '#2c2220'; el(c, cx + dx * u, hc + 2 * u, 1.4 * u, 2 * u);
+      c.strokeStyle = shd(SP.HAIRC[cfg.hairc], -10); c.lineWidth = 1.1 * u; c.beginPath(); c.arc(cx + dx * u, hc - 3 * u, 3 * u, Math.PI * 1.15, Math.PI * 1.85); c.stroke(); }
+    c.fillStyle = 'rgba(240,150,150,.9)'; for (const dx of [-10.5, 10.5]) el(c, cx + dx * u, hc + 6.5 * u, 3 * u, 1.8 * u);
+    c.fillStyle = '#963c3e'; c.beginPath(); c.ellipse(cx, hc + 7 * u, 4.5 * u, 3 * u, 0, 0, Math.PI); c.fill();
+    c.fillStyle = '#fffaf4'; c.beginPath(); c.ellipse(cx, hc + 5.8 * u, 3.2 * u, 1.3 * u, 0, 0, Math.PI); c.fill();
+    c.fillStyle = 'rgba(255,255,255,.9)'; el(c, cx - 5 * u, hc - 10 * u, 3 * u, 2 * u);
+    c.strokeStyle = 'rgba(255,236,200,.9)'; c.lineWidth = 1.3 * u; c.beginPath(); c.arc(cx, hc, r - .6 * u, -Math.PI * .33, Math.PI * .17); c.stroke();
+    if (cfg.acc === 'glasses') { c.fillStyle = '#32303a'; rr(c, cx - 11 * u, hc - 1 * u, 22 * u, 6 * u, 3 * u); }
+    if (cfg.acc === 'camera') { c.fillStyle = '#4a4a52'; rr(c, cx - 4 * u, cy - 21 * u, 8 * u, 5 * u, 1.5 * u); c.fillStyle = '#9ad0f0'; el(c, cx, cy - 18.5 * u, 1.6 * u, 1.6 * u); }
+  }
+  function roundRect(c, x, y, w, h, r) { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
+  new ResizeObserver(resize).observe(canvas); resize();
+
+  function drawFlag(x, y, color, done) {
+    if (isModern()) { const cs = getComputedStyle(document.body); color = color === '#d23e32' ? (cs.getPropertyValue('--accent').trim() || '#d9634f') : color === '#3f6fb0' ? (cs.getPropertyValue('--accent-2').trim() || '#4d7fc0') : color; }
+    ctx.fillStyle = isModern() ? '#4a3c34' : '#2e2628'; ctx.fillRect(x, y - 12, 1, 12);
+    ctx.fillStyle = color; ctx.beginPath(); ctx.moveTo(x + 1, y - 12); ctx.lineTo(x + 8, y - 10); ctx.lineTo(x + 1, y - 8); ctx.closePath(); ctx.fill();
+    if (done) { ctx.fillStyle = '#e0b34a'; ctx.fillRect(x - 2, y - 15, 5, 2); ctx.fillRect(x - 1, y - 17, 3, 6); }
+  }
+  function drawVehicleCG(x, y, mode) {
+    const body = mode === 'rail' ? [96, 108, 124] : [104, 170, 112], band = mode === 'rail' ? '#d9634f' : '#f0c846';
+    ctx.fillStyle = 'rgba(40,28,18,.25)'; el(ctx, x, y + 1, 22, 5);
+    ctx.fillStyle = cgc(body); rr(ctx, x - 21, y - 17, 42, 16, 5); ctx.fillStyle = band; rr(ctx, x - 21, y - 17, 42, 4, 3);
+    ctx.fillStyle = 'rgba(210,236,250,.95)'; for (let k = -16; k < 18; k += 8) rr(ctx, x + k, y - 11, 5, 5, 1.5);
+    ctx.fillStyle = '#2e2a2e'; el(ctx, x - 12, y - 1, 3, 2); el(ctx, x + 12, y - 1, 3, 2);
+  }
+  function drawVehicle(x, y, mode) {
+    const body = mode === 'rail' ? '#606874' : '#5ca064', band = mode === 'rail' ? '#d23e32' : '#f0c846';
+    ctx.fillStyle = '#28282e'; ctx.fillRect(x - 21, y - 17, 42, 16);
+    ctx.fillStyle = body; ctx.fillRect(x - 20, y - 16, 40, 14); ctx.fillStyle = band; ctx.fillRect(x - 20, y - 16, 40, 3);
+    ctx.fillStyle = '#c8e2f0'; for (let k = -16; k < 18; k += 8) ctx.fillRect(x + k, y - 11, 5, 5);
+    ctx.fillStyle = '#1e1e22'; ctx.fillRect(x - 15, y - 2, 5, 2); ctx.fillRect(x + 10, y - 2, 5, 2);
+  }
+  let lastDrawT = performance.now();
+  function draw() {
+    const d = day(), city = B.cities[d.city], img = isCG() ? (imgsCG[d.city][state.pal] || imgsCG[d.city].sea || imgs[d.city]) : imgs[d.city];
+    const modern = isModern(); const cgm = isCG(); const now = performance.now(); const fdt = Math.min(.05, (now - lastDrawT) / 1000); lastDrawT = now;
+    ctx = modern ? wctx : mctx;
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = modern ? PAL[state.pal].fill : '#e6dcc4'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    if (!img.complete || !img.naturalWidth) return;
+    const hp = heroPos();
+    let Z, cx, cy;
+    if (state.cam === 'follow') {
+      Z = state.zoom * dpr;
+      const tx = hp.x - vw * dpr / (2 * Z), ty = hp.y - vh * dpr / (2 * Z) - 20;
+      if (!state.camInit) { state.camX = tx; state.camY = ty; state.camInit = true; }
+      state.camX += (tx - state.camX) * 0.12; state.camY += (ty - state.camY) * 0.12;
+      const maxX = Math.max(0, city.w - vw * dpr / Z), maxY = Math.max(0, city.h - vh * dpr / Z);
+      cx = Math.max(0, Math.min(maxX, state.camX)); cy = Math.max(0, Math.min(maxY, state.camY));
+      if (city.w < vw * dpr / Z) cx = -(vw * dpr / Z - city.w) / 2; if (city.h < vh * dpr / Z) cy = -(vh * dpr / Z - city.h) / 2;
+    } else {
+      Z = Math.min(vw * dpr / city.w, vh * dpr / city.h) * 0.96; cx = -(vw * dpr / Z - city.w) / 2; cy = -(vh * dpr / Z - city.h) / 2 - 10 / Z;
+    }
+    const ns = nextStop();
+    ctx.setTransform(Z, 0, 0, Z, -cx * Z, -cy * Z); ctx.imageSmoothingEnabled = cgm;
+    if (modern && !cgm && 'filter' in ctx) ctx.filter = 'saturate(0.84) contrast(0.94) brightness(1.04)';
+    ctx.drawImage(img, 0, 0);
+    if (modern && !cgm && 'filter' in ctx) ctx.filter = 'none';
+    ctx.imageSmoothingEnabled = false;
+    // 路径：走过的亮，没走的暗
+    const ti = Math.floor(state.t);
+    if (modern) d.path.forEach((c, i) => { const [x, y] = P(c[0] + .5, c[1] + .5); ctx.beginPath(); ctx.arc(x, y, i <= ti ? 1.9 : 1.4, 0, 6.283); ctx.fillStyle = i <= ti ? 'rgba(232,168,52,.95)' : 'rgba(255,255,255,.75)'; ctx.fill(); });
+    else d.path.forEach((c, i) => { const [x, y] = P(c[0] + .5, c[1] + .5); ctx.fillStyle = '#2e2628'; ctx.fillRect(x - 3, y - 2, 5, 4); ctx.fillStyle = i <= ti ? '#ffd628' : '#cfc3a6'; ctx.fillRect(x - 2, y - 1, 3, 2); });
+    // 旗
+    const lmz = {}; for (const lm of city.landmarks) lmz[lm.x + ',' + lm.y] = lm.topz;
+    for (const s of d.stops) { const [x, y] = P(s.x + .5, s.y + .5, lmz[s.x + ',' + s.y] || 0); drawFlag(x, y, '#d23e32', state.done.has(s.arrive)); }
+    if (d.lodging && !d.lodging.offPlate) { const [x, y] = P(d.lodging.x + .5, d.lodging.y + .5, lmz[d.lodging.x + ',' + d.lodging.y] || 0); drawFlag(x, y, '#3f6fb0', state.finished); }
+    // 小人 / 车
+    const seg = segmentAt(state.t); const riding = seg.mode !== 'walk' && !state.finished && performance.now() >= state.pauseUntil && state.t < seg.end;
+    const frame = Math.floor(state.t * 4) % 4;
+    if (modern && !cgm) { ctx.beginPath(); ctx.ellipse(hp.x, hp.y + 1, 7, 3, 0, 0, 6.283); ctx.fillStyle = 'rgba(40,28,18,.22)'; ctx.fill(); }
+    if (cgm) {
+      if (riding) { drawVehicleCG(hp.x, hp.y + 2, seg.mode); drawChibi(ctx, hp.x, hp.y - 12, state.cfg, hp.dir, 0, .66); }
+      else drawChibi(ctx, hp.x, hp.y + 2, state.cfg, hp.dir, performance.now() < state.pauseUntil || state.finished ? 0 : frame, .66);
+    } else if (riding) { drawVehicle(hp.x, hp.y + 2, seg.mode); const sp = sprite(state.cfg, 'front', 0); ctx.drawImage(sp, Math.round(hp.x - 8), Math.round(hp.y - 34)); }
+    else { const sp = sprite(state.cfg, hp.dir, performance.now() < state.pauseUntil || state.finished ? 0 : frame); ctx.drawImage(sp, Math.round(hp.x - 8), Math.round(hp.y - 19)); }
+    // 现代模式：世界层合成 → 暖色分级、移轴景深、暗角、红叶
+    if (modern) {
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.globalCompositeOperation = 'soft-light'; ctx.fillStyle = cgm ? PAL[state.pal].soft : 'rgba(255,190,130,.28)'; ctx.fillRect(0, 0, wc.width, wc.height); ctx.globalCompositeOperation = 'source-over';
+      ctx = mctx; ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(wc, 0, 0);
+      if ('filter' in ctx) {
+        const H = canvas.height, bands = [[0, .10, .8], [.10, .20, .45], [.20, .28, .18], [.72, .80, .18], [.80, .90, .45], [.90, 1, .8]];
+        ctx.filter = 'blur(' + (2.2 * dpr) + 'px)';
+        for (const [a, b, al] of bands) { ctx.globalAlpha = al; ctx.drawImage(wc, 0, H * a, wc.width, H * (b - a), 0, H * a, wc.width, H * (b - a)); }
+        ctx.filter = 'none'; ctx.globalAlpha = 1;
+      }
+      const g = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, Math.min(canvas.width, canvas.height) * .35, canvas.width / 2, canvas.height / 2, Math.max(canvas.width, canvas.height) * .75);
+      g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, PAL[state.pal].vig); ctx.fillStyle = g; ctx.fillRect(0, 0, canvas.width, canvas.height);
+      drawLeaves(fdt);
+      ctx.imageSmoothingEnabled = false;
+    }
+    // 标签（屏幕空间，字号固定）
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.textBaseline = 'middle';
+    const label = (ix, iy, txt, col) => { const sx = (ix - cx) * Z / dpr, sy = (iy - cy) * Z / dpr; if (sx < -80 || sy < 0 || sx > vw + 20 || sy > vh) return; const w = ctx.measureText(txt).width; ctx.fillStyle = modern ? 'rgba(255,252,247,.72)' : 'rgba(246,239,225,.88)'; if (modern) { roundRect(ctx, sx + 6, sy - 9, w + 8, 18, 9); ctx.fill(); } else ctx.fillRect(sx + 6, sy - 9, w + 8, 18); ctx.fillStyle = col; ctx.fillText(txt, sx + 10, sy); };
+    // 非站点地标：淡一点的小标签
+    const stopKeys = new Set(d.stops.map(s => s.x + ',' + s.y)); if (d.lodging && !d.lodging.offPlate) stopKeys.add(d.lodging.x + ',' + d.lodging.y);
+    ctx.font = `500 11px ${getComputedStyle(document.body).fontFamily}`;
+    for (const lm of city.landmarks) if (lm.name && !stopKeys.has(lm.x + ',' + lm.y)) { const [x, y] = P(lm.x + .5, lm.y + .5, lm.topz); label(x, y - 16, lm.name, modern ? 'rgba(80,66,58,.85)' : '#6e625c'); }
+    for (const l of city.labels) { const [x, y] = P(l[0], l[1]); label(x, y, l[2], rgb(l[3])); }
+    // 路段标牌：交通方式 + 时长，挂在该段路径的中点
+    const placed = [];
+    const tag = (ix, iy, parts, opts) => {
+      const sx = (ix - cx) * Z / dpr; let sy = (iy - cy) * Z / dpr; if (sx < -160 || sy < -20 || sx > vw + 40 || sy > vh + 20) return;
+      const pad = 6, h = opts.big ? 24 : 20; let w = pad;
+      const widths = parts.map(pt => { ctx.font = pt.font; const ww = ctx.measureText(pt.text).width + (pt.box ? 10 : 0); w += ww + 5; return ww; });
+      const x0 = Math.round(sx - w / 2); let y0 = Math.round(sy - h / 2);
+      for (let tries = 0; tries < 6; tries++) { const hit = placed.some(r => x0 < r.x + r.w && x0 + w > r.x && y0 < r.y + r.h && y0 + h > r.y); if (!hit) break; y0 += h + 4; sy += h + 4; }
+      placed.push({ x: x0, y: y0, w, h });
+      if (modern) {
+        ctx.save(); ctx.shadowColor = 'rgba(40,28,18,.22)'; ctx.shadowBlur = 10; ctx.shadowOffsetY = 3;
+        roundRect(ctx, x0, y0, w, h, Math.min(10, h / 2)); ctx.fillStyle = opts.fill && opts.fill.indexOf('255,246,214') >= 0 ? 'rgba(255,250,232,.97)' : 'rgba(255,252,247,.94)'; ctx.fill(); ctx.restore();
+        if (opts.stroke === '#e0b34a' || opts.stroke === '#3f6fb0') { ctx.strokeStyle = opts.stroke === '#3f6fb0' ? 'rgba(77,127,192,.9)' : 'rgba(226,176,79,.95)'; ctx.lineWidth = 1.5; roundRect(ctx, x0 + .75, y0 + .75, w - 1.5, h - 1.5, Math.min(9, h / 2)); ctx.stroke(); }
+      } else {
+        ctx.fillStyle = 'rgba(46,38,40,.55)'; ctx.fillRect(x0, y0 + 3, w, h);
+        ctx.fillStyle = opts.fill || 'rgba(250,246,236,.97)'; ctx.fillRect(x0, y0, w, h);
+        ctx.strokeStyle = opts.stroke || '#2e2628'; ctx.lineWidth = opts.big ? 2 : 1.5; ctx.strokeRect(x0 + .5, y0 + .5, w - 1, h - 1);
+      }
+      let x = x0 + pad;
+      const ACC = getComputedStyle(document.body).getPropertyValue('--accent').trim() || '#d9634f';
+      parts.forEach((pt, i) => { ctx.font = pt.font; if (pt.box) { ctx.fillStyle = pt.box === '#c8503e' && modern ? ACC : pt.box; if (modern) { roundRect(ctx, x, y0 + 4, widths[i], h - 8, (h - 8) / 2); ctx.fill(); } else ctx.fillRect(x, y0 + 4, widths[i], h - 8); ctx.fillStyle = '#fff'; ctx.fillText(pt.text, x + 5, sy); } else { ctx.fillStyle = pt.color || (modern ? '#2b2624' : '#2e2628'); ctx.fillText(pt.text, x, sy); } x += widths[i] + 5; });
+    };
+    const fam = getComputedStyle(document.body).fontFamily;
+    const curSeg = segmentAt(state.t);
+    d.segments.forEach((sg, i) => {
+      if (sg.end - sg.start < 3 || !sg.label || sg.label === '步行' && !sg.duration) return;
+      const mid = d.path[Math.floor((sg.start + sg.end) / 2)]; const [x, y] = P(mid[0] + .5, mid[1] + .5);
+      const toks = sg.label.split(' '); const head = toks[0]; const rest = toks.slice(1).join(' ');
+      const boxCol = sg.mode === 'rail' ? '#3f6fb0' : sg.mode === 'bus' ? '#3f8f5a' : '#8a7a6a';
+      const body = [rest, sg.duration].filter(Boolean).join(' · ');
+      tag(x, y - 6, [{ text: head, font: `700 10px ${fam}`, box: boxCol }].concat(body ? [{ text: body, font: `600 11px ${fam}`, color: sg === curSeg ? '#2e2628' : '#5a504a' }] : []),
+          { fill: sg === curSeg ? 'rgba(255,246,214,.98)' : 'rgba(250,246,236,.92)', stroke: sg === curSeg ? '#e0b34a' : '#8a7a6a' });
+    });
+    // 站点标牌：序号 + 时间 + 地名（打卡后打勾）
+    d.stops.forEach((s, i) => {
+      const [x, y] = P(s.x + .5, s.y + .5, lmz[s.x + ',' + s.y] || 0); const done = state.done.has(s.arrive); const isNext = ns === s;
+      tag(x + 6, y - 28, [{ text: done ? '✓' : String(i + 1), font: `700 11px ${fam}`, box: done ? '#3f8f5a' : '#c8503e' }, { text: s.time || '', font: `700 12px ${fam}` }, { text: s.short, font: `600 12px ${fam}` }],
+          { big: true, fill: isNext ? 'rgba(255,246,214,.98)' : 'rgba(250,246,236,.97)', stroke: isNext ? '#e0b34a' : '#2e2628' });
+    });
+    if (d.lodging && !d.lodging.offPlate) { const [x, y] = P(d.lodging.x + .5, d.lodging.y + .5, lmz[d.lodging.x + ',' + d.lodging.y] || 0); tag(x + 6, y - 28, [{ text: '住', font: `700 11px ${fam}`, box: '#3f6fb0' }, { text: d.lodging.name, font: `600 12px ${fam}` }], { big: true, stroke: '#3f6fb0' }); }
+    // HUD
+    if (state.finished) { $('hudK').textContent = '今天'; $('hudV').textContent = d.lodging ? `到了 · ${d.lodging.name}` : '走完了 · 翻到下一页'; $('hudW').textContent = d.lodging ? '合上书之前，写两句今天的日记' : '合上书，整段旅程变成日记'; }
+    else if (ns) { const sgN = d.segments.find(g => g.end === ns.arrive) || seg; $('hudK').textContent = performance.now() < state.pauseUntil ? '打卡中' : '下一站'; $('hudV').textContent = `${d.stops.indexOf(ns) + 1} · ${ns.short}`; $('hudW').textContent = `${sgN.label}${sgN.duration ? ' · ' + sgN.duration : ''}${ns.time ? ' · 预计 ' + ns.time : ''}`; }
+    else { $('hudK').textContent = '回住处'; $('hudV').textContent = d.lodging ? d.lodging.name : '回程'; $('hudW').textContent = seg.label; }
+  }
+
+  // ---------- 动画 ----------
+  let last = performance.now();
+  function tick(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    if (state.playing && !state.finished && now >= state.pauseUntil && !coverShown) {
+      const d = day(), path = d.path, seg = segmentAt(state.t);
+      const speed = seg.mode === 'walk' ? 2.6 : 7;
+      const prev = state.t; state.t = Math.min(state.t + speed * dt, path.length - 1);
+      for (const s of d.stops) if (!state.done.has(s.arrive) && state.t >= s.arrive && prev < s.arrive) { state.t = s.arrive; state.done.add(s.arrive); state.pauseUntil = now + 1500; toast('打卡 · ' + s.short); renderLeft(); break; }
+      if (state.t >= path.length - 1 && !state.finished) { state.finished = true; toast(d.lodging ? '到了 · ' + d.lodging.name : '今天走完了'); renderLeft(); }
+      if (Math.floor(prev) !== Math.floor(state.t) && now >= state.pauseUntil) { /* 段切换时刷新列表高亮 */ const s2 = segmentAt(state.t); if (s2 !== seg) renderLeft(); }
+    }
+    if (now > state.toastUntil) $('toast').style.opacity = '0';
+    draw(); requestAnimationFrame(tick);
+  }
+  function toast(msg) { const t = $('toast'); t.textContent = msg; t.style.opacity = '1'; state.toastUntil = performance.now() + 1600; }
+
+  // ---------- 控件 ----------
+  $('btnPlay').addEventListener('click', () => { state.playing = !state.playing; $('btnPlay').textContent = state.playing ? '⏸ 暂停' : '▶ 继续'; });
+  $('btnCam').addEventListener('click', () => { state.cam = state.cam === 'follow' ? 'overview' : 'follow'; $('btnCam').textContent = state.cam === 'follow' ? '全景' : '跟随小人'; state.camInit = false; });
+  $('btnZoom').addEventListener('click', () => { state.zoom = state.zoom === 2 ? 3 : 2; $('btnZoom').textContent = state.zoom + '×'; state.camInit = false; if (state.cam !== 'follow') { state.cam = 'follow'; $('btnCam').textContent = '全景'; } });
+  $('btnRestart').addEventListener('click', () => loadDay(state.day, true));
+  $('btnPal').addEventListener('click', () => { const ks = Object.keys(PAL); state.pal = ks[(ks.indexOf(state.pal) + 1) % ks.length]; try { localStorage.setItem('pal', state.pal); } catch (e) {} applyPal(); });
+  $('btnStyle').addEventListener('click', () => { state.style = state.style === 'cg' ? 'modern' : state.style === 'modern' ? 'classic' : 'cg'; try { localStorage.setItem('style', state.style); } catch (e) {} applyStyle(); });
+  $('btnPrev').addEventListener('click', () => flipTo((state.day + TRIP.days.length - 1) % TRIP.days.length));
+  $('btnNext').addEventListener('click', () => flipTo((state.day + 1) % TRIP.days.length));
+  $('btnQuest').addEventListener('click', () => { $('quest').hidden = true; $('questTab').hidden = false; });
+  $('questTab').addEventListener('click', () => { $('quest').hidden = false; $('questTab').hidden = true; });
+  function renderChip() { const cv = $('heroChip'), c = cv.getContext('2d'); c.imageSmoothingEnabled = false; c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, cv.width, cv.height);
+    if (isCG()) { cv.width = 48; cv.height = 60; c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, 48, 60); c.save(); c.scale(1.05, 1.05); drawChibi(c, 23, 55, state.cfg, 'front', 0); c.restore(); }
+    else { cv.width = 16; cv.height = 20; c.imageSmoothingEnabled = false; c.drawImage(sprite(state.cfg, 'front', 0), 0, 0); } }
+
+  // ---------- 封面 ----------
+  let coverShown = true;
+  let coverTimer = null;
+  function showCover(on) {
+    coverShown = on; const cv = $('cover'); clearTimeout(coverTimer);
+    if (on) { cv.hidden = false; requestAnimationFrame(() => cv.classList.remove('open')); }
+    else { cv.classList.add('open'); state.pauseUntil = performance.now() + 900; coverTimer = setTimeout(() => { cv.hidden = true; }, 800); }
+  }
+  $('btnOpen').addEventListener('click', () => showCover(false));
+  function renderCover() {
+    $('coverTitle').textContent = TRIP.title; $('coverSub').textContent = TRIP.subtitle; $('coverDates').textContent = TRIP.dates;
+    const nP = TRIP.days.reduce((a, d) => a + d.stops.length, 0), nT = TRIP.days.reduce((a, d) => a + d.entries.filter(e => e.type === 'transport').length, 0);
+    const nL = new Set(TRIP.days.map(d => d.lodging && d.lodging.name).filter(Boolean)).size;
+    $('coverStats').innerHTML = `世界主题 · ${TRIP.theme}<br>7 天 · 4 座城 · ${nP} 站 · ${nT} 段交通 · ${nL} 家住宿`;
+    const cv = $('coverHero'), c = cv.getContext('2d'); c.setTransform(1, 0, 0, 1, 0, 0); c.imageSmoothingEnabled = false; c.clearRect(0, 0, cv.width, cv.height);
+    if (isCG()) { c.save(); c.scale(2.9, 2.9); drawChibi(c, 22, 53, state.cfg, 'front', 0); c.restore(); } else c.drawImage(sprite(state.cfg, 'front', 0), 0, 0, 128, 160);
+  }
+
+  // ---------- 捏人 ----------
+  const SLOTS = [
+    ['skin', '肤色', SP.SKIN.map((c, i) => [i, `肤色 ${i + 1}`])],
+    ['hair', '发型', [['short', '短发'], ['long', '长发'], ['bun', '双丸子'], ['curly', '卷发']]],
+    ['hairc', '发色', SP.HAIRC.map((c, i) => [i, ['黑', '棕', '栗', '金', '灰', '红', '蓝'][i]])],
+    ['top', '上衣', SP.TOPC.map((c, i) => [i, ['蓝', '红', '黄', '绿', '白', '黑', '粉', '紫'][i]])],
+    ['pants', '下装', SP.PANTC.map((c, i) => [i, ['深蓝', '棕', '米', '黑', '浅蓝', '酒红'][i]])],
+    ['shoes', '鞋', SP.SHOEC.map((c, i) => [i, ['黑', '白', '棕'][i]])],
+    ['hat', '帽子', [['none', '不戴'], ['cap', '棒球帽'], ['beanie', '毛线帽'], ['straw', '草帽']]],
+    ['hatc', '帽色', SP.HATC.map((c, i) => [i, ['红', '藏青', '米黄', '绿', '白'][i]])],
+    ['acc', '配件', [['none', '无'], ['glasses', '眼镜'], ['scarf', '围巾'], ['camera', '相机'], ['backpack', '背包']]],
+  ];
+  function buildAvatar() {
+    const g = $('avGrid'); g.innerHTML = '';
+    for (const [key, name, opts] of SLOTS) {
+      const lab = document.createElement('label'); lab.textContent = name;
+      const sel = document.createElement('select'); sel.id = 'av-' + key;
+      for (const [v, t] of opts) { const o = document.createElement('option'); o.value = String(v); o.textContent = t; sel.appendChild(o); }
+      sel.value = String(state.cfg[key]);
+      sel.addEventListener('change', () => { state.cfg[key] = isNaN(+sel.value) ? sel.value : +sel.value; onCfg(); });
+      lab.appendChild(sel); g.appendChild(lab);
+    }
+    previewAvatar();
+  }
+  function onCfg() { cache.clear(); try { localStorage.setItem('avatar', JSON.stringify(state.cfg)); } catch (e) {} previewAvatar(); renderCover(); renderChip(); }
+  // 小人芯片的画布尺寸随风格变，CSS 里固定显示尺寸
+  function previewAvatar() {
+    for (const [id, dir] of [['avPreview', 'front'], ['avPreview2', 'right']]) { const cv = $(id), c = cv.getContext('2d'); c.setTransform(1, 0, 0, 1, 0, 0); c.imageSmoothingEnabled = false; c.clearRect(0, 0, cv.width, cv.height);
+      if (isCG()) { c.save(); c.scale(1.45, 1.45); drawChibi(c, 22, 53, state.cfg, dir === 'right' ? 'right' : 'front', dir === 'right' ? 1 : 0); c.restore(); } else c.drawImage(sprite(state.cfg, dir, dir === 'right' ? 1 : 0), 0, 0, 64, 80); }
+  }
+  $('btnAvatar').addEventListener('click', () => { const p = $('avatarPanel'); p.hidden = !p.hidden; if (!p.hidden) buildAvatar(); });
+  $('btnAvDone').addEventListener('click', () => { $('avatarPanel').hidden = true; });
+  $('btnAvRandom').addEventListener('click', () => { const pick = a => a[Math.floor(Math.random() * a.length)]; state.cfg = { skin: pick([0, 1, 2, 3, 4]), hair: pick(['short', 'long', 'bun', 'curly']), hairc: pick([0, 1, 2, 3, 4, 5, 6]), top: pick([0, 1, 2, 3, 4, 5, 6, 7]), pants: pick([0, 1, 2, 3, 4, 5]), shoes: pick([0, 1, 2]), hat: pick(['none', 'cap', 'beanie', 'straw']), hatc: pick([0, 1, 2, 3, 4]), acc: pick(['none', 'glasses', 'scarf', 'camera', 'backpack']) }; onCfg(); buildAvatar(); });
+  $('btnAvReset').addEventListener('click', () => { state.cfg = Object.assign({}, SP.default, FEMALE_DEFAULT); onCfg(); buildAvatar(); });
+
+  // ---------- 启动 ----------
+  function start(snap) {
+    if (snap && typeof snap.day === 'number') state.day = snap.day; if (snap && snap.cfg) state.cfg = snap.cfg;
+    // 锚点：#open 直接翻开，#day3 翻到第 3 天
+    // 锚点：#open 直接翻开，#day3 翻到第 3 天，#day3-cg 指定风格（cg / modern / classic）
+    const m = /^#(open|day(\d))(?:-(cg|modern|classic))?(?:-(sea|warm|dusk))?$/.exec(location.hash || '');
+    if (m && m[2]) state.day = Math.max(0, Math.min(TRIP.days.length - 1, +m[2] - 1));
+    if (m && m[3]) state.style = m[3];
+    if (m && m[4]) state.pal = m[4];
+    started = true; applyStyle();
+    renderCover(); renderChip(); loadDay(state.day, false);
+    if ((snap && snap.opened) || m) showCover(false);
+    if (window.innerWidth < 860) { $('quest').hidden = true; $('questTab').hidden = false; }
+    requestAnimationFrame(tick);
+  }
+  try { window.claude && window.claude.hot && window.claude.hot.snapshot && window.claude.hot.snapshot(() => ({ day: state.day, cfg: state.cfg, opened: !coverShown })); } catch (e) {}
+  (window.claude && window.claude.hot && window.claude.hot.ready) ? window.claude.hot.ready(start) : start((window.claude && window.claude.hot && window.claude.hot.data) || {});
+})();
+</script>

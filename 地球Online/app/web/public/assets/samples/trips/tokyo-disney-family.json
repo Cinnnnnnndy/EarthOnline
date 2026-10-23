@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "0.3",
+  "id": "sample-tokyo-disney-family",
+  "title": "东京迪士尼亲子",
+  "destination": "东京",
+  "startDate": "2026-12-19",
+  "endDate": "2026-12-21",
+  "theme": "亲子乐园",
+  "seed": 3630841914,
+  "status": "planning",
+  "days": [
+    {
+      "index": 1,
+      "date": "2026-12-19",
+      "title": "飞东京，住进迪士尼",
+      "city": "geo",
+      "lodging": "舞滨",
+      "entries": [
+        {"id":"d1-e0","type":"place","name":"上海浦东国际机场","category":"airport","plannedStart":"07:00","stayMinutes":90,"notes":"儿童推车可以一直推到登机口再托运","geo":{"lat":31.1443,"lng":121.8083}},
+        {"id":"d1-e1","type":"transport","mode":"flight","label":"上海浦东飞东京羽田","durationMinutes":170,"distanceKm":1740},
+        {"id":"d1-e2","type":"place","name":"东京羽田机场","category":"airport","plannedStart":"12:20","stayMinutes":60,"notes":"日本比上海快一小时；到达层买利木津巴士票","geo":{"lat":35.5494,"lng":139.7798}},
+        {"id":"d1-e3","type":"transport","mode":"bus","label":"利木津巴士直达迪士尼度假区","durationMinutes":45,"distanceKm":25},
+        {"id":"d1-e4","type":"place","name":"东京迪士尼乐园大饭店","category":"hotel","stayMinutes":30,"notes":"官方酒店，入园可以提前 15 分钟","geo":{"lat":35.6355,"lng":139.8812}},
+        {"id":"d1-e5","type":"transport","mode":"walk","label":"步行","durationMinutes":8,"distanceKm":0.6},
+        {"id":"d1-e6","type":"place","name":"伊克斯皮儿莉商场","category":"shop","stayMinutes":120,"notes":"室内商场，下雨也能逛；在这里吃晚饭","geo":{"lat":35.6345,"lng":139.8843}},
+        {"id":"d1-e7","type":"transport","mode":"walk","label":"步行回酒店","durationMinutes":8,"distanceKm":0.6},
+        {"id":"d1-e8","type":"place","name":"东京迪士尼乐园大饭店","category":"hotel","geo":{"lat":35.6355,"lng":139.8812}}
+      ]
+    },
+    {
+      "index": 2,
+      "date": "2026-12-20",
+      "title": "东京迪士尼乐园一整天",
+      "city": "geo",
+      "lodging": "舞滨",
+      "entries": [
+        {"id":"d2-e0","type":"place","name":"东京迪士尼乐园大饭店","category":"hotel","plannedStart":"08:15","stayMinutes":5,"notes":"先在应用里买美女与野兽的尊享卡","geo":{"lat":35.6355,"lng":139.8812}},
+        {"id":"d2-e1","type":"transport","mode":"walk","label":"步行","durationMinutes":3,"distanceKm":0.2},
+        {"id":"d2-e2","type":"place","name":"东京迪士尼乐园","category":"sight","plannedStart":"08:30","stayMinutes":15,"notes":"进门就是世界市集","geo":{"lat":35.6329,"lng":139.8804}},
+        {"id":"d2-e3","type":"transport","mode":"walk","label":"步行","durationMinutes":8,"distanceKm":0.5},
+        {"id":"d2-e4","type":"place","name":"美女与野兽城堡奇缘","category":"sight","stayMinutes":45,"geo":{"lat":35.6348,"lng":139.8786}},
+        {"id":"d2-e5","type":"transport","mode":"walk","label":"步行","durationMinutes":5,"distanceKm":0.3},
+        {"id":"d2-e6","type":"place","name":"小小世界","category":"sight","stayMinutes":30,"notes":"适合小朋友，排队短","geo":{"lat":35.6343,"lng":139.8797}},
+        {"id":"d2-e7","type":"transport","mode":"walk","label":"步行","durationMinutes":8,"distanceKm":0.4},
+        {"id":"d2-e8","type":"place","name":"灰姑娘城堡","category":"sight","stayMinutes":20,"notes":"城堡前拍全家福","geo":{"lat":35.6325,"lng":139.8807}},
+        {"id":"d2-e9","type":"transport","mode":"walk","label":"步行","durationMinutes":8,"distanceKm":0.4},
+        {"id":"d2-e10","type":"place","name":"巴斯光年星际历险","category":"sight","stayMinutes":40,"notes":"打靶比分数","geo":{"lat":35.6316,"lng":139.8826}},
+        {"id":"d2-e11","type":"transport","mode":"walk","label":"步行","durationMinutes":5,"distanceKm":0.3},
+        {"id":"d2-e12","type":"place","name":"明日乐园露天餐厅","category":"food","stayMinutes":50,"notes":"午饭","geo":{"lat":35.6313,"lng":139.8818}},
+        {"id":"d2-e13","type":"transport","mode":"walk","label":"步行回酒店午睡","durationMinutes":12,"distanceKm":0.7},
+        {"id":"d2-e14","type":"place","name":"东京迪士尼乐园大饭店","category":"hotel","plannedStart":"13:30","stayMinutes":90,"notes":"小朋友午睡","geo":{"lat":35.6355,"lng":139.8812}},
+        {"id":"d2-e15","type":"transport","mode":"walk","label":"步行","durationMinutes":8,"distanceKm":0.5},
+        {"id":"d2-e16","type":"place","name":"小熊维尼猎蜜记","category":"sight","stayMinutes":50,"geo":{"lat":35.6341,"lng":139.8785}},
+        {"id":"d2-e17","type":"transport","mode":"walk","label":"步行","durationMinutes":5,"distanceKm":0.3},
+        {"id":"d2-e18","type":"place","name":"巨雷山","category":"sight","stayMinutes":45,"notes":"身高 102 厘米以上才能坐","geo":{"lat":35.632,"lng":139.8768}},
+        {"id":"d2-e19","type":"transport","mode":"walk","label":"步行","durationMinutes":10,"distanceKm":0.5},
+        {"id":"d2-e20","type":"place","name":"电子大游行","category":"sight","plannedStart":"19:30","stayMinutes":45,"notes":"提前 40 分钟在城堡前的路边占位","geo":{"lat":35.6331,"lng":139.88}},
+        {"id":"d2-e21","type":"transport","mode":"walk","label":"步行回酒店","durationMinutes":10,"distanceKm":0.6},
+        {"id":"d2-e22","type":"place","name":"东京迪士尼乐园大饭店","category":"hotel","geo":{"lat":35.6355,"lng":139.8812}}
+      ]
+    },
+    {
+      "index": 3,
+      "date": "2026-12-21",
+      "title": "迪士尼海洋半天，晚上回上海",
+      "city": "geo",
+      "entries": [
+        {"id":"d3-e0","type":"place","name":"东京迪士尼乐园大饭店","category":"hotel","plannedStart":"08:00","stayMinutes":10,"notes":"退房，行李寄存在酒店","geo":{"lat":35.6355,"lng":139.8812}},
+        {"id":"d3-e1","type":"transport","mode":"rail","label":"迪士尼度假区单轨电车","durationMinutes":10,"distanceKm":3.5},
+        {"id":"d3-e2","type":"place","name":"东京迪士尼海洋","category":"sight","plannedStart":"08:45","stayMinutes":20,"notes":"周一人少一点","geo":{"lat":35.6267,"lng":139.8851}},
+        {"id":"d3-e3","type":"transport","mode":"walk","label":"步行","durationMinutes":5,"distanceKm":0.3},
+        {"id":"d3-e4","type":"place","name":"地中海港湾","category":"sight","stayMinutes":20,"geo":{"lat":35.6283,"lng":139.8845}},
+        {"id":"d3-e5","type":"transport","mode":"walk","label":"步行","durationMinutes":8,"distanceKm":0.4},
+        {"id":"d3-e6","type":"place","name":"神秘岛","category":"sight","stayMinutes":45,"notes":"看普罗米修斯火山喷火，坐海底两万里","geo":{"lat":35.6258,"lng":139.885}},
+        {"id":"d3-e7","type":"transport","mode":"walk","label":"步行","durationMinutes":8,"distanceKm":0.4},
+        {"id":"d3-e8","type":"place","name":"玩具总动员疯狂游戏屋","category":"sight","stayMinutes":60,"notes":"排队最长，买尊享卡","geo":{"lat":35.6262,"lng":139.8822}},
+        {"id":"d3-e9","type":"transport","mode":"walk","label":"步行出园","durationMinutes":10,"distanceKm":0.6},
+        {"id":"d3-e10","type":"place","name":"东京迪士尼海洋站","category":"station","stayMinutes":5,"geo":{"lat":35.6275,"lng":139.8859}},
+        {"id":"d3-e11","type":"transport","mode":"rail","label":"单轨电车回酒店","durationMinutes":10,"distanceKm":3.5},
+        {"id":"d3-e12","type":"place","name":"东京迪士尼乐园大饭店","category":"hotel","plannedStart":"14:30","stayMinutes":30,"notes":"取行李","geo":{"lat":35.6355,"lng":139.8812}},
+        {"id":"d3-e13","type":"transport","mode":"bus","label":"利木津巴士去羽田","durationMinutes":50,"distanceKm":25},
+        {"id":"d3-e14","type":"place","name":"东京羽田机场","category":"airport","plannedStart":"16:00","stayMinutes":150,"notes":"免税店买零食当伴手礼","geo":{"lat":35.5494,"lng":139.7798}},
+        {"id":"d3-e15","type":"transport","mode":"flight","label":"东京羽田飞上海浦东","durationMinutes":195,"distanceKm":1740},
+        {"id":"d3-e16","type":"place","name":"上海浦东国际机场","category":"airport","plannedStart":"20:35","notes":"上海比东京慢一小时","geo":{"lat":31.1443,"lng":121.8083}}
+      ]
+    }
+  ],
+  "createdAt": "2026-09-25T11:00:00.000Z",
+  "updatedAt": "2026-09-25T11:00:00.000Z"
+}

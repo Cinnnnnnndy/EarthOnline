@@ -1,0 +1,98 @@
+/* 说一句话做行程（web/src/voice/composer.ts）。
+   只用 shared/world/tokens.ts 注入的变量：颜色 --c-*、字阶 --t-*（22 / 17 / 15 / 12 四个字号，400 / 600 两种字重）、玻璃 --g-*、圆角 --r-*。
+   面板本身用 app.css 的液态玻璃 .lg.strong；第八轮去色：话筒、主按钮、发送都是墨（夜里白），没有蓝紫色；不用晨色（它只给「现在 / 去过」）。
+   面板贴着内容长高，不设固定高度；触控目标都不小于 44px。 */
+
+.vc-wrap{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center;
+  padding:0 8px calc(8px + env(safe-area-inset-bottom) + var(--vc-kb, 0px));background:rgba(20,24,48,0);transition:background .22s ease;-webkit-tap-highlight-color:transparent}
+.vc-wrap.in{background:rgba(20,24,48,.28)}
+.vc-wrap.out{background:rgba(20,24,48,0);pointer-events:none}
+
+.vc{width:min(560px,100%);max-height:calc(100dvh - 24px - env(safe-area-inset-top) - var(--vc-kb, 0px));display:flex;flex-direction:column;gap:12px;
+  border-radius:var(--r-sheet);padding:6px 16px 16px;overflow:hidden;color:var(--c-ink);font-family:var(--font);
+  transform:translateY(24px);opacity:0;transition:transform .26s cubic-bezier(.2,.8,.2,1),opacity .2s ease}
+.vc-wrap.in .vc{transform:none;opacity:1}
+.vc-wrap.out .vc{transform:translateY(24px);opacity:0}
+.vc [hidden]{display:none!important}
+.vc:focus{outline:none}
+.vc :focus-visible{outline:2px solid var(--c-lake);outline-offset:2px}
+
+/* ---------- 抓手与标题 */
+.vc-grab{align-self:center;flex:0 0 auto;width:36px;height:5px;border-radius:3px;background:var(--c-grab);margin-top:2px}
+.vc-head{display:flex;align-items:center;gap:8px;min-height:44px;flex:0 0 auto}
+.vc-title{flex:1;min-width:0;margin:0;font-size:var(--t-headline-size);line-height:var(--t-headline-lh);font-weight:600}
+.vc-tools{display:flex;gap:2px;margin-right:-10px;flex:0 0 auto}
+.vc-icon{width:44px;height:44px;border-radius:50%;border:none;background:none;box-shadow:none;padding:0;display:grid;place-items:center;color:var(--c-mist);cursor:pointer}
+.vc-icon:active{background:var(--c-press)}
+.vc-icon[aria-pressed="true"]{color:var(--c-ink)}
+
+/* ---------- 对话 */
+.vc-thread{display:flex;flex-direction:column;gap:8px;flex:0 1 auto;min-height:0;max-height:32vh;overflow-y:auto;overscroll-behavior:contain;padding:2px 0}
+.vc-msg{max-width:86%;padding:8px 12px;border-radius:16px;font-size:var(--t-sub-size);line-height:var(--t-sub-lh);font-weight:400;white-space:pre-wrap;overflow-wrap:anywhere}
+.vc-msg.bot{align-self:flex-start;background:var(--c-list-strong);border-bottom-left-radius:6px}
+.vc-msg.me{align-self:flex-end;background:var(--c-fill);border-bottom-right-radius:6px}
+.vc-q{display:block;margin-top:2px;font-weight:600}
+.vc-typing{display:inline-flex;align-items:center;gap:4px;padding:13px 14px}
+.vc-typing i{width:6px;height:6px;border-radius:50%;background:var(--c-mist);animation:vc-dot 1.2s ease-in-out infinite}
+.vc-typing i:nth-child(2){animation-delay:.15s} .vc-typing i:nth-child(3){animation-delay:.3s}
+@keyframes vc-dot{0%,80%,100%{opacity:.3;transform:none}40%{opacity:1;transform:translateY(-3px)}}
+
+/* ---------- 草稿小卡 */
+.vc-draft{display:flex;flex-direction:column;gap:10px;flex:0 1 auto;min-height:0}
+.vc-draft-card{flex:0 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;background:var(--c-list-strong);border-radius:var(--r-m);padding:12px 14px}
+.vc-primary{flex:0 0 auto}
+.vc-draft-title{margin:0;font-size:var(--t-headline-size);line-height:var(--t-headline-lh);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vc-draft-meta{margin:2px 0 8px;font-size:var(--t-sub-size);line-height:var(--t-sub-lh);color:var(--c-mist);font-variant-numeric:tabular-nums}
+.vc-days{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.vc-days li{display:flex;align-items:baseline;gap:10px;min-width:0;font-size:var(--t-sub-size);line-height:var(--t-sub-lh)}
+.vc-dn{flex:0 0 auto;min-width:18px;font-size:var(--t-caption-size);line-height:var(--t-caption-lh);color:var(--c-mist);font-variant-numeric:tabular-nums}
+.vc-dt{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vc-more{margin:6px 0 0 28px;font-size:var(--t-caption-size);line-height:var(--t-caption-lh);color:var(--c-mist)}
+/* 第七轮：主按钮是墨色小胶囊（与 app.css 的 .btn.primary 同一套），靠右，不用蓝色填充 */
+.vc-primary{align-self:flex-end;height:36px;padding:0 16px;border:none;border-radius:18px;background:var(--c-ink);color:var(--c-paper);box-shadow:none;font-size:var(--t-sub-size);font-weight:600;cursor:pointer}
+.vc-primary:active{opacity:.82}
+
+/* ---------- 话筒 */
+.vc-voice{display:flex;flex-direction:column;align-items:center;gap:6px;flex:0 0 auto}
+.vc-live{margin:0;max-width:100%;text-align:center;font-size:var(--t-body-size);line-height:var(--t-body-lh);font-weight:400;color:var(--c-mist)}
+.vc-live:empty{display:none}
+.vc-live.on{display:block;min-height:var(--t-body-lh);color:var(--c-ink)}
+.vc-voice.no-mic .vc-live,.vc-voice.mic-off .vc-live{font-size:var(--t-sub-size);line-height:var(--t-sub-lh)}
+.vc-mic{position:relative;flex:0 0 auto;width:72px;height:72px;margin:10px 0 4px;border-radius:50%;border:none;padding:0;cursor:pointer;display:grid;place-items:center;color:var(--c-ink);
+  background:var(--g-fill-strong);-webkit-backdrop-filter:blur(var(--g-blur)) saturate(var(--g-sat));backdrop-filter:blur(var(--g-blur)) saturate(var(--g-sat));
+  box-shadow:var(--g-shadow),inset 0 1px 0 var(--g-rim),inset 0 0 0 1px var(--g-rim-soft);transition:transform .15s ease,background-color .2s ease,color .2s ease}
+.vc-mic:active{transform:scale(.96)}
+.vc-mic.on{background:var(--c-ink);color:var(--c-paper)}
+.vc-mic:disabled{color:var(--c-mist2);cursor:default;transform:none}
+.vc-mic-ic{position:relative;z-index:1;display:grid;place-items:center}
+.vc-ring{position:absolute;inset:0;border-radius:50%;border:2px solid var(--c-mist);opacity:0;pointer-events:none}
+.vc-mic.on .vc-ring{animation:vc-pulse 1.8s cubic-bezier(.2,.6,.3,1) infinite}
+.vc-mic.on .vc-ring2{animation-delay:.9s}
+@keyframes vc-pulse{0%{transform:scale(1);opacity:.55}100%{transform:scale(1.5);opacity:0}}
+.vc-status{margin:0;text-align:center;font-size:var(--t-caption-size);line-height:var(--t-caption-lh);color:var(--c-mist)} .vc-status:empty{display:none}
+.vc-voice.mic-off .vc-mic,.vc-voice.mic-off .vc-status{display:none}
+/* 有草稿时话筒小一号，给小卡让地方 */
+.vc:has(.vc-draft:not([hidden])) .vc-mic{width:64px;height:64px;margin-top:8px}
+.vc:has(.vc-draft:not([hidden])) .vc-mic svg{width:26px;height:26px}
+
+/* ---------- 打字 */
+.vc-text{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.vc-input{flex:1;min-width:0;min-height:44px;padding:0 16px;border-radius:22px;border:.5px solid var(--c-line);background:var(--c-field);color:var(--c-ink);
+  font:inherit;font-size:var(--t-body-size);line-height:var(--t-body-lh);font-weight:400;box-shadow:none}
+.vc-input::placeholder{color:var(--c-mist2)}
+.vc-input:focus-visible{outline:none;border-color:var(--c-mist)}
+.vc-send{flex:0 0 auto;width:44px;height:44px;border-radius:50%;border:none;padding:0;display:grid;place-items:center;background:var(--c-ink);color:var(--c-paper);box-shadow:none;cursor:pointer}
+.vc-send:disabled{background:var(--c-fill);color:var(--c-mist2);cursor:default}
+.vc-note{margin:-4px 0 0;text-align:center;font-size:var(--t-caption-size);line-height:var(--t-caption-lh);color:var(--c-mist)}
+
+/* ---------- 矮屏（折叠外屏、横屏） */
+@media (max-height:700px){
+  .vc-mic{width:72px;height:72px;margin-top:8px}
+  .vc-thread{max-height:24vh}
+}
+@media (prefers-reduced-motion:reduce){
+  .vc,.vc-wrap{transition:none}
+  .vc-mic.on .vc-ring{animation:none;opacity:.35;transform:scale(1.18)}
+  .vc-mic.on .vc-ring2{display:none}
+  .vc-typing i{animation:none;opacity:.6}
+}

@@ -1,0 +1,6 @@
+/* Earth Online · Info.plist (English) */
+"CFBundleDisplayName" = "Earth Online";
+"NSMicrophoneUsageDescription" = "Earth Online listens when you say where you'd like to go, so it can plan the trip with you.";
+"NSSpeechRecognitionUsageDescription" = "Your words are turned into text on this iPhone to plan your trip.";
+"NSLocationWhenInUseUsageDescription" = "Your location marks your home, so the sky around the globe follows your local sunrise and sunset.";
+"地球Online 旅程" = "Earth Online trip";

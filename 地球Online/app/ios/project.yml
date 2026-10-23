@@ -1,0 +1,135 @@
+# XcodeGen 工程描述：在 ios/ 目录里运行 `xcodegen` 生成 EarthOnline.xcodeproj（生成物不进版本库）。
+# 世界层（地球 + 某一天的微缩世界）是网页构建：先在 地球Online/app 里 `npm ci && npm run build`，
+# 构建脚本会把 ../web/dist 拷进 App 包里的 World/ 目录；没构建时拷一个占位页，原生界面照常可用。
+name: EarthOnline
+
+options:
+  bundleIdPrefix: app.earthonline
+  developmentLanguage: zh-Hans
+  deploymentTarget:
+    iOS: "26.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+fileGroups:
+  - EarthOnline.storekit
+  - README.md
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    SWIFT_STRICT_CONCURRENCY: minimal
+    ENABLE_USER_SCRIPT_SANDBOXING: NO
+    LOCALIZATION_PREFERS_STRING_CATALOGS: YES
+    SWIFT_EMIT_LOC_STRINGS: YES
+    ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: NO
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    CODE_SIGN_STYLE: Automatic
+
+targets:
+  EarthOnline:
+    type: application
+    platform: iOS
+    sources:
+      - path: EarthOnline
+        excludes:
+          - "**/*.md"
+          - "Info.plist"
+    info:
+      path: EarthOnline/Info.plist
+      properties:
+        CFBundleDisplayName: 地球Online
+        CFBundleDevelopmentRegion: zh-Hans
+        CFBundleLocalizations: [zh-Hans, en, ja]
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        ITSAppUsesNonExemptEncryption: false
+        LSRequiresIPhoneOS: true
+        UILaunchScreen:
+          UIColorName: LaunchBackground
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UIRequiresFullScreen: false
+        # 用途说明的其他语言在 Resources/<lang>.lproj/InfoPlist.strings
+        NSMicrophoneUsageDescription: 用麦克风听你说想去哪里，帮你规划旅程。
+        NSSpeechRecognitionUsageDescription: 在手机上把你说的话转成文字，用来规划旅程。
+        NSLocationWhenInUseUsageDescription: 用当前位置标注你的家，地球外的天色会跟着你那里的日出日落。
+        # 从「文件」或别的 App 的分享面板打开导出的旅程 JSON
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: 地球Online 旅程
+            CFBundleTypeRole: Viewer
+            LSHandlerRank: Alternate
+            LSItemContentTypes: [public.json]
+        LSSupportsOpeningDocumentsInPlace: false
+        # iCloud 同步（Pro）：开通 iCloud / CloudKit 能力后在这里填容器 ID（如 iCloud.app.earthonline.ios）；空 = 不同步
+        EOCloudKitContainerID: ""
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.earthonline.ios
+        PRODUCT_NAME: EarthOnline
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        SUPPORTS_MACCATALYST: NO
+        SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
+        # iPhone Duo（iOS 27.1）的新 API 签名未经验证：拿到正式 SDK 后在这里加上 -D IPHONE_DUO_SDK 才会编译 Layout/DuoLayout.swift 里那一段
+        OTHER_SWIFT_FLAGS: "$(inherited)"
+    postBuildScripts:
+      - name: Bundle World (web/dist → EarthOnline.app/World)
+        basedOnDependencyAnalysis: false
+        shell: /bin/bash
+        script: |
+          set -euo pipefail
+          SRC="${SRCROOT}/../web/dist"
+          DST="${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/World"
+          mkdir -p "${DST}"
+          if [ -f "${SRC}/embed.html" ]; then
+            rsync -a --delete --exclude "hero-lab.html" "${SRC}/" "${DST}/"
+            echo "World: bundled ${SRC}"
+          else
+            echo "warning: ${SRC}/embed.html 不存在：先在 地球Online/app 里运行 npm ci && npm run build。这次打包的是占位世界。"
+            rm -rf "${DST:?}"/*
+            cp "${SRCROOT}/Support/placeholder-embed.html" "${DST}/embed.html"
+          fi
+
+  EarthOnlineTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: EarthOnlineTests
+      # 三端共用的屏幕形态用例（D90，shared/spec/layout.golden.json）
+      - path: ../shared/spec/layout.golden.json
+        buildPhase: resources
+    dependencies:
+      - target: EarthOnline
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: app.earthonline.ios.tests
+
+schemes:
+  EarthOnline:
+    build:
+      targets:
+        EarthOnline: all
+        EarthOnlineTests: [test]
+    run:
+      config: Debug
+      storeKitConfiguration: EarthOnline.storekit
+      commandLineArguments:
+        "-screenshotState traveling": false
+        "-screenshotState planning": false
+        "-screenshotState empty": false
+        "-proUnlocked YES": false
+    test:
+      config: Debug
+      gatherCoverageData: false
+      targets:
+        - name: EarthOnlineTests
+    archive:
+      config: Release

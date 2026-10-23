@@ -1,0 +1,75 @@
+/* 付费页（web/src/paywall.ts）。
+   卡片是 ui.ts 的 sheet() 加上 .pw.lg.strong：液态玻璃（app.css 的 .lg），离屏幕四边各留 8px，高度跟着内容。
+   只用 shared/world/tokens.ts 注入的变量：颜色 --c-*、字阶 --t-*（22 / 17 / 15 / 12 四个字号，400 / 600 两种字重）、玻璃 --g-*、圆角 --r-*。
+   第八轮去色：没有蓝紫色，图标、选中、主按钮都是墨（夜里白）；晨色只给「现在 / 去过」，这里不用。触控目标都不小于 44px。
+   选择器都挂在 .pw 下，压过 styles.css 里全局 button 的底色、悬停与晨色焦点框。 */
+
+/* ---------- 卡片：浮在底部的玻璃，不贴边、不铺满 */
+.sheet.pw{width:min(400px,calc(100% - 16px));margin:0 8px calc(8px + env(safe-area-inset-bottom));padding:6px 16px 8px!important;
+  border-radius:var(--r-sheet)!important;background:var(--g-fill-strong)!important;box-shadow:var(--g-shadow)!important;
+  -webkit-backdrop-filter:blur(var(--g-blur)) saturate(var(--g-sat))!important;backdrop-filter:blur(var(--g-blur)) saturate(var(--g-sat))!important;
+  max-height:calc(100dvh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;overflow:auto;overscroll-behavior:contain}
+/* .sheet 的 ::before 是抓手，.lg 的 ::before 是亮边；这张卡不能拖，把 ::before 还给亮边 */
+.sheet.pw::before{width:auto;height:auto;margin:0;border-radius:inherit;
+  background:linear-gradient(155deg,var(--g-rim) 0%,var(--g-rim-soft) 28%,rgba(255,255,255,0) 50%,var(--g-rim-soft) 78%,rgba(255,255,255,.55) 100%)}
+.pw :focus-visible{outline:2px solid var(--c-lake);outline-offset:2px}
+.sheet.pw:focus{outline:none}
+
+/* ---------- 标题行：关闭按钮点击区 44px，看起来是 30px 的圆 */
+.sheet.pw header{margin-bottom:2px!important}
+.sheet.pw header button.icon,.sheet.pw header button.icon:hover{width:44px;height:44px;right:-10px;background:none;color:var(--c-mist)}
+.sheet.pw header button.icon::before{content:"";position:absolute;inset:7px;border-radius:50%;background:var(--c-fill);z-index:-1}
+
+.pw .pw-body{display:flex;flex-direction:column;gap:12px}
+
+/* ---------- 一句话：碰到了什么限制 */
+.pw .pw-why{margin:0;padding:0 4px;text-align:center;text-wrap:balance;font-size:var(--t-body-size);line-height:var(--t-body-lh);font-weight:400;color:var(--c-ink)}
+
+/* ---------- 权益：分组列表，每行一句（第八轮精简），行高 44，分隔线从文字处开始 */
+.pw .pw-list{border-radius:var(--r-m);background:var(--c-list-strong);overflow:hidden}
+.pw .pw-why .cl{display:inline-block}                                        /* 中日文一小句一块，只在逗号、句号后换行 */
+.pw:lang(ja) .pw-why,.pw:lang(ja) .pw-fine{word-break:auto-phrase}          /* 日文按词组换行，不在词中间断开 */
+.pw .pw-row{position:relative;display:flex;align-items:center;gap:12px;min-height:44px;padding:6px 12px}
+.pw .pw-row + .pw-row::before{content:"";position:absolute;top:0;left:54px;right:0;border-top:.5px solid var(--c-line)}
+.pw .pw-ic{flex:0 0 auto;width:28px;height:28px;display:grid;place-items:center;background:none;color:var(--c-ink2)}
+.pw .pw-ic .ic{width:17px;height:17px}
+.pw .pw-row.hit .pw-ic{color:var(--c-ink)} .pw .pw-row.hit .pw-tt{font-weight:600}
+.pw .pw-tx{flex:1;min-width:0;display:flex;flex-direction:column}
+.pw .pw-tt{font-size:var(--t-body-size);line-height:var(--t-body-lh);font-weight:400;color:var(--c-ink)}
+.pw .pw-st{font-size:var(--t-sub-size);line-height:var(--t-sub-lh);color:var(--c-mist)}
+
+/* ---------- 按月 / 按年：两格的分段选择，每格三行（周期、价格、说明） */
+.pw .pw-seg{display:flex;gap:3px;padding:3px;border-radius:var(--r-m);background:var(--c-fill)}
+.pw .pw-opt,.pw .pw-opt:hover{flex:1 1 0;min-width:0;min-height:72px;padding:8px 12px;border:none;border-radius:11px;background:none;box-shadow:none;filter:none;
+  display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:1px;text-align:left;color:var(--c-ink);cursor:pointer}
+.pw .pw-opt[aria-checked="true"],.pw .pw-opt[aria-checked="true"]:hover{background:var(--c-seg-on);box-shadow:0 1px 3px rgba(30,38,64,.14)}
+.pw .pw-opt .k{font-size:var(--t-sub-size);line-height:var(--t-sub-lh);color:var(--c-mist);display:flex;align-items:center;gap:6px}
+.pw .pw-opt[aria-checked="true"] .k{color:var(--c-ink)}
+.pw .pw-opt .p{font-size:var(--t-body-size);line-height:var(--t-body-lh);font-weight:600}
+.pw .pw-opt .x{font-size:var(--t-caption-size);line-height:var(--t-caption-lh);color:var(--c-mist)}
+.pw .pw-opt .x b{font-weight:600;color:var(--c-ink);white-space:nowrap}
+
+/* ---------- 主按钮、说明、以后再说 */
+.pw .pw-cta{margin-top:4px;align-self:center;padding:0 20px}
+.pw .pw-fine{margin:-4px 4px 0;text-align:center;font-size:var(--t-caption-size);line-height:var(--t-caption-lh);color:var(--c-mist)}
+.pw .pw-later,.pw .pw-later:hover{align-self:center;min-height:44px;min-width:88px;margin-top:-6px;padding:0 16px;border:none;border-radius:var(--r-pill);background:none;box-shadow:none;filter:none;
+  font-size:var(--t-sub-size);font-weight:400;color:var(--c-mist);cursor:pointer}
+.pw .pw-later:active{background:var(--c-press)}
+
+/* 矮屏（折叠外屏、横持手机）：权益行再矮一点，主按钮不用滚动就能看到 */
+@media (max-height:720px){
+  html:not([data-shape="spread"]) .pw .pw-row{min-height:40px;padding:4px 12px}
+}
+
+/* 展开态（阔折叠内屏、平板横持）：卡片居中、变宽，分成两栏：左边是说明与权益，右边是选择与按钮 */
+html[data-shape="spread"] .sheet.pw{margin:0 auto;width:min(680px,calc(100% - 32px));max-height:calc(100dvh - 32px)!important}
+html[data-shape="spread"] .pw .pw-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:16px;row-gap:12px;align-items:start;
+  grid-template-areas:"why why" "list seg" "list cta" "list fine" "list later";grid-template-rows:auto auto auto auto 1fr}
+html[data-shape="spread"] .pw .pw-why{grid-area:why}
+html[data-shape="spread"] .pw .pw-list{grid-area:list}
+html[data-shape="spread"] .pw .pw-seg{grid-area:seg}
+html[data-shape="spread"] .pw .pw-cta{grid-area:cta;margin-top:0}
+html[data-shape="spread"] .pw .pw-fine{grid-area:fine;margin-top:-4px}
+html[data-shape="spread"] .pw .pw-later{grid-area:later;justify-self:center;align-self:start}
+
+@media (prefers-reduced-transparency:reduce){.sheet.pw{background:var(--c-sheet)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}}

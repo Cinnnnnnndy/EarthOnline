@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 自动生成（tools/export-shared.ts），勿改；改源头（shared/）再跑 npm run export:shared -->
+<resources>
+    <string name="app_name">Earth Online</string>
+    <string name="module_desc">Turn a trip into a book and a little world</string>
+    <string name="ability_desc">The globe and the world of a day</string>
+    <string name="reason_internet">Connect to the planning service (optional) and sync</string>
+    <string name="reason_microphone">Listen when you describe a trip by voice</string>
+    <string name="reason_location">Put home where you are (only when you tap “Use my location”)</string>
+</resources>

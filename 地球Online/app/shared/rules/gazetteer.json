@@ -1,0 +1,1494 @@
+[
+{
+"name": "关西机场",
+"aliases": [
+"关空",
+"KIX"
+],
+"lat": 34.4347,
+"lng": 135.244,
+"kind": "poi"
+},
+{
+"name": "难波",
+"aliases": [
+"难波 · 酒店",
+"なんば"
+],
+"lat": 34.6659,
+"lng": 135.5013,
+"kind": "poi"
+},
+{
+"name": "道顿堀",
+"aliases": [],
+"lat": 34.6687,
+"lng": 135.5013,
+"kind": "poi"
+},
+{
+"name": "心斋桥",
+"aliases": [],
+"lat": 34.6751,
+"lng": 135.501,
+"kind": "poi"
+},
+{
+"name": "大阪城",
+"aliases": [],
+"lat": 34.6873,
+"lng": 135.5262,
+"kind": "poi"
+},
+{
+"name": "梅田空中庭园",
+"aliases": [
+"梅田"
+],
+"lat": 34.7053,
+"lng": 135.4903,
+"kind": "poi"
+},
+{
+"name": "通天阁",
+"aliases": [
+"新世界"
+],
+"lat": 34.6525,
+"lng": 135.5063,
+"kind": "poi"
+},
+{
+"name": "海游馆",
+"aliases": [],
+"lat": 34.6545,
+"lng": 135.429,
+"kind": "poi"
+},
+{
+"name": "京都站",
+"aliases": [
+"京都站前"
+],
+"lat": 34.9858,
+"lng": 135.7588,
+"kind": "poi"
+},
+{
+"name": "伏见稻荷",
+"aliases": [],
+"lat": 34.9671,
+"lng": 135.7727,
+"kind": "poi"
+},
+{
+"name": "清水寺",
+"aliases": [],
+"lat": 34.9949,
+"lng": 135.785,
+"kind": "poi"
+},
+{
+"name": "祇园",
+"aliases": [],
+"lat": 35.0037,
+"lng": 135.7788,
+"kind": "poi"
+},
+{
+"name": "二条城",
+"aliases": [],
+"lat": 35.0142,
+"lng": 135.7481,
+"kind": "poi"
+},
+{
+"name": "金阁寺",
+"aliases": [],
+"lat": 35.0394,
+"lng": 135.7292,
+"kind": "poi"
+},
+{
+"name": "岚山",
+"aliases": [
+"渡月桥",
+"竹林"
+],
+"lat": 35.0094,
+"lng": 135.6668,
+"kind": "poi"
+},
+{
+"name": "近铁奈良",
+"aliases": [],
+"lat": 34.6845,
+"lng": 135.8278,
+"kind": "poi"
+},
+{
+"name": "兴福寺",
+"aliases": [],
+"lat": 34.6832,
+"lng": 135.8317,
+"kind": "poi"
+},
+{
+"name": "东大寺",
+"aliases": [],
+"lat": 34.689,
+"lng": 135.8398,
+"kind": "poi"
+},
+{
+"name": "春日大社",
+"aliases": [],
+"lat": 34.6813,
+"lng": 135.8484,
+"kind": "poi"
+},
+{
+"name": "三宫",
+"aliases": [],
+"lat": 34.6946,
+"lng": 135.1955,
+"kind": "poi"
+},
+{
+"name": "北野异人馆",
+"aliases": [],
+"lat": 34.7003,
+"lng": 135.19,
+"kind": "poi"
+},
+{
+"name": "南京町",
+"aliases": [],
+"lat": 34.688,
+"lng": 135.188,
+"kind": "poi"
+},
+{
+"name": "神户港塔",
+"aliases": [
+"美利坚公园"
+],
+"lat": 34.6826,
+"lng": 135.1867,
+"kind": "poi"
+},
+{
+"name": "雷克雅未克",
+"aliases": [
+"冰岛",
+"Reykjavik",
+"Iceland"
+],
+"lat": 64.1466,
+"lng": -21.9426,
+"kind": "city"
+},
+{
+"name": "哈尔格林姆教堂",
+"aliases": [
+"Hallgrímskirkja"
+],
+"lat": 64.1418,
+"lng": -21.9266,
+"kind": "poi"
+},
+{
+"name": "辛格韦德利",
+"aliases": [
+"Þingvellir",
+"Thingvellir"
+],
+"lat": 64.2559,
+"lng": -21.1295,
+"kind": "poi"
+},
+{
+"name": "盖锡尔",
+"aliases": [
+"间歇泉",
+"Geysir",
+"Strokkur"
+],
+"lat": 64.3104,
+"lng": -20.3024,
+"kind": "poi"
+},
+{
+"name": "古佛斯瀑布",
+"aliases": [
+"黄金瀑布",
+"Gullfoss"
+],
+"lat": 64.3271,
+"lng": -20.12,
+"kind": "poi"
+},
+{
+"name": "火口湖",
+"aliases": [
+"Kerið",
+"Kerid"
+],
+"lat": 64.041,
+"lng": -20.885,
+"kind": "poi"
+},
+{
+"name": "塞里雅兰瀑布",
+"aliases": [
+"Seljalandsfoss"
+],
+"lat": 63.6156,
+"lng": -19.9887,
+"kind": "poi"
+},
+{
+"name": "斯科加瀑布",
+"aliases": [
+"Skógafoss"
+],
+"lat": 63.532,
+"lng": -19.5117,
+"kind": "poi"
+},
+{
+"name": "黑沙滩",
+"aliases": [
+"Reynisfjara"
+],
+"lat": 63.4064,
+"lng": -19.045,
+"kind": "poi"
+},
+{
+"name": "维克",
+"aliases": [
+"Vík"
+],
+"lat": 63.4194,
+"lng": -19.0064,
+"kind": "city"
+},
+{
+"name": "冰河湖",
+"aliases": [
+"Jökulsárlón"
+],
+"lat": 64.0785,
+"lng": -16.2306,
+"kind": "poi"
+},
+{
+"name": "钻石冰沙滩",
+"aliases": [
+"Diamond Beach"
+],
+"lat": 64.0468,
+"lng": -16.1826,
+"kind": "poi"
+},
+{
+"name": "蓝湖",
+"aliases": [
+"Blue Lagoon"
+],
+"lat": 63.8804,
+"lng": -22.4495,
+"kind": "poi"
+},
+{
+"name": "凯夫拉维克机场",
+"aliases": [
+"KEF"
+],
+"lat": 63.985,
+"lng": -22.6056,
+"kind": "poi"
+},
+{
+"name": "哥本哈根",
+"aliases": [
+"Copenhagen",
+"丹麦"
+],
+"lat": 55.6761,
+"lng": 12.5683,
+"kind": "city"
+},
+{
+"name": "奥斯陆",
+"aliases": [
+"Oslo",
+"挪威"
+],
+"lat": 59.9139,
+"lng": 10.7522,
+"kind": "city"
+},
+{
+"name": "卑尔根",
+"aliases": [
+"Bergen"
+],
+"lat": 60.3913,
+"lng": 5.3221,
+"kind": "city"
+},
+{
+"name": "特罗姆瑟",
+"aliases": [
+"Tromsø",
+"Tromso"
+],
+"lat": 69.6492,
+"lng": 18.9553,
+"kind": "city"
+},
+{
+"name": "罗弗敦",
+"aliases": [
+"Lofoten",
+"Svolvær"
+],
+"lat": 68.234,
+"lng": 14.5615,
+"kind": "city"
+},
+{
+"name": "斯德哥尔摩",
+"aliases": [
+"Stockholm",
+"瑞典"
+],
+"lat": 59.3293,
+"lng": 18.0686,
+"kind": "city"
+},
+{
+"name": "赫尔辛基",
+"aliases": [
+"Helsinki",
+"芬兰"
+],
+"lat": 60.1699,
+"lng": 24.9384,
+"kind": "city"
+},
+{
+"name": "罗瓦涅米",
+"aliases": [
+"圣诞老人村",
+"Rovaniemi"
+],
+"lat": 66.5039,
+"lng": 25.7294,
+"kind": "city"
+},
+{
+"name": "东京",
+"aliases": [
+"Tokyo",
+"日本"
+],
+"lat": 35.6812,
+"lng": 139.7671,
+"kind": "city"
+},
+{
+"name": "京都",
+"aliases": [
+"Kyoto"
+],
+"lat": 35.0116,
+"lng": 135.7681,
+"kind": "city"
+},
+{
+"name": "大阪",
+"aliases": [
+"Osaka"
+],
+"lat": 34.6937,
+"lng": 135.5023,
+"kind": "city"
+},
+{
+"name": "奈良",
+"aliases": [
+"Nara"
+],
+"lat": 34.6851,
+"lng": 135.8048,
+"kind": "city"
+},
+{
+"name": "神户",
+"aliases": [
+"Kobe"
+],
+"lat": 34.6901,
+"lng": 135.1955,
+"kind": "city"
+},
+{
+"name": "札幌",
+"aliases": [
+"北海道"
+],
+"lat": 43.0618,
+"lng": 141.3545,
+"kind": "city"
+},
+{
+"name": "那霸",
+"aliases": [
+"冲绳"
+],
+"lat": 26.2124,
+"lng": 127.6809,
+"kind": "city"
+},
+{
+"name": "首尔",
+"aliases": [
+"韩国"
+],
+"lat": 37.5665,
+"lng": 126.978,
+"kind": "city"
+},
+{
+"name": "台北",
+"aliases": [],
+"lat": 25.033,
+"lng": 121.5654,
+"kind": "city"
+},
+{
+"name": "香港",
+"aliases": [],
+"lat": 22.3193,
+"lng": 114.1694,
+"kind": "city"
+},
+{
+"name": "上海",
+"aliases": [],
+"lat": 31.2304,
+"lng": 121.4737,
+"kind": "city"
+},
+{
+"name": "北京",
+"aliases": [],
+"lat": 39.9042,
+"lng": 116.4074,
+"kind": "city"
+},
+{
+"name": "成都",
+"aliases": [],
+"lat": 30.5728,
+"lng": 104.0668,
+"kind": "city"
+},
+{
+"name": "西安",
+"aliases": [],
+"lat": 34.3416,
+"lng": 108.9398,
+"kind": "city"
+},
+{
+"name": "拉萨",
+"aliases": [
+"西藏"
+],
+"lat": 29.652,
+"lng": 91.1721,
+"kind": "city"
+},
+{
+"name": "大理",
+"aliases": [],
+"lat": 25.6065,
+"lng": 100.2676,
+"kind": "city"
+},
+{
+"name": "丽江",
+"aliases": [],
+"lat": 26.8721,
+"lng": 100.2299,
+"kind": "city"
+},
+{
+"name": "厦门",
+"aliases": [],
+"lat": 24.4798,
+"lng": 118.0894,
+"kind": "city"
+},
+{
+"name": "杭州",
+"aliases": [],
+"lat": 30.2741,
+"lng": 120.1551,
+"kind": "city"
+},
+{
+"name": "新加坡",
+"aliases": [],
+"lat": 1.3521,
+"lng": 103.8198,
+"kind": "city"
+},
+{
+"name": "曼谷",
+"aliases": [
+"泰国"
+],
+"lat": 13.7563,
+"lng": 100.5018,
+"kind": "city"
+},
+{
+"name": "清迈",
+"aliases": [],
+"lat": 18.7883,
+"lng": 98.9853,
+"kind": "city"
+},
+{
+"name": "普吉岛",
+"aliases": [],
+"lat": 7.8804,
+"lng": 98.3923,
+"kind": "city"
+},
+{
+"name": "巴厘岛",
+"aliases": [],
+"lat": -8.3405,
+"lng": 115.092,
+"kind": "city"
+},
+{
+"name": "河内",
+"aliases": [
+"越南"
+],
+"lat": 21.0278,
+"lng": 105.8342,
+"kind": "city"
+},
+{
+"name": "岘港",
+"aliases": [],
+"lat": 16.0544,
+"lng": 108.2022,
+"kind": "city"
+},
+{
+"name": "迪拜",
+"aliases": [],
+"lat": 25.2048,
+"lng": 55.2708,
+"kind": "city"
+},
+{
+"name": "伊斯坦布尔",
+"aliases": [
+"土耳其"
+],
+"lat": 41.0082,
+"lng": 28.9784,
+"kind": "city"
+},
+{
+"name": "开罗",
+"aliases": [
+"埃及"
+],
+"lat": 30.0444,
+"lng": 31.2357,
+"kind": "city"
+},
+{
+"name": "巴黎",
+"aliases": [
+"法国"
+],
+"lat": 48.8566,
+"lng": 2.3522,
+"kind": "city"
+},
+{
+"name": "伦敦",
+"aliases": [
+"英国"
+],
+"lat": 51.5074,
+"lng": -0.1278,
+"kind": "city"
+},
+{
+"name": "罗马",
+"aliases": [
+"意大利"
+],
+"lat": 41.9028,
+"lng": 12.4964,
+"kind": "city"
+},
+{
+"name": "佛罗伦萨",
+"aliases": [],
+"lat": 43.7696,
+"lng": 11.2558,
+"kind": "city"
+},
+{
+"name": "威尼斯",
+"aliases": [],
+"lat": 45.4408,
+"lng": 12.3155,
+"kind": "city"
+},
+{
+"name": "巴塞罗那",
+"aliases": [
+"西班牙"
+],
+"lat": 41.3851,
+"lng": 2.1734,
+"kind": "city"
+},
+{
+"name": "马德里",
+"aliases": [],
+"lat": 40.4168,
+"lng": -3.7038,
+"kind": "city"
+},
+{
+"name": "里斯本",
+"aliases": [
+"葡萄牙"
+],
+"lat": 38.7223,
+"lng": -9.1393,
+"kind": "city"
+},
+{
+"name": "阿姆斯特丹",
+"aliases": [
+"荷兰"
+],
+"lat": 52.3676,
+"lng": 4.9041,
+"kind": "city"
+},
+{
+"name": "柏林",
+"aliases": [
+"德国"
+],
+"lat": 52.52,
+"lng": 13.405,
+"kind": "city"
+},
+{
+"name": "慕尼黑",
+"aliases": [],
+"lat": 48.1351,
+"lng": 11.582,
+"kind": "city"
+},
+{
+"name": "布拉格",
+"aliases": [
+"捷克"
+],
+"lat": 50.0755,
+"lng": 14.4378,
+"kind": "city"
+},
+{
+"name": "维也纳",
+"aliases": [
+"奥地利"
+],
+"lat": 48.2082,
+"lng": 16.3738,
+"kind": "city"
+},
+{
+"name": "布达佩斯",
+"aliases": [],
+"lat": 47.4979,
+"lng": 19.0402,
+"kind": "city"
+},
+{
+"name": "因特拉肯",
+"aliases": [
+"瑞士"
+],
+"lat": 46.6863,
+"lng": 7.8632,
+"kind": "city"
+},
+{
+"name": "圣托里尼",
+"aliases": [
+"希腊"
+],
+"lat": 36.3932,
+"lng": 25.4615,
+"kind": "city"
+},
+{
+"name": "纽约",
+"aliases": [
+"美国"
+],
+"lat": 40.7128,
+"lng": -74.006,
+"kind": "city"
+},
+{
+"name": "旧金山",
+"aliases": [],
+"lat": 37.7749,
+"lng": -122.4194,
+"kind": "city"
+},
+{
+"name": "洛杉矶",
+"aliases": [],
+"lat": 34.0522,
+"lng": -118.2437,
+"kind": "city"
+},
+{
+"name": "檀香山",
+"aliases": [
+"夏威夷"
+],
+"lat": 21.3069,
+"lng": -157.8583,
+"kind": "city"
+},
+{
+"name": "温哥华",
+"aliases": [
+"加拿大"
+],
+"lat": 49.2827,
+"lng": -123.1207,
+"kind": "city"
+},
+{
+"name": "班夫",
+"aliases": [],
+"lat": 51.1784,
+"lng": -115.5708,
+"kind": "city"
+},
+{
+"name": "墨西哥城",
+"aliases": [],
+"lat": 19.4326,
+"lng": -99.1332,
+"kind": "city"
+},
+{
+"name": "库斯科",
+"aliases": [
+"马丘比丘",
+"秘鲁"
+],
+"lat": -13.532,
+"lng": -71.9675,
+"kind": "city"
+},
+{
+"name": "悉尼",
+"aliases": [
+"澳大利亚"
+],
+"lat": -33.8688,
+"lng": 151.2093,
+"kind": "city"
+},
+{
+"name": "墨尔本",
+"aliases": [],
+"lat": -37.8136,
+"lng": 144.9631,
+"kind": "city"
+},
+{
+"name": "皇后镇",
+"aliases": [
+"新西兰"
+],
+"lat": -45.0312,
+"lng": 168.6626,
+"kind": "city"
+},
+{
+"name": "开普敦",
+"aliases": [
+"南非"
+],
+"lat": -33.9249,
+"lng": 18.4241,
+"kind": "city"
+},
+{
+"name": "马拉喀什",
+"aliases": [
+"摩洛哥"
+],
+"lat": 31.6295,
+"lng": -7.9811,
+"kind": "city"
+},
+{
+"name": "马尔代夫",
+"aliases": [
+"马累"
+],
+"lat": 4.1755,
+"lng": 73.5093,
+"kind": "city"
+},
+{
+"name": "广州",
+"aliases": [
+"Guangzhou"
+],
+"lat": 23.129,
+"lng": 113.264,
+"kind": "city"
+},
+{
+"name": "深圳",
+"aliases": [
+"Shenzhen"
+],
+"lat": 22.543,
+"lng": 114.058,
+"kind": "city"
+},
+{
+"name": "南京",
+"aliases": [
+"Nanjing"
+],
+"lat": 32.06,
+"lng": 118.797,
+"kind": "city"
+},
+{
+"name": "苏州",
+"aliases": [
+"Suzhou"
+],
+"lat": 31.299,
+"lng": 120.585,
+"kind": "city"
+},
+{
+"name": "武汉",
+"aliases": [
+"Wuhan"
+],
+"lat": 30.593,
+"lng": 114.305,
+"kind": "city"
+},
+{
+"name": "重庆",
+"aliases": [
+"Chongqing"
+],
+"lat": 29.563,
+"lng": 106.551,
+"kind": "city"
+},
+{
+"name": "天津",
+"aliases": [
+"Tianjin"
+],
+"lat": 39.084,
+"lng": 117.201,
+"kind": "city"
+},
+{
+"name": "长沙",
+"aliases": [
+"Changsha"
+],
+"lat": 28.228,
+"lng": 112.939,
+"kind": "city"
+},
+{
+"name": "青岛",
+"aliases": [
+"Qingdao"
+],
+"lat": 36.067,
+"lng": 120.383,
+"kind": "city"
+},
+{
+"name": "大连",
+"aliases": [
+"Dalian"
+],
+"lat": 38.914,
+"lng": 121.615,
+"kind": "city"
+},
+{
+"name": "沈阳",
+"aliases": [
+"Shenyang"
+],
+"lat": 41.806,
+"lng": 123.432,
+"kind": "city"
+},
+{
+"name": "哈尔滨",
+"aliases": [
+"Harbin"
+],
+"lat": 45.803,
+"lng": 126.535,
+"kind": "city"
+},
+{
+"name": "长春",
+"aliases": [
+"Changchun"
+],
+"lat": 43.817,
+"lng": 125.324,
+"kind": "city"
+},
+{
+"name": "郑州",
+"aliases": [
+"Zhengzhou"
+],
+"lat": 34.747,
+"lng": 113.625,
+"kind": "city"
+},
+{
+"name": "济南",
+"aliases": [
+"Jinan"
+],
+"lat": 36.651,
+"lng": 117.12,
+"kind": "city"
+},
+{
+"name": "合肥",
+"aliases": [
+"Hefei"
+],
+"lat": 31.821,
+"lng": 117.227,
+"kind": "city"
+},
+{
+"name": "福州",
+"aliases": [
+"Fuzhou"
+],
+"lat": 26.074,
+"lng": 119.296,
+"kind": "city"
+},
+{
+"name": "泉州",
+"aliases": [
+"Quanzhou"
+],
+"lat": 24.874,
+"lng": 118.676,
+"kind": "city"
+},
+{
+"name": "昆明",
+"aliases": [
+"Kunming"
+],
+"lat": 25.038,
+"lng": 102.718,
+"kind": "city"
+},
+{
+"name": "贵阳",
+"aliases": [
+"Guiyang"
+],
+"lat": 26.647,
+"lng": 106.63,
+"kind": "city"
+},
+{
+"name": "南宁",
+"aliases": [
+"Nanning"
+],
+"lat": 22.817,
+"lng": 108.366,
+"kind": "city"
+},
+{
+"name": "桂林",
+"aliases": [
+"Guilin"
+],
+"lat": 25.274,
+"lng": 110.29,
+"kind": "city"
+},
+{
+"name": "海口",
+"aliases": [
+"Haikou"
+],
+"lat": 20.044,
+"lng": 110.199,
+"kind": "city"
+},
+{
+"name": "三亚",
+"aliases": [
+"Sanya"
+],
+"lat": 18.253,
+"lng": 109.512,
+"kind": "city"
+},
+{
+"name": "兰州",
+"aliases": [
+"Lanzhou"
+],
+"lat": 36.061,
+"lng": 103.834,
+"kind": "city"
+},
+{
+"name": "西宁",
+"aliases": [
+"Xining"
+],
+"lat": 36.617,
+"lng": 101.778,
+"kind": "city"
+},
+{
+"name": "银川",
+"aliases": [
+"Yinchuan"
+],
+"lat": 38.487,
+"lng": 106.231,
+"kind": "city"
+},
+{
+"name": "乌鲁木齐",
+"aliases": [
+"Urumqi"
+],
+"lat": 43.825,
+"lng": 87.617,
+"kind": "city"
+},
+{
+"name": "呼和浩特",
+"aliases": [
+"Hohhot"
+],
+"lat": 40.842,
+"lng": 111.749,
+"kind": "city"
+},
+{
+"name": "太原",
+"aliases": [
+"Taiyuan"
+],
+"lat": 37.87,
+"lng": 112.549,
+"kind": "city"
+},
+{
+"name": "石家庄",
+"aliases": [
+"Shijiazhuang"
+],
+"lat": 38.042,
+"lng": 114.515,
+"kind": "city"
+},
+{
+"name": "南昌",
+"aliases": [
+"Nanchang"
+],
+"lat": 28.683,
+"lng": 115.858,
+"kind": "city"
+},
+{
+"name": "宁波",
+"aliases": [
+"Ningbo"
+],
+"lat": 29.868,
+"lng": 121.544,
+"kind": "city"
+},
+{
+"name": "温州",
+"aliases": [
+"Wenzhou"
+],
+"lat": 27.994,
+"lng": 120.699,
+"kind": "city"
+},
+{
+"name": "绍兴",
+"aliases": [
+"Shaoxing"
+],
+"lat": 30.0,
+"lng": 120.58,
+"kind": "city"
+},
+{
+"name": "嘉兴",
+"aliases": [
+"Jiaxing"
+],
+"lat": 30.746,
+"lng": 120.755,
+"kind": "city"
+},
+{
+"name": "无锡",
+"aliases": [
+"Wuxi"
+],
+"lat": 31.491,
+"lng": 120.312,
+"kind": "city"
+},
+{
+"name": "常州",
+"aliases": [
+"Changzhou"
+],
+"lat": 31.811,
+"lng": 119.974,
+"kind": "city"
+},
+{
+"name": "扬州",
+"aliases": [
+"Yangzhou"
+],
+"lat": 32.394,
+"lng": 119.413,
+"kind": "city"
+},
+{
+"name": "徐州",
+"aliases": [
+"Xuzhou"
+],
+"lat": 34.206,
+"lng": 117.285,
+"kind": "city"
+},
+{
+"name": "洛阳",
+"aliases": [
+"Luoyang"
+],
+"lat": 34.62,
+"lng": 112.454,
+"kind": "city"
+},
+{
+"name": "烟台",
+"aliases": [
+"Yantai"
+],
+"lat": 37.464,
+"lng": 121.448,
+"kind": "city"
+},
+{
+"name": "珠海",
+"aliases": [
+"Zhuhai"
+],
+"lat": 22.271,
+"lng": 113.577,
+"kind": "city"
+},
+{
+"name": "东莞",
+"aliases": [
+"Dongguan"
+],
+"lat": 23.021,
+"lng": 113.752,
+"kind": "city"
+},
+{
+"name": "佛山",
+"aliases": [
+"Foshan"
+],
+"lat": 23.022,
+"lng": 113.122,
+"kind": "city"
+},
+{
+"name": "惠州",
+"aliases": [
+"Huizhou"
+],
+"lat": 23.112,
+"lng": 114.416,
+"kind": "city"
+},
+{
+"name": "澳门",
+"aliases": [
+"Macau"
+],
+"lat": 22.199,
+"lng": 113.544,
+"kind": "city"
+},
+{
+"name": "台中",
+"aliases": [
+"Taichung"
+],
+"lat": 24.148,
+"lng": 120.674,
+"kind": "city"
+},
+{
+"name": "高雄",
+"aliases": [
+"Kaohsiung"
+],
+"lat": 22.627,
+"lng": 120.301,
+"kind": "city"
+},
+{
+"name": "釜山",
+"aliases": [
+"Busan"
+],
+"lat": 35.18,
+"lng": 129.075,
+"kind": "city"
+},
+{
+"name": "名古屋",
+"aliases": [
+"Nagoya"
+],
+"lat": 35.181,
+"lng": 136.906,
+"kind": "city"
+},
+{
+"name": "福冈",
+"aliases": [
+"Fukuoka"
+],
+"lat": 33.59,
+"lng": 130.402,
+"kind": "city"
+},
+{
+"name": "吉隆坡",
+"aliases": [
+"Kuala Lumpur"
+],
+"lat": 3.139,
+"lng": 101.687,
+"kind": "city"
+},
+{
+"name": "雅加达",
+"aliases": [
+"Jakarta"
+],
+"lat": -6.2,
+"lng": 106.817,
+"kind": "city"
+},
+{
+"name": "马尼拉",
+"aliases": [
+"Manila"
+],
+"lat": 14.599,
+"lng": 120.984,
+"kind": "city"
+},
+{
+"name": "胡志明市",
+"aliases": [
+"Ho Chi Minh City"
+],
+"lat": 10.823,
+"lng": 106.63,
+"kind": "city"
+},
+{
+"name": "孟买",
+"aliases": [
+"Mumbai"
+],
+"lat": 19.076,
+"lng": 72.878,
+"kind": "city"
+},
+{
+"name": "新德里",
+"aliases": [
+"New Delhi"
+],
+"lat": 28.614,
+"lng": 77.209,
+"kind": "city"
+},
+{
+"name": "莫斯科",
+"aliases": [
+"Moscow"
+],
+"lat": 55.756,
+"lng": 37.617,
+"kind": "city"
+},
+{
+"name": "多伦多",
+"aliases": [
+"Toronto"
+],
+"lat": 43.653,
+"lng": -79.383,
+"kind": "city"
+},
+{
+"name": "芝加哥",
+"aliases": [
+"Chicago"
+],
+"lat": 41.878,
+"lng": -87.63,
+"kind": "city"
+},
+{
+"name": "西雅图",
+"aliases": [
+"Seattle"
+],
+"lat": 47.606,
+"lng": -122.332,
+"kind": "city"
+},
+{
+"name": "波士顿",
+"aliases": [
+"Boston"
+],
+"lat": 42.36,
+"lng": -71.059,
+"kind": "city"
+},
+{
+"name": "奥克兰",
+"aliases": [
+"Auckland"
+],
+"lat": -36.848,
+"lng": 174.763,
+"kind": "city"
+},
+{
+"name": "苏黎世",
+"aliases": [
+"Zurich"
+],
+"lat": 47.376,
+"lng": 8.541,
+"kind": "city"
+},
+{
+"name": "爱丁堡",
+"aliases": [
+"Edinburgh"
+],
+"lat": 55.953,
+"lng": -3.188,
+"kind": "city"
+},
+{
+"name": "都柏林",
+"aliases": [
+"Dublin"
+],
+"lat": 53.35,
+"lng": -6.26,
+"kind": "city"
+},
+{
+"name": "布鲁塞尔",
+"aliases": [
+"Brussels"
+],
+"lat": 50.85,
+"lng": 4.352,
+"kind": "city"
+},
+{
+"name": "华沙",
+"aliases": [
+"Warsaw"
+],
+"lat": 52.23,
+"lng": 21.011,
+"kind": "city"
+}
+]

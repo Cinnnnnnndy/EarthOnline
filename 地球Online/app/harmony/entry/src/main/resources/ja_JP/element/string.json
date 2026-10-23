@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "app_name",
+      "value": "地球Online"
+    },
+    {
+      "name": "module_desc",
+      "value": "旅を一冊の本と小さな世界に"
+    },
+    {
+      "name": "ability_desc",
+      "value": "地球とある一日の世界"
+    },
+    {
+      "name": "reason_internet",
+      "value": "プランニングサービス（任意）と同期に接続します"
+    },
+    {
+      "name": "reason_microphone",
+      "value": "声で旅程を作るときに使います"
+    },
+    {
+      "name": "reason_location",
+      "value": "「現在地を使う」を押したときだけ、家を今いる街に置きます"
+    }
+  ]
+}

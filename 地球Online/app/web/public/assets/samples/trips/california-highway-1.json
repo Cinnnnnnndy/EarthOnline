@@ -1,0 +1,162 @@
+{
+  "schemaVersion": "0.3",
+  "id": "sample-california-highway-1",
+  "title": "加州一号公路自驾",
+  "destination": "美国加州",
+  "startDate": "2027-04-24",
+  "endDate": "2027-04-30",
+  "theme": "海风港町",
+  "seed": 1742044104,
+  "status": "planning",
+  "days": [
+    {
+      "index": 1,
+      "date": "2027-04-24",
+      "title": "上海飞旧金山",
+      "city": "geo",
+      "lodging": "联合广场",
+      "entries": [
+        {"id":"d1-e0","type":"place","name":"上海浦东国际机场","category":"airport","plannedStart":"13:40","stayMinutes":180,"notes":"提前 3 小时到，美国航线值机柜台关得早","geo":{"lat":31.1443,"lng":121.8083}},
+        {"id":"d1-e1","type":"transport","mode":"flight","label":"上海浦东飞旧金山","durationMinutes":665,"distanceKm":9880},
+        {"id":"d1-e2","type":"place","name":"旧金山国际机场","category":"airport","plannedStart":"12:45","stayMinutes":60,"notes":"入境排队约一小时；时差 15 小时，落地还是同一天中午","geo":{"lat":37.6213,"lng":-122.379}},
+        {"id":"d1-e3","type":"transport","mode":"subway","label":"BART 湾区捷运到鲍威尔街站","durationMinutes":32,"distanceKm":22},
+        {"id":"d1-e4","type":"place","name":"联合广场酒店","category":"hotel","stayMinutes":30,"notes":"办入住，放行李","geo":{"lat":37.788,"lng":-122.4075}},
+        {"id":"d1-e5","type":"transport","mode":"walk","label":"步行","durationMinutes":5,"distanceKm":0.4},
+        {"id":"d1-e6","type":"place","name":"鲍威尔街叮当车站","category":"station","stayMinutes":20,"notes":"叮当车起点的转盘，排队 20 分钟左右","geo":{"lat":37.7847,"lng":-122.4079}},
+        {"id":"d1-e7","type":"transport","mode":"rail","label":"叮当车 Powell-Hyde 线","durationMinutes":18,"distanceKm":2.6},
+        {"id":"d1-e8","type":"place","name":"九曲花街","category":"sight","stayMinutes":20,"notes":"在 Hyde 街中途下车，从上往下走","geo":{"lat":37.8021,"lng":-122.4187}},
+        {"id":"d1-e9","type":"transport","mode":"walk","label":"步行","durationMinutes":12,"distanceKm":0.9},
+        {"id":"d1-e10","type":"place","name":"渔人码头","category":"sight","stayMinutes":60,"notes":"晚饭吃酸面包碗装的蛤蜊浓汤","geo":{"lat":37.808,"lng":-122.4177}},
+        {"id":"d1-e11","type":"transport","mode":"walk","label":"步行","durationMinutes":15,"distanceKm":1.1},
+        {"id":"d1-e12","type":"place","name":"39 号码头","category":"sight","plannedStart":"18:30","stayMinutes":45,"notes":"看码头边晒太阳的海狮","geo":{"lat":37.8087,"lng":-122.4098}},
+        {"id":"d1-e13","type":"transport","mode":"taxi","label":"打车回酒店","durationMinutes":15,"distanceKm":3.2},
+        {"id":"d1-e14","type":"place","name":"联合广场酒店","category":"hotel","geo":{"lat":37.788,"lng":-122.4075}}
+      ]
+    },
+    {
+      "index": 2,
+      "date": "2027-04-25",
+      "title": "走过金门大桥，坐渡轮回城",
+      "city": "geo",
+      "lodging": "联合广场",
+      "entries": [
+        {"id":"d2-e0","type":"place","name":"联合广场酒店","category":"hotel","plannedStart":"08:30","stayMinutes":5,"geo":{"lat":37.788,"lng":-122.4075}},
+        {"id":"d2-e1","type":"transport","mode":"bus","label":"公交到金门大桥南端","durationMinutes":40,"distanceKm":9},
+        {"id":"d2-e2","type":"place","name":"金门大桥游客中心","category":"sight","plannedStart":"09:15","stayMinutes":20,"notes":"南端游客中心有卫生间；桥上风大，带件外套","geo":{"lat":37.8078,"lng":-122.475}},
+        {"id":"d2-e3","type":"transport","mode":"walk","label":"步行过桥，桥长 2.7 公里","durationMinutes":50,"distanceKm":2.9},
+        {"id":"d2-e4","type":"place","name":"金门大桥北端观景点","category":"sight","stayMinutes":20,"notes":"回头拍整座桥和城市","geo":{"lat":37.8324,"lng":-122.4795}},
+        {"id":"d2-e5","type":"transport","mode":"walk","label":"沿亚历山大大道走下山","durationMinutes":45,"distanceKm":3.3},
+        {"id":"d2-e6","type":"place","name":"索萨利托","category":"sight","stayMinutes":120,"notes":"海边小镇，午饭吃生蚝和鱼肉塔可","geo":{"lat":37.8591,"lng":-122.4853}},
+        {"id":"d2-e7","type":"transport","mode":"walk","label":"步行","durationMinutes":10,"distanceKm":0.8},
+        {"id":"d2-e8","type":"place","name":"索萨利托渡轮码头","category":"port","plannedStart":"14:30","stayMinutes":10,"notes":"金门渡轮，用 Clipper 卡刷","geo":{"lat":37.8565,"lng":-122.4785}},
+        {"id":"d2-e9","type":"transport","mode":"ship","label":"渡轮回旧金山，途经恶魔岛","durationMinutes":30,"distanceKm":10.5},
+        {"id":"d2-e10","type":"place","name":"渡轮大厦","category":"shop","stayMinutes":90,"notes":"码头集市，买蓝瓶咖啡和酸面包","geo":{"lat":37.7955,"lng":-122.3937}},
+        {"id":"d2-e11","type":"transport","mode":"walk","label":"沿内河码头走","durationMinutes":20,"distanceKm":1.6},
+        {"id":"d2-e12","type":"place","name":"唐人街","category":"sight","stayMinutes":60,"notes":"从都板街的龙门进，晚饭吃点心","geo":{"lat":37.7941,"lng":-122.4078}},
+        {"id":"d2-e13","type":"transport","mode":"walk","label":"步行","durationMinutes":10,"distanceKm":0.8},
+        {"id":"d2-e14","type":"place","name":"联合广场酒店","category":"hotel","geo":{"lat":37.788,"lng":-122.4075}}
+      ]
+    },
+    {
+      "index": 3,
+      "date": "2027-04-26",
+      "title": "取车南下，半月湾到蒙特雷",
+      "city": "geo",
+      "lodging": "蒙特雷",
+      "entries": [
+        {"id":"d3-e0","type":"place","name":"联合广场酒店","category":"hotel","plannedStart":"08:30","stayMinutes":15,"notes":"在酒店旁的租车点取车，买全险","geo":{"lat":37.788,"lng":-122.4075}},
+        {"id":"d3-e1","type":"transport","mode":"car","label":"自驾出城上一号公路","durationMinutes":45,"distanceKm":45},
+        {"id":"d3-e2","type":"place","name":"半月湾","category":"sight","stayMinutes":45,"notes":"海边悬崖步道，4 月早上常有雾","geo":{"lat":37.4636,"lng":-122.4286}},
+        {"id":"d3-e3","type":"transport","mode":"car","label":"自驾","durationMinutes":75,"distanceKm":80,"polyline":[[37.4636,-122.4286],[37.3213,-122.402],[37.2625,-122.4125],[37.1817,-122.39],[37.11,-122.315],[37.096,-122.277],[37.0116,-122.1966],[36.97,-122.09],[36.9643,-122.0177]]},
+        {"id":"d3-e4","type":"place","name":"圣克鲁斯海滩木板路","category":"sight","stayMinutes":90,"notes":"1924 年的木头过山车还在跑，海滩边吃午饭","geo":{"lat":36.9643,"lng":-122.0177}},
+        {"id":"d3-e5","type":"transport","mode":"car","label":"自驾绕蒙特雷湾","durationMinutes":60,"distanceKm":70,"polyline":[[36.9643,-122.0177],[36.9752,-121.9533],[36.9772,-121.8994],[36.91,-121.77],[36.8047,-121.7869],[36.7658,-121.77],[36.6844,-121.8022],[36.6111,-121.8516],[36.6002,-121.8947],[36.6182,-121.9018]]},
+        {"id":"d3-e6","type":"place","name":"蒙特雷湾水族馆","category":"sight","plannedStart":"14:00","stayMinutes":150,"notes":"海獭喂食时间看官网；海藻森林展厅最值得看","geo":{"lat":36.6182,"lng":-121.9018}},
+        {"id":"d3-e7","type":"transport","mode":"walk","label":"步行","durationMinutes":5,"distanceKm":0.3},
+        {"id":"d3-e8","type":"place","name":"罐头厂街","category":"sight","stayMinutes":60,"notes":"斯坦贝克小说里的那条街，晚饭吃海鲜","geo":{"lat":36.616,"lng":-121.9}},
+        {"id":"d3-e9","type":"transport","mode":"walk","label":"步行","durationMinutes":5,"distanceKm":0.3},
+        {"id":"d3-e10","type":"place","name":"蒙特雷海边酒店","category":"hotel","geo":{"lat":36.615,"lng":-121.8975}}
+      ]
+    },
+    {
+      "index": 4,
+      "date": "2027-04-27",
+      "title": "17 英里湾和大苏尔",
+      "city": "geo",
+      "lodging": "坎布里亚",
+      "entries": [
+        {"id":"d4-e0","type":"place","name":"蒙特雷海边酒店","category":"hotel","plannedStart":"08:00","stayMinutes":5,"notes":"出发前查加州交通局路况，大苏尔段常因塌方封路","geo":{"lat":36.615,"lng":-121.8975}},
+        {"id":"d4-e1","type":"transport","mode":"car","label":"自驾进 17 英里湾，门票按车收","durationMinutes":25,"distanceKm":15},
+        {"id":"d4-e2","type":"place","name":"孤柏","category":"sight","stayMinutes":15,"notes":"海边岩石上的一棵柏树，只能远看","geo":{"lat":36.5689,"lng":-121.9656}},
+        {"id":"d4-e3","type":"transport","mode":"car","label":"自驾","durationMinutes":15,"distanceKm":8,"polyline":[[36.5689,-121.9656],[36.5725,-121.948],[36.563,-121.93],[36.5552,-121.9233]]},
+        {"id":"d4-e4","type":"place","name":"卡梅尔小镇","category":"sight","stayMinutes":90,"notes":"童话式小屋和画廊，在这里吃早午饭","geo":{"lat":36.5552,"lng":-121.9233}},
+        {"id":"d4-e5","type":"transport","mode":"car","label":"自驾","durationMinutes":25,"distanceKm":22,"polyline":[[36.5552,-121.9233],[36.53,-121.923],[36.517,-121.937],[36.45,-121.923],[36.4,-121.912],[36.3715,-121.9017]]},
+        {"id":"d4-e6","type":"place","name":"比克斯比大桥","category":"sight","stayMinutes":20,"notes":"北侧路边的观景位车多，停稳再下车","geo":{"lat":36.3715,"lng":-121.9017}},
+        {"id":"d4-e7","type":"transport","mode":"car","label":"自驾","durationMinutes":35,"distanceKm":27,"polyline":[[36.3715,-121.9017],[36.33,-121.885],[36.3066,-121.887],[36.285,-121.845],[36.2704,-121.8081],[36.25,-121.785],[36.2211,-121.7581]]},
+        {"id":"d4-e8","type":"place","name":"大苏尔悬崖餐厅","category":"food","stayMinutes":60,"notes":"露台看海，吃汉堡","geo":{"lat":36.2211,"lng":-121.7581}},
+        {"id":"d4-e9","type":"transport","mode":"car","label":"自驾","durationMinutes":15,"distanceKm":13,"polyline":[[36.2211,-121.7581],[36.19,-121.72],[36.1581,-121.6722]]},
+        {"id":"d4-e10","type":"place","name":"麦克威瀑布","category":"sight","stayMinutes":30,"notes":"瀑布直接落在沙滩上，步道单程 10 分钟","geo":{"lat":36.1581,"lng":-121.6722}},
+        {"id":"d4-e11","type":"transport","mode":"car","label":"自驾南下到坎布里亚","durationMinutes":110,"distanceKm":100,"polyline":[[36.1581,-121.6722],[36.088,-121.605],[36.0205,-121.5485],[35.9261,-121.4661],[35.85,-121.4],[35.7786,-121.3265],[35.71,-121.29],[35.6636,-121.2569],[35.6436,-121.19],[35.6,-121.13],[35.57,-121.102]]},
+        {"id":"d4-e12","type":"place","name":"坎布里亚海边旅馆","category":"hotel","geo":{"lat":35.57,"lng":-121.102}}
+      ]
+    },
+    {
+      "index": 5,
+      "date": "2027-04-28",
+      "title": "象海豹和赫氏古堡，开到圣巴巴拉",
+      "city": "geo",
+      "lodging": "圣巴巴拉",
+      "entries": [
+        {"id":"d5-e0","type":"place","name":"坎布里亚海边旅馆","category":"hotel","plannedStart":"08:30","stayMinutes":5,"geo":{"lat":35.57,"lng":-121.102}},
+        {"id":"d5-e1","type":"transport","mode":"car","label":"自驾","durationMinutes":20,"distanceKm":19,"polyline":[[35.57,-121.102],[35.6,-121.13],[35.6436,-121.19],[35.6636,-121.2569]]},
+        {"id":"d5-e2","type":"place","name":"象海豹观景点","category":"sight","stayMinutes":30,"notes":"4 月是换毛期，沙滩上躺满象海豹，免费看","geo":{"lat":35.6636,"lng":-121.2569}},
+        {"id":"d5-e3","type":"transport","mode":"car","label":"自驾","durationMinutes":20,"distanceKm":14,"polyline":[[35.6636,-121.2569],[35.6436,-121.19],[35.66,-121.185],[35.6853,-121.1681]]},
+        {"id":"d5-e4","type":"place","name":"赫氏古堡","category":"sight","plannedStart":"10:30","stayMinutes":150,"notes":"只能跟团参观，在山下游客中心坐大巴上山；提前订大房间路线","geo":{"lat":35.6853,"lng":-121.1681}},
+        {"id":"d5-e5","type":"transport","mode":"car","label":"自驾","durationMinutes":45,"distanceKm":55,"polyline":[[35.6853,-121.1681],[35.6436,-121.19],[35.6,-121.13],[35.5641,-121.0807],[35.5086,-121.0243],[35.4428,-120.892],[35.39,-120.86],[35.3712,-120.8665]]},
+        {"id":"d5-e6","type":"place","name":"莫罗岩","category":"sight","stayMinutes":35,"notes":"海湾口的火山岩，午饭吃炸鱼薯条","geo":{"lat":35.3712,"lng":-120.8665}},
+        {"id":"d5-e7","type":"transport","mode":"car","label":"自驾南下，走 101 号公路","durationMinutes":130,"distanceKm":170,"polyline":[[35.3712,-120.8665],[35.3658,-120.8499],[35.2828,-120.6596],[35.1428,-120.6413],[34.953,-120.4357],[34.7444,-120.2782],[34.6136,-120.1927],[34.5,-120.225],[34.4717,-120.2279],[34.458,-120.024],[34.4358,-119.8276],[34.4383,-119.7137]]},
+        {"id":"d5-e8","type":"place","name":"圣巴巴拉老教堂","category":"sight","plannedStart":"16:30","stayMinutes":45,"notes":"加州传教站里最漂亮的一座，西班牙式双钟楼","geo":{"lat":34.4383,"lng":-119.7137}},
+        {"id":"d5-e9","type":"transport","mode":"car","label":"自驾","durationMinutes":10,"distanceKm":4},
+        {"id":"d5-e10","type":"place","name":"斯登斯码头","category":"sight","stayMinutes":60,"notes":"木码头上看日落","geo":{"lat":34.41,"lng":-119.6856}},
+        {"id":"d5-e11","type":"transport","mode":"walk","label":"步行","durationMinutes":10,"distanceKm":0.8},
+        {"id":"d5-e12","type":"place","name":"圣巴巴拉州街酒店","category":"hotel","geo":{"lat":34.415,"lng":-119.6905}}
+      ]
+    },
+    {
+      "index": 6,
+      "date": "2027-04-29",
+      "title": "马里布海岸进洛杉矶",
+      "city": "geo",
+      "lodging": "好莱坞",
+      "entries": [
+        {"id":"d6-e0","type":"place","name":"圣巴巴拉州街酒店","category":"hotel","plannedStart":"09:00","stayMinutes":5,"geo":{"lat":34.415,"lng":-119.6905}},
+        {"id":"d6-e1","type":"transport","mode":"car","label":"自驾","durationMinutes":80,"distanceKm":110,"polyline":[[34.415,-119.6905],[34.4214,-119.5965],[34.3989,-119.5185],[34.37,-119.47],[34.33,-119.4],[34.2746,-119.229],[34.1975,-119.1771],[34.0875,-119.06],[34.0444,-118.9346],[34.0382,-118.8747]]},
+        {"id":"d6-e2","type":"place","name":"马塔多海滩","category":"sight","stayMinutes":45,"notes":"礁石拱门，退潮时能走进洞里","geo":{"lat":34.0382,"lng":-118.8747}},
+        {"id":"d6-e3","type":"transport","mode":"car","label":"自驾","durationMinutes":20,"distanceKm":19,"polyline":[[34.0382,-118.8747],[34.02,-118.82],[34.027,-118.78],[34.033,-118.73],[34.0356,-118.6771]]},
+        {"id":"d6-e4","type":"place","name":"马里布码头","category":"sight","stayMinutes":60,"notes":"码头尽头吃午饭","geo":{"lat":34.0356,"lng":-118.6771}},
+        {"id":"d6-e5","type":"transport","mode":"car","label":"自驾","durationMinutes":25,"distanceKm":20,"polyline":[[34.0356,-118.6771],[34.04,-118.62],[34.038,-118.555],[34.02,-118.515],[34.0094,-118.4973]]},
+        {"id":"d6-e6","type":"place","name":"圣莫尼卡码头","category":"sight","stayMinutes":60,"notes":"66 号公路的终点牌就在码头上","geo":{"lat":34.0094,"lng":-118.4973}},
+        {"id":"d6-e7","type":"transport","mode":"car","label":"自驾穿城，晚高峰很堵","durationMinutes":55,"distanceKm":30},
+        {"id":"d6-e8","type":"place","name":"格里菲斯天文台","category":"sight","plannedStart":"18:30","stayMinutes":90,"notes":"免费，看日落和好莱坞标志；停车位难找","geo":{"lat":34.1184,"lng":-118.3004}},
+        {"id":"d6-e9","type":"transport","mode":"car","label":"自驾","durationMinutes":15,"distanceKm":7},
+        {"id":"d6-e10","type":"place","name":"好莱坞酒店","category":"hotel","geo":{"lat":34.1016,"lng":-118.3387}}
+      ]
+    },
+    {
+      "index": 7,
+      "date": "2027-04-30",
+      "title": "星光大道，还车回国",
+      "city": "geo",
+      "entries": [
+        {"id":"d7-e0","type":"place","name":"好莱坞酒店","category":"hotel","plannedStart":"08:30","stayMinutes":5,"geo":{"lat":34.1016,"lng":-118.3387}},
+        {"id":"d7-e1","type":"transport","mode":"walk","label":"步行","durationMinutes":5,"distanceKm":0.3},
+        {"id":"d7-e2","type":"place","name":"中国剧院","category":"sight","stayMinutes":45,"notes":"门口水泥地上有明星的手印脚印，星光大道从这里往两边延伸","geo":{"lat":34.1022,"lng":-118.3409}},
+        {"id":"d7-e3","type":"transport","mode":"car","label":"自驾去机场，路上加满油再还车","durationMinutes":50,"distanceKm":30},
+        {"id":"d7-e4","type":"place","name":"洛杉矶国际机场","category":"airport","plannedStart":"10:15","stayMinutes":145,"notes":"还车后坐接驳车到国际航站楼","geo":{"lat":33.9416,"lng":-118.4085}},
+        {"id":"d7-e5","type":"transport","mode":"flight","label":"洛杉矶飞上海浦东","durationMinutes":830,"distanceKm":10420},
+        {"id":"d7-e6","type":"place","name":"上海浦东国际机场","category":"airport","plannedStart":"17:30","notes":"5 月 1 日傍晚落地，飞越日期变更线，比出发晚一天","geo":{"lat":31.1443,"lng":121.8083}}
+      ]
+    }
+  ],
+  "createdAt": "2026-09-20T14:05:00.000Z",
+  "updatedAt": "2026-09-20T14:05:00.000Z"
+}

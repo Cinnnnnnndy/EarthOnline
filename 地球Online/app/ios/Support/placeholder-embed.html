@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>地球Online · 占位世界</title>
+<style>
+  /* 还没构建 web/dist 时打进 App 包的占位页：一颗平涂的小地球，原生界面照常可用。
+     运行 `npm ci && npm run build`（地球Online/app）后重新构建 App 即换成真正的世界层。 */
+  html, body { margin: 0; height: 100%; overflow: hidden; background: transparent; }
+  body { display: grid; place-items: center; transition: padding .6s ease; box-sizing: border-box; }
+  .earth { width: min(62vw, 62vh); aspect-ratio: 1; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #bfe0ff 0%, #5a96d6 38%, #2f63b5 100%);
+    box-shadow: 0 0 60px rgba(255,255,255,.35), inset -30px -40px 80px rgba(20,30,80,.35); position: relative; }
+  .land { position: absolute; border-radius: 45% 55% 50% 50%; background: #8fbf76; opacity: .95; }
+  .l1 { width: 34%; height: 26%; left: 18%; top: 22%; transform: rotate(-18deg); }
+  .l2 { width: 22%; height: 30%; left: 56%; top: 46%; transform: rotate(12deg); }
+  .l3 { width: 16%; height: 12%; left: 30%; top: 64%; }
+  body[data-mode="day"] .earth { border-radius: 24px; width: 70vw; aspect-ratio: 1.2; background: linear-gradient(#8db2ec, #efdcec); }
+</style>
+</head>
+<body data-mode="globe">
+<div class="earth"><div class="land l1"></div><div class="land l2"></div><div class="land l3"></div></div>
+<script>
+  window.EarthWorld = {
+    send: function (m) {
+      try {
+        var msg = typeof m === "string" ? JSON.parse(m) : m;
+        if (msg.kind === "show-day") document.body.dataset.mode = "day";
+        if (msg.kind === "show-globe") document.body.dataset.mode = "globe";
+        if (msg.kind === "set-insets") document.body.style.padding = "0 0 " + (msg.bottom || 0) + "px " + (msg.left || 0) + "px";
+      } catch (e) {}
+    },
+    setPalette: function () {}, markVisited: function () {}
+  };
+  try { window.webkit.messageHandlers.world.postMessage(JSON.stringify({ kind: "ready" })); } catch (e) {}
+</script>
+</body>
+</html>

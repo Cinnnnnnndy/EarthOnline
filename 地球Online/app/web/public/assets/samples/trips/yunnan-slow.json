@@ -1,0 +1,148 @@
+{
+  "schemaVersion": "0.3",
+  "id": "sample-yunnan-slow",
+  "title": "云南慢游",
+  "destination": "大理、丽江",
+  "startDate": "2026-03-14",
+  "endDate": "2026-03-19",
+  "theme": "樱花春日",
+  "seed": 2740783907,
+  "status": "closed",
+  "days": [
+    {
+      "index": 1,
+      "date": "2026-03-14",
+      "title": "飞到大理，在古城里慢慢走",
+      "city": "geo",
+      "lodging": "大理古城",
+      "entries": [
+        {"id":"d1-e0","type":"place","name":"上海浦东国际机场","category":"airport","plannedStart":"08:10","stayMinutes":90,"geo":{"lat":31.1443,"lng":121.8083}},
+        {"id":"d1-e1","type":"transport","mode":"flight","label":"上海浦东飞大理","durationMinutes":235,"distanceKm":2180},
+        {"id":"d1-e2","type":"place","name":"大理凤仪机场","category":"airport","plannedStart":"13:35","stayMinutes":20,"geo":{"lat":25.6494,"lng":100.3192}},
+        {"id":"d1-e3","type":"transport","mode":"taxi","label":"打车进古城","durationMinutes":40,"distanceKm":28},
+        {"id":"d1-e4","type":"place","name":"大理古城客栈","category":"hotel","stayMinutes":45,"notes":"院子里有三角梅，老板泡了一壶普洱","geo":{"lat":25.693,"lng":100.16}},
+        {"id":"d1-e5","type":"transport","mode":"walk","label":"步行","durationMinutes":6,"distanceKm":0.4},
+        {"id":"d1-e6","type":"place","name":"五华楼","category":"sight","stayMinutes":20,"visited":true,"visitedAt":"2026-03-14T07:36:00.000Z","geo":{"lat":25.6935,"lng":100.1622}},
+        {"id":"d1-e7","type":"transport","mode":"walk","label":"步行","durationMinutes":8,"distanceKm":0.5},
+        {"id":"d1-e8","type":"place","name":"人民路","category":"sight","stayMinutes":90,"notes":"晒太阳，逛小店和手作摊","visited":true,"visitedAt":"2026-03-14T08:04:00.000Z","geo":{"lat":25.6958,"lng":100.161}},
+        {"id":"d1-e9","type":"transport","mode":"walk","label":"步行","durationMinutes":5,"distanceKm":0.3},
+        {"id":"d1-e10","type":"place","name":"古城里的白族菜馆","category":"food","stayMinutes":75,"notes":"晚饭：酸辣鱼、乳扇、烤饵块","visited":true,"visitedAt":"2026-03-14T09:39:00.000Z","geo":{"lat":25.694,"lng":100.1615}},
+        {"id":"d1-e11","type":"transport","mode":"walk","label":"步行回客栈","durationMinutes":8,"distanceKm":0.5},
+        {"id":"d1-e12","type":"place","name":"大理古城客栈","category":"hotel","geo":{"lat":25.693,"lng":100.16}}
+      ]
+    },
+    {
+      "index": 2,
+      "date": "2026-03-15",
+      "title": "包车环洱海西岸到双廊",
+      "city": "geo",
+      "lodging": "大理古城",
+      "entries": [
+        {"id":"d2-e0","type":"place","name":"大理古城客栈","category":"hotel","plannedStart":"06:40","stayMinutes":5,"notes":"早起去看日出","geo":{"lat":25.693,"lng":100.16}},
+        {"id":"d2-e1","type":"transport","mode":"car","label":"包车","durationMinutes":20,"distanceKm":8},
+        {"id":"d2-e2","type":"place","name":"龙龛码头","category":"sight","plannedStart":"07:10","stayMinutes":45,"notes":"洱海边看日出，红嘴鸥还没飞走","visited":true,"visitedAt":"2026-03-14T23:20:00.000Z","geo":{"lat":25.7053,"lng":100.1985}},
+        {"id":"d2-e3","type":"transport","mode":"car","label":"包车","durationMinutes":30,"distanceKm":22},
+        {"id":"d2-e4","type":"place","name":"喜洲古镇","category":"sight","stayMinutes":120,"notes":"早饭吃喜洲粑粑，看严家大院","visited":true,"visitedAt":"2026-03-15T00:35:00.000Z","geo":{"lat":25.8531,"lng":100.1275}},
+        {"id":"d2-e5","type":"transport","mode":"car","label":"包车","durationMinutes":10,"distanceKm":5},
+        {"id":"d2-e6","type":"place","name":"周城扎染坊","category":"shop","stayMinutes":60,"notes":"白族扎染，可以自己动手染一块方巾","visited":true,"visitedAt":"2026-03-15T02:45:00.000Z","geo":{"lat":25.8905,"lng":100.113}},
+        {"id":"d2-e7","type":"transport","mode":"car","label":"包车","durationMinutes":8,"distanceKm":3},
+        {"id":"d2-e8","type":"place","name":"蝴蝶泉","category":"sight","stayMinutes":45,"notes":"三月蝴蝶还不多，四五月才是季节","visited":true,"visitedAt":"2026-03-15T03:53:00.000Z","geo":{"lat":25.9028,"lng":100.1047}},
+        {"id":"d2-e9","type":"transport","mode":"car","label":"包车绕过洱海北端到双廊","durationMinutes":50,"distanceKm":30},
+        {"id":"d2-e10","type":"place","name":"双廊古镇","category":"sight","stayMinutes":180,"notes":"看日落","visited":true,"visitedAt":"2026-03-15T05:28:00.000Z","geo":{"lat":25.916,"lng":100.197}},
+        {"id":"d2-e11","type":"transport","mode":"car","label":"包车走环海东路回古城","durationMinutes":70,"distanceKm":45},
+        {"id":"d2-e12","type":"place","name":"大理古城客栈","category":"hotel","geo":{"lat":25.693,"lng":100.16}}
+      ]
+    },
+    {
+      "index": 3,
+      "date": "2026-03-16",
+      "title": "苍山索道和玉带路，傍晚看三塔",
+      "city": "geo",
+      "lodging": "大理古城",
+      "entries": [
+        {"id":"d3-e0","type":"place","name":"大理古城客栈","category":"hotel","plannedStart":"09:00","stayMinutes":5,"geo":{"lat":25.693,"lng":100.16}},
+        {"id":"d3-e1","type":"transport","mode":"taxi","label":"打车","durationMinutes":10,"distanceKm":3},
+        {"id":"d3-e2","type":"place","name":"苍山中和索道","category":"sight","stayMinutes":15,"notes":"买上下行索道票","visited":true,"visitedAt":"2026-03-16T01:25:00.000Z","geo":{"lat":25.695,"lng":100.15}},
+        {"id":"d3-e3","type":"transport","mode":"rail","label":"中和索道上山","durationMinutes":15,"distanceKm":1.7},
+        {"id":"d3-e4","type":"place","name":"中和寺","category":"sight","stayMinutes":20,"visited":true,"visitedAt":"2026-03-16T01:55:00.000Z","geo":{"lat":25.6985,"lng":100.134}},
+        {"id":"d3-e5","type":"transport","mode":"walk","label":"沿玉带路往南走，基本是平路","durationMinutes":50,"distanceKm":2.8},
+        {"id":"d3-e6","type":"place","name":"玉带路观景点","category":"sight","stayMinutes":30,"notes":"整片洱海和大理古城都在脚下","visited":true,"visitedAt":"2026-03-16T03:05:00.000Z","geo":{"lat":25.685,"lng":100.134}},
+        {"id":"d3-e7","type":"transport","mode":"walk","label":"原路返回","durationMinutes":50,"distanceKm":2.8},
+        {"id":"d3-e8","type":"place","name":"中和寺","category":"sight","stayMinutes":5,"visited":true,"visitedAt":"2026-03-16T04:25:00.000Z","geo":{"lat":25.6985,"lng":100.134}},
+        {"id":"d3-e9","type":"transport","mode":"rail","label":"索道下山","durationMinutes":15,"distanceKm":1.7},
+        {"id":"d3-e10","type":"place","name":"苍山中和索道","category":"sight","stayMinutes":5,"visited":true,"visitedAt":"2026-03-16T04:45:00.000Z","geo":{"lat":25.695,"lng":100.15}},
+        {"id":"d3-e11","type":"transport","mode":"taxi","label":"打车","durationMinutes":10,"distanceKm":3.5},
+        {"id":"d3-e12","type":"place","name":"崇圣寺三塔","category":"sight","plannedStart":"15:30","stayMinutes":120,"notes":"傍晚在聚影池拍三塔倒影","visited":true,"visitedAt":"2026-03-16T07:40:00.000Z","geo":{"lat":25.7081,"lng":100.1475}},
+        {"id":"d3-e13","type":"transport","mode":"taxi","label":"打车回客栈","durationMinutes":10,"distanceKm":3.5},
+        {"id":"d3-e14","type":"place","name":"大理古城客栈","category":"hotel","geo":{"lat":25.693,"lng":100.16}}
+      ]
+    },
+    {
+      "index": 4,
+      "date": "2026-03-17",
+      "title": "坐动车去丽江，古城和木府",
+      "city": "geo",
+      "lodging": "丽江古城",
+      "entries": [
+        {"id":"d4-e0","type":"place","name":"大理古城客栈","category":"hotel","plannedStart":"08:30","stayMinutes":5,"notes":"退房","geo":{"lat":25.693,"lng":100.16}},
+        {"id":"d4-e1","type":"transport","mode":"taxi","label":"打车去大理站","durationMinutes":30,"distanceKm":16},
+        {"id":"d4-e2","type":"place","name":"大理站","category":"station","stayMinutes":30,"geo":{"lat":25.588,"lng":100.242}},
+        {"id":"d4-e3","type":"transport","mode":"rail","label":"动车到丽江","durationMinutes":110,"distanceKm":167},
+        {"id":"d4-e4","type":"place","name":"丽江站","category":"station","stayMinutes":10,"geo":{"lat":26.82,"lng":100.26}},
+        {"id":"d4-e5","type":"transport","mode":"taxi","label":"打车进古城","durationMinutes":20,"distanceKm":9},
+        {"id":"d4-e6","type":"place","name":"丽江古城客栈","category":"hotel","stayMinutes":30,"geo":{"lat":26.874,"lng":100.232}},
+        {"id":"d4-e7","type":"transport","mode":"walk","label":"步行","durationMinutes":10,"distanceKm":0.6},
+        {"id":"d4-e8","type":"place","name":"四方街","category":"sight","stayMinutes":45,"notes":"古城中心，晚上有人围圈打跳","visited":true,"visitedAt":"2026-03-17T04:45:00.000Z","geo":{"lat":26.8721,"lng":100.2339}},
+        {"id":"d4-e9","type":"transport","mode":"walk","label":"步行","durationMinutes":8,"distanceKm":0.5},
+        {"id":"d4-e10","type":"place","name":"木府","category":"sight","stayMinutes":90,"notes":"明代纳西木氏土司的府邸","visited":true,"visitedAt":"2026-03-17T05:38:00.000Z","geo":{"lat":26.8686,"lng":100.2349}},
+        {"id":"d4-e11","type":"transport","mode":"walk","label":"步行上狮子山","durationMinutes":15,"distanceKm":0.8},
+        {"id":"d4-e12","type":"place","name":"万古楼","category":"sight","stayMinutes":45,"notes":"看整座古城的屋顶，天晴能看到雪山","visited":true,"visitedAt":"2026-03-17T07:23:00.000Z","geo":{"lat":26.871,"lng":100.2295}},
+        {"id":"d4-e13","type":"transport","mode":"walk","label":"步行下山","durationMinutes":15,"distanceKm":0.8},
+        {"id":"d4-e14","type":"place","name":"古城里的纳西菜馆","category":"food","stayMinutes":75,"notes":"晚饭吃腊排骨火锅","visited":true,"visitedAt":"2026-03-17T08:23:00.000Z","geo":{"lat":26.873,"lng":100.233}},
+        {"id":"d4-e15","type":"transport","mode":"walk","label":"步行回客栈","durationMinutes":5,"distanceKm":0.3},
+        {"id":"d4-e16","type":"place","name":"丽江古城客栈","category":"hotel","geo":{"lat":26.874,"lng":100.232}}
+      ]
+    },
+    {
+      "index": 5,
+      "date": "2026-03-18",
+      "title": "玉龙雪山：冰川公园大索道和蓝月谷",
+      "city": "geo",
+      "lodging": "丽江古城",
+      "entries": [
+        {"id":"d5-e0","type":"place","name":"丽江古城客栈","category":"hotel","plannedStart":"06:30","stayMinutes":5,"notes":"索道票要提前在官方小程序实名预约，常常抢不到","geo":{"lat":26.874,"lng":100.232}},
+        {"id":"d5-e1","type":"transport","mode":"car","label":"包车","durationMinutes":50,"distanceKm":30},
+        {"id":"d5-e2","type":"place","name":"甘海子游客中心","category":"other","stayMinutes":20,"visited":true,"visitedAt":"2026-03-17T23:35:00.000Z","geo":{"lat":27.115,"lng":100.244}},
+        {"id":"d5-e3","type":"transport","mode":"bus","label":"景区环保车","durationMinutes":20,"distanceKm":7},
+        {"id":"d5-e4","type":"place","name":"冰川公园大索道","category":"sight","stayMinutes":30,"visited":true,"visitedAt":"2026-03-18T00:15:00.000Z","geo":{"lat":27.105,"lng":100.22}},
+        {"id":"d5-e5","type":"transport","mode":"rail","label":"大索道上到 4506 米","durationMinutes":20,"distanceKm":3},
+        {"id":"d5-e6","type":"place","name":"玉龙雪山冰川公园","category":"sight","stayMinutes":40,"notes":"4506 米观景台；氧气瓶在山下买好，别跑","visited":true,"visitedAt":"2026-03-18T01:05:00.000Z","geo":{"lat":27.099,"lng":100.195}},
+        {"id":"d5-e7","type":"transport","mode":"rail","label":"索道下山","durationMinutes":20,"distanceKm":3},
+        {"id":"d5-e8","type":"place","name":"冰川公园大索道","category":"sight","stayMinutes":10,"visited":true,"visitedAt":"2026-03-18T02:05:00.000Z","geo":{"lat":27.105,"lng":100.22}},
+        {"id":"d5-e9","type":"transport","mode":"bus","label":"景区环保车","durationMinutes":25,"distanceKm":12},
+        {"id":"d5-e10","type":"place","name":"蓝月谷","category":"sight","stayMinutes":60,"notes":"冰川融水，晴天是蓝绿色","visited":true,"visitedAt":"2026-03-18T02:40:00.000Z","geo":{"lat":27.131,"lng":100.25}},
+        {"id":"d5-e11","type":"transport","mode":"bus","label":"景区环保车回甘海子","durationMinutes":15,"distanceKm":6},
+        {"id":"d5-e12","type":"place","name":"印象丽江","category":"sight","plannedStart":"13:30","stayMinutes":70,"notes":"雪山下的实景演出，演员是附近村子的村民","visited":true,"visitedAt":"2026-03-18T05:40:00.000Z","geo":{"lat":27.113,"lng":100.247}},
+        {"id":"d5-e13","type":"transport","mode":"car","label":"包车回古城","durationMinutes":50,"distanceKm":30},
+        {"id":"d5-e14","type":"place","name":"丽江古城客栈","category":"hotel","geo":{"lat":26.874,"lng":100.232}}
+      ]
+    },
+    {
+      "index": 6,
+      "date": "2026-03-19",
+      "title": "束河古镇，下午飞回上海",
+      "city": "geo",
+      "entries": [
+        {"id":"d6-e0","type":"place","name":"丽江古城客栈","category":"hotel","plannedStart":"09:30","stayMinutes":10,"notes":"退房","geo":{"lat":26.874,"lng":100.232}},
+        {"id":"d6-e1","type":"transport","mode":"taxi","label":"打车","durationMinutes":20,"distanceKm":7},
+        {"id":"d6-e2","type":"place","name":"束河古镇","category":"sight","stayMinutes":150,"notes":"比大研古城安静，九鼎龙潭的水很清","visited":true,"visitedAt":"2026-03-19T02:10:00.000Z","geo":{"lat":26.9204,"lng":100.2091}},
+        {"id":"d6-e3","type":"transport","mode":"taxi","label":"打车去机场","durationMinutes":45,"distanceKm":38},
+        {"id":"d6-e4","type":"place","name":"丽江三义机场","category":"airport","plannedStart":"14:00","stayMinutes":90,"geo":{"lat":26.68,"lng":100.2458}},
+        {"id":"d6-e5","type":"transport","mode":"flight","label":"丽江飞上海浦东","durationMinutes":225,"distanceKm":2150},
+        {"id":"d6-e6","type":"place","name":"上海浦东国际机场","category":"airport","plannedStart":"19:15","geo":{"lat":31.1443,"lng":121.8083}}
+      ]
+    }
+  ],
+  "createdAt": "2026-02-10T10:00:00.000Z",
+  "updatedAt": "2026-03-20T03:00:00.000Z"
+}

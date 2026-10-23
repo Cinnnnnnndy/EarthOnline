@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "0.3",
+  "id": "sample-shanghai-business-day",
+  "title": "上海出差一日",
+  "destination": "上海",
+  "startDate": "2026-10-15",
+  "endDate": "2026-10-15",
+  "theme": "都市霓虹",
+  "seed": 646755347,
+  "status": "planning",
+  "days": [
+    {
+      "index": 1,
+      "date": "2026-10-15",
+      "title": "早班机到上海，见两家客户",
+      "city": "geo",
+      "entries": [
+        {"id":"d1-e0","type":"place","name":"北京首都国际机场","category":"airport","plannedStart":"07:00","stayMinutes":60,"notes":"只带电脑包，不托运","geo":{"lat":40.0799,"lng":116.6031}},
+        {"id":"d1-e1","type":"transport","mode":"flight","label":"北京首都飞上海虹桥","durationMinutes":135,"distanceKm":1080},
+        {"id":"d1-e2","type":"place","name":"上海虹桥国际机场","category":"airport","plannedStart":"10:15","stayMinutes":15,"geo":{"lat":31.1979,"lng":121.3363}},
+        {"id":"d1-e3","type":"transport","mode":"subway","label":"地铁 2 号线到陆家嘴","durationMinutes":50,"distanceKm":25},
+        {"id":"d1-e4","type":"place","name":"陆家嘴客户公司","category":"other","plannedStart":"11:30","stayMinutes":70,"notes":"11:30 见客户，带两份合同；前台登记要身份证","geo":{"lat":31.2385,"lng":121.503}},
+        {"id":"d1-e5","type":"transport","mode":"walk","label":"步行","durationMinutes":8,"distanceKm":0.6},
+        {"id":"d1-e6","type":"place","name":"国金中心午饭","category":"food","stayMinutes":45,"notes":"和客户吃粤菜，发票抬头提前发给对方","geo":{"lat":31.2366,"lng":121.5024}},
+        {"id":"d1-e7","type":"transport","mode":"taxi","label":"打车去静安","durationMinutes":25,"distanceKm":10},
+        {"id":"d1-e8","type":"place","name":"静安嘉里中心","category":"other","plannedStart":"14:00","stayMinutes":150,"notes":"14:00 到 16:30 项目评审会，会议室在 12 楼","geo":{"lat":31.2238,"lng":121.4546}},
+        {"id":"d1-e9","type":"transport","mode":"walk","label":"步行","durationMinutes":10,"distanceKm":0.9},
+        {"id":"d1-e10","type":"place","name":"静安寺","category":"sight","stayMinutes":20,"notes":"会后十几分钟，在门口看一眼金顶","geo":{"lat":31.2236,"lng":121.4453}},
+        {"id":"d1-e11","type":"transport","mode":"subway","label":"地铁 2 号线到南京东路","durationMinutes":15,"distanceKm":5.5},
+        {"id":"d1-e12","type":"place","name":"外滩","category":"sight","plannedStart":"17:45","stayMinutes":30,"notes":"天黑前后看对岸陆家嘴亮灯","geo":{"lat":31.24,"lng":121.4903}},
+        {"id":"d1-e13","type":"transport","mode":"walk","label":"步行","durationMinutes":5,"distanceKm":0.4},
+        {"id":"d1-e14","type":"place","name":"外滩的本帮菜馆","category":"food","stayMinutes":55,"notes":"一个人吃，点红烧肉和响油鳝丝","geo":{"lat":31.2385,"lng":121.488}},
+        {"id":"d1-e15","type":"transport","mode":"taxi","label":"打车去虹桥机场，晚高峰留足时间","durationMinutes":45,"distanceKm":20},
+        {"id":"d1-e16","type":"place","name":"上海虹桥国际机场","category":"airport","plannedStart":"20:00","stayMinutes":50,"notes":"国内航班起飞前 40 分钟截止值机","geo":{"lat":31.1979,"lng":121.3363}},
+        {"id":"d1-e17","type":"transport","mode":"flight","label":"上海虹桥飞北京首都","durationMinutes":140,"distanceKm":1080},
+        {"id":"d1-e18","type":"place","name":"北京首都国际机场","category":"airport","plannedStart":"23:15","notes":"到家大概零点半","geo":{"lat":40.0799,"lng":116.6031}}
+      ]
+    }
+  ],
+  "createdAt": "2026-09-28T02:30:00.000Z",
+  "updatedAt": "2026-09-28T02:30:00.000Z"
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 自动生成（tools/export-shared.ts），勿改；改源头（shared/）再跑 npm run export:shared -->
+<resources>
+    <string name="app_name">地球Online</string>
+    <string name="module_desc">把旅程做成一本书、一个世界</string>
+    <string name="ability_desc">地球与某一天的世界</string>
+    <string name="reason_internet">连接规划服务（可选）与同步</string>
+    <string name="reason_microphone">说一句话做行程时听你说话</string>
+    <string name="reason_location">把家放在你所在的城市（只在你点「用现在的位置」时）</string>
+</resources>

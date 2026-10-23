@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "app_name",
+      "value": "地球Online"
+    },
+    {
+      "name": "module_desc",
+      "value": "把旅程做成一本书、一个世界"
+    },
+    {
+      "name": "ability_desc",
+      "value": "地球与某一天的世界"
+    },
+    {
+      "name": "reason_internet",
+      "value": "连接规划服务（可选）与同步"
+    },
+    {
+      "name": "reason_microphone",
+      "value": "说一句话做行程时听你说话"
+    },
+    {
+      "name": "reason_location",
+      "value": "把家放在你所在的城市（只在你点「用现在的位置」时）"
+    }
+  ]
+}

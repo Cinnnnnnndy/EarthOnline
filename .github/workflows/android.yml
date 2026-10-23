@@ -1,0 +1,65 @@
+# 地球Online · 安卓：构建世界层、同步进安卓壳、assembleDebug + 单元测试，上传 APK。
+# 只在手动触发时运行（Actions → Android (地球Online) → Run workflow），不在 push / PR 上跑。
+name: Android (地球Online)
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash
+    env:
+      APP_DIR: 地球Online/app
+      ANDROID_DIR: 地球Online/app/android
+      # 路径里有中文：JVM 要按 UTF-8 解析文件名，否则 Gradle 读不到 地球Online/ 下的文件
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: 地球Online/app/package-lock.json
+
+      - name: Build the world layer and sync it into the shells
+        working-directory: ${{ env.APP_DIR }}
+        run: npm ci && npm run build && npm run sync:shells
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      # 仓库里没有 gradle-wrapper.jar：直接用指定版本的 Gradle（与 gradle/wrapper/gradle-wrapper.properties 一致）
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.11.1"
+
+      - name: Assemble debug APK and run unit tests
+        working-directory: ${{ env.ANDROID_DIR }}
+        run: gradle --no-daemon assembleDebug testDebugUnitTest
+
+      - name: Upload the debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: earth-online-debug-apk
+          path: 地球Online/app/android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+
+      - name: Upload unit test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: earth-online-unit-test-reports
+          path: 地球Online/app/android/app/build/reports/tests/
+          if-no-files-found: ignore

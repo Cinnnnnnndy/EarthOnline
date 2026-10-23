@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "app_name",
+      "value": "Earth Online"
+    },
+    {
+      "name": "module_desc",
+      "value": "Turn a trip into a book and a little world"
+    },
+    {
+      "name": "ability_desc",
+      "value": "The globe and the world of a day"
+    },
+    {
+      "name": "reason_internet",
+      "value": "Connect to the planning service (optional) and sync"
+    },
+    {
+      "name": "reason_microphone",
+      "value": "Listen when you describe a trip by voice"
+    },
+    {
+      "name": "reason_location",
+      "value": "Put home where you are (only when you tap “Use my location”)"
+    }
+  ]
+}

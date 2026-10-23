@@ -1,0 +1,6 @@
+/* 地球Online · Info.plist（日本語） */
+"CFBundleDisplayName" = "地球Online";
+"NSMicrophoneUsageDescription" = "行きたい場所を話すと、マイクで聞き取って旅行の計画を手伝います。";
+"NSSpeechRecognitionUsageDescription" = "話した内容はこの端末上で文字にして、旅行の計画に使います。";
+"NSLocationWhenInUseUsageDescription" = "現在地を自宅として登録し、地球の外の空をその土地の日の出と日の入りに合わせます。";
+"地球Online 旅程" = "地球Online の旅行";

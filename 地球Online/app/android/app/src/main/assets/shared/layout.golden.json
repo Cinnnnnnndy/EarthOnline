@@ -1,0 +1,27 @@
+{
+  "note": "屏幕形态的黄金用例（D90）：三端的布局态算法都要过这一组。单位 CSS px / vp / dp。expect.panes 是页数。",
+  "cases": [
+    { "name": "普通直板机竖持（iPhone 15）", "input": { "width": 390, "height": 844 }, "expect": { "state": "phone", "device": "bar", "panes": 1 } },
+    { "name": "普通直板机横持", "input": { "width": 844, "height": 390 }, "expect": { "state": "spread", "device": "wide", "panes": 2 } },
+    { "name": "窄直板机（360 宽）", "input": { "width": 360, "height": 780 }, "expect": { "state": "phone", "device": "bar", "panes": 1 } },
+    { "name": "Pura X Max 外屏（合上）", "input": { "width": 421, "height": 616, "posture": "closed", "hasOuter": true }, "expect": { "state": "outer", "device": "outer", "panes": 1 } },
+    { "name": "Pura X Max 外屏（拿不到姿态）", "input": { "width": 421, "height": 616 }, "expect": { "state": "phone", "device": "bar", "panes": 1 } },
+    { "name": "Pura X Max 内屏展开横持（没量到折痕）", "input": { "width": 861, "height": 609, "posture": "flat" }, "expect": { "state": "spread", "device": "wide", "panes": 2 } },
+    { "name": "Pura X Max 内屏展开横持（量到折痕）", "input": { "width": 861, "height": 609, "posture": "flat", "segments": [ { "x": 0, "y": 0, "w": 426, "h": 609 }, { "x": 435, "y": 0, "w": 426, "h": 609 } ] }, "expect": { "state": "spread", "device": "wide", "panes": 2, "measured": true, "creases": [430] } },
+    { "name": "Pura X Max 展开后竖持（单页放大）", "input": { "width": 609, "height": 861, "posture": "flat" }, "expect": { "state": "phone", "device": "book", "panes": 1 } },
+    { "name": "Galaxy Z Fold 内屏竖持（近方形）", "input": { "width": 690, "height": 829, "posture": "flat" }, "expect": { "state": "spread", "device": "book", "panes": 2 } },
+    { "name": "Galaxy Z Fold 外屏", "input": { "width": 362, "height": 904, "posture": "closed", "hasOuter": true }, "expect": { "state": "outer", "device": "outer", "panes": 1 } },
+    { "name": "Pixel Fold 内屏横持", "input": { "width": 840, "height": 701, "posture": "flat" }, "expect": { "state": "spread", "device": "wide", "panes": 2 } },
+    { "name": "半开悬停（横放桌面，量到上下两段）", "input": { "width": 861, "height": 609, "posture": "half", "segments": [ { "x": 0, "y": 0, "w": 861, "h": 300 }, { "x": 0, "y": 309, "w": 861, "h": 300 } ] }, "expect": { "state": "hover", "panes": 2, "measured": true, "creases": [304] } },
+    { "name": "半开悬停（只知道姿态）", "input": { "width": 861, "height": 609, "posture": "half" }, "expect": { "state": "hover", "panes": 2, "measured": false } },
+    { "name": "半开但竖着拿（当展开横持）", "input": { "width": 609, "height": 861, "posture": "half" }, "expect": { "state": "phone", "panes": 1 } },
+    { "name": "三折叠全开（Mate XT，量到两条折痕）", "input": { "width": 1360, "height": 950, "posture": "flat", "segments": [ { "x": 0, "y": 0, "w": 450, "h": 950 }, { "x": 455, "y": 0, "w": 450, "h": 950 }, { "x": 910, "y": 0, "w": 450, "h": 950 } ] }, "expect": { "state": "triple", "device": "tri", "panes": 3, "measured": true, "creases": [452, 907] } },
+    { "name": "三折叠开两折（像书式）", "input": { "width": 905, "height": 950, "posture": "flat", "segments": [ { "x": 0, "y": 0, "w": 450, "h": 950 }, { "x": 455, "y": 0, "w": 450, "h": 950 } ] }, "expect": { "state": "spread", "device": "book", "panes": 2, "measured": true } },
+    { "name": "三折叠合上（一折屏）", "input": { "width": 430, "height": 950, "posture": "closed", "hasOuter": true }, "expect": { "state": "outer", "device": "outer", "panes": 1 } },
+    { "name": "平板横持（iPad 11）", "input": { "width": 1194, "height": 834 }, "expect": { "state": "triple", "device": "tablet", "panes": 3 } },
+    { "name": "平板竖持", "input": { "width": 834, "height": 1194 }, "expect": { "state": "phone", "device": "book", "panes": 1 } },
+    { "name": "小平板横持（iPad mini）", "input": { "width": 1024, "height": 744 }, "expect": { "state": "spread", "device": "tablet", "panes": 2 } },
+    { "name": "桌面浏览器", "input": { "width": 1440, "height": 900 }, "expect": { "state": "triple", "device": "desktop", "panes": 3 } },
+    { "name": "桌面窄窗", "input": { "width": 700, "height": 900 }, "expect": { "state": "phone", "device": "book", "panes": 1 } }
+  ]
+}

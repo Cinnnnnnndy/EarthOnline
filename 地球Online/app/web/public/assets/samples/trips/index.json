@@ -1,0 +1,12 @@
+[
+  {"id":"sample-paris-weekend","file":"paris-weekend.json","title":"巴黎城市漫步周末","type":"city-walk","blurb":"三天两晚，欧洲之星来回伦敦，西岱岛、卢浮宫、埃菲尔铁塔和蒙马特，靠步行和地铁。"},
+  {"id":"sample-california-highway-1","file":"california-highway-1.json","title":"加州一号公路自驾","type":"road-trip","blurb":"七天，从旧金山沿一号公路开到洛杉矶，经过蒙特雷、大苏尔和圣巴巴拉；来回都是跨太平洋航班。"},
+  {"id":"sample-bali-island","file":"bali-island.json","title":"巴厘岛海岛度假","type":"island","blurb":"五天，乌布的梯田和寺庙，坐快船去佩尼达岛，在乌鲁瓦图看日落和火舞。已经去过。"},
+  {"id":"sample-swiss-jungfrau-hiking","file":"swiss-jungfrau-hiking.json","title":"瑞士少女峰地区徒步","type":"hiking","blurb":"五天住格林德瓦，坐齿轨火车和缆车上少女峰、菲斯特和雪朗峰，每天走两三小时山路。已经去过。"},
+  {"id":"sample-europe-rail-4-countries","file":"europe-rail-4-countries.json","title":"欧洲铁路四国","type":"rail-multi-country","blurb":"八天四国，城市之间全坐火车：巴黎、阿姆斯特丹，在科隆停两小时看大教堂再去柏林，最后到布拉格。"},
+  {"id":"sample-tokyo-disney-family","file":"tokyo-disney-family.json","title":"东京迪士尼亲子","type":"family-theme-park","blurb":"三天，带孩子住迪士尼酒店，一天乐园、半天海洋，中午回酒店午睡。"},
+  {"id":"sample-shanghai-business-day","file":"shanghai-business-day.json","title":"上海出差一日","type":"business-day","blurb":"当天来回：早班机到上海，见两家客户，晚班机回北京。"},
+  {"id":"sample-beijing-classic-4d","file":"beijing-classic-4d.json","title":"北京经典四日","type":"classic-sightseeing","blurb":"国庆前后四天，高铁来回：故宫、慕田峪长城、天坛、颐和园。"},
+  {"id":"sample-yunnan-slow","file":"yunnan-slow.json","title":"云南慢游","type":"slow-travel","blurb":"六天，大理古城、环洱海、苍山，再坐动车去丽江和玉龙雪山。已经去过。"},
+  {"id":"sample-hangzhou-west-lake","file":"hangzhou-west-lake.json","title":"杭州西湖两日","type":"short-getaway","blurb":"周末两天，高铁来回，环西湖走一圈，第二天去灵隐寺和龙井村。"}
+]

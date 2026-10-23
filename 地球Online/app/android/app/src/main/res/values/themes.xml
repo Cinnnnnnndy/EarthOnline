@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 窗口主题：不带标题栏，底色是夜里的宇宙蓝（世界层加载前不闪白）；边到边由 MainActivity.enableEdgeToEdge() 打开。
+     只用平台主题，不引 AppCompat / Material Components（界面全是 Compose，颜色走 shared 的设计令牌） -->
+<resources>
+    <style name="Theme.EarthOnline" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/space_night</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:colorAccent">@color/ink</item>
+    </style>
+</resources>

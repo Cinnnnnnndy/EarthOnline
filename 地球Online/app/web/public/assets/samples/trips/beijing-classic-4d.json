@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "0.3",
+  "id": "sample-beijing-classic-4d",
+  "title": "北京经典四日",
+  "destination": "北京",
+  "startDate": "2026-09-29",
+  "endDate": "2026-10-02",
+  "theme": "红叶古都",
+  "seed": 4091810864,
+  "status": "traveling",
+  "days": [
+    {
+      "index": 1,
+      "date": "2026-09-29",
+      "title": "高铁到北京，天安门和前门",
+      "city": "geo",
+      "lodging": "王府井",
+      "entries": [
+        {"id":"d1-e0","type":"transport","mode":"rail","label":"高铁，上海虹桥到北京南","durationMinutes":270,"distanceKm":1318},
+        {"id":"d1-e1","type":"place","name":"北京南站","category":"station","plannedStart":"11:30","stayMinutes":15,"geo":{"lat":39.8652,"lng":116.3786}},
+        {"id":"d1-e2","type":"transport","mode":"subway","label":"地铁 4 号线转 1 号线到王府井","durationMinutes":40,"distanceKm":12},
+        {"id":"d1-e3","type":"lodging","name":"王府井的酒店","notes":"13 点前到，先寄存行李，14 点后入住"},
+        {"id":"d1-e4","type":"transport","mode":"walk","label":"步行","durationMinutes":15,"distanceKm":1.2},
+        {"id":"d1-e5","type":"place","name":"四季民福烤鸭店","category":"food","stayMinutes":90,"notes":"午饭吃烤鸭，先在手机上取号，排队一小时","visited":true,"visitedAt":"2026-09-29T04:50:00.000Z","geo":{"lat":39.9135,"lng":116.403}},
+        {"id":"d1-e6","type":"transport","mode":"walk","label":"步行","durationMinutes":20,"distanceKm":1.6},
+        {"id":"d1-e7","type":"place","name":"天安门广场","category":"sight","plannedStart":"15:00","stayMinutes":60,"notes":"进广场要提前实名预约，带身份证","visited":true,"visitedAt":"2026-09-29T07:10:00.000Z","geo":{"lat":39.9055,"lng":116.3976}},
+        {"id":"d1-e8","type":"transport","mode":"walk","label":"步行","durationMinutes":15,"distanceKm":1.2},
+        {"id":"d1-e9","type":"place","name":"前门大街","category":"sight","stayMinutes":90,"notes":"北京坊和大栅栏就在旁边","visited":true,"visitedAt":"2026-09-29T08:25:00.000Z","geo":{"lat":39.896,"lng":116.398}},
+        {"id":"d1-e10","type":"transport","mode":"walk","label":"步行","durationMinutes":15,"distanceKm":1.1},
+        {"id":"d1-e11","type":"place","name":"天安门广场看降旗","category":"sight","plannedStart":"18:00","stayMinutes":30,"notes":"日落时降旗，人很多，提前 40 分钟到","visited":true,"visitedAt":"2026-09-29T10:10:00.000Z","geo":{"lat":39.9055,"lng":116.3976}},
+        {"id":"d1-e12","type":"transport","mode":"subway","label":"地铁 1 号线回王府井","durationMinutes":15,"distanceKm":3}
+      ]
+    },
+    {
+      "index": 2,
+      "date": "2026-09-30",
+      "title": "故宫、景山、什刹海",
+      "city": "geo",
+      "lodging": "王府井",
+      "entries": [
+        {"id":"d2-e0","type":"transport","mode":"subway","label":"地铁 1 号线到天安门东","durationMinutes":10,"distanceKm":2.5},
+        {"id":"d2-e1","type":"place","name":"故宫博物院","category":"sight","plannedStart":"08:30","stayMinutes":240,"notes":"午门进、神武门出；提前 7 天在官网抢票，周一闭馆","visited":true,"visitedAt":"2026-09-30T00:40:00.000Z","geo":{"lat":39.9163,"lng":116.3972}},
+        {"id":"d2-e2","type":"transport","mode":"walk","label":"出神武门过马路","durationMinutes":15,"distanceKm":1.1},
+        {"id":"d2-e3","type":"place","name":"景山公园","category":"sight","stayMinutes":45,"notes":"上万春亭看故宫全景","visited":true,"visitedAt":"2026-09-30T04:55:00.000Z","geo":{"lat":39.925,"lng":116.3966}},
+        {"id":"d2-e4","type":"transport","mode":"walk","label":"步行","durationMinutes":15,"distanceKm":1.1},
+        {"id":"d2-e5","type":"place","name":"北海公园","category":"sight","stayMinutes":75,"notes":"白塔，湖上可以划船","geo":{"lat":39.9254,"lng":116.383}},
+        {"id":"d2-e6","type":"transport","mode":"walk","label":"步行","durationMinutes":25,"distanceKm":1.9},
+        {"id":"d2-e7","type":"place","name":"什刹海","category":"sight","stayMinutes":60,"notes":"银锭桥看西山，沿后海走","geo":{"lat":39.94,"lng":116.386}},
+        {"id":"d2-e8","type":"transport","mode":"walk","label":"步行","durationMinutes":20,"distanceKm":1.5},
+        {"id":"d2-e9","type":"place","name":"南锣鼓巷","category":"sight","stayMinutes":60,"notes":"工作日傍晚人少一点","geo":{"lat":39.937,"lng":116.4032}},
+        {"id":"d2-e10","type":"transport","mode":"taxi","label":"打车去簋街","durationMinutes":12,"distanceKm":3},
+        {"id":"d2-e11","type":"place","name":"簋街","category":"food","plannedStart":"19:00","stayMinutes":90,"notes":"晚饭吃麻辣小龙虾","geo":{"lat":39.9406,"lng":116.423}},
+        {"id":"d2-e12","type":"transport","mode":"taxi","label":"打车回酒店","durationMinutes":15,"distanceKm":4.5}
+      ]
+    },
+    {
+      "index": 3,
+      "date": "2026-10-01",
+      "title": "国庆第一天去慕田峪长城，晚上看鸟巢",
+      "city": "geo",
+      "lodging": "王府井",
+      "entries": [
+        {"id":"d3-e0","type":"transport","mode":"car","label":"包车去慕田峪，6 点半出发避开国庆车流","durationMinutes":90,"distanceKm":75},
+        {"id":"d3-e1","type":"place","name":"慕田峪长城","category":"sight","plannedStart":"08:00","stayMinutes":240,"notes":"坐缆车上、滑道下；国庆人多，先坐缆车到 14 号敌楼再往西走","geo":{"lat":40.4319,"lng":116.5704}},
+        {"id":"d3-e2","type":"transport","mode":"car","label":"包车回城","durationMinutes":100,"distanceKm":80},
+        {"id":"d3-e3","type":"place","name":"鸟巢","category":"sight","plannedStart":"18:30","stayMinutes":60,"notes":"国家体育场晚上亮灯，和水立方一起拍","geo":{"lat":39.9929,"lng":116.3965}},
+        {"id":"d3-e4","type":"transport","mode":"walk","label":"步行","durationMinutes":10,"distanceKm":0.8},
+        {"id":"d3-e5","type":"place","name":"水立方","category":"sight","stayMinutes":30,"geo":{"lat":39.992,"lng":116.3847}},
+        {"id":"d3-e6","type":"transport","mode":"subway","label":"地铁 8 号线直达王府井","durationMinutes":35,"distanceKm":14}
+      ]
+    },
+    {
+      "index": 4,
+      "date": "2026-10-02",
+      "title": "天坛、颐和园，傍晚高铁回上海",
+      "city": "geo",
+      "entries": [
+        {"id":"d4-e0","type":"transport","mode":"subway","label":"地铁 5 号线到天坛东门","durationMinutes":20,"distanceKm":5},
+        {"id":"d4-e1","type":"place","name":"天坛公园","category":"sight","plannedStart":"08:00","stayMinutes":110,"notes":"祈年殿、回音壁、圜丘；早上公园里有人打太极","geo":{"lat":39.8822,"lng":116.4066}},
+        {"id":"d4-e2","type":"transport","mode":"subway","label":"地铁 5 号线转 2 号线再转 4 号线，到北宫门","durationMinutes":70,"distanceKm":25},
+        {"id":"d4-e3","type":"place","name":"颐和园","category":"sight","plannedStart":"11:00","stayMinutes":60,"notes":"北宫门进，先上万寿山","geo":{"lat":39.9999,"lng":116.2755}},
+        {"id":"d4-e4","type":"transport","mode":"walk","label":"步行上万寿山","durationMinutes":20,"distanceKm":0.8},
+        {"id":"d4-e5","type":"place","name":"佛香阁","category":"sight","stayMinutes":40,"geo":{"lat":40.0003,"lng":116.2733}},
+        {"id":"d4-e6","type":"transport","mode":"walk","label":"步行下山到长廊和石舫","durationMinutes":15,"distanceKm":0.6},
+        {"id":"d4-e7","type":"place","name":"颐和园石舫码头","category":"port","stayMinutes":10,"geo":{"lat":39.9993,"lng":116.27}},
+        {"id":"d4-e8","type":"transport","mode":"ship","label":"昆明湖游船到南湖岛","durationMinutes":20,"distanceKm":1.8},
+        {"id":"d4-e9","type":"place","name":"十七孔桥","category":"sight","stayMinutes":30,"notes":"桥栏上有 544 只石狮子","geo":{"lat":39.9925,"lng":116.283}},
+        {"id":"d4-e10","type":"transport","mode":"walk","label":"步行到东宫门","durationMinutes":15,"distanceKm":1},
+        {"id":"d4-e11","type":"place","name":"颐和园东宫门","category":"sight","stayMinutes":5,"geo":{"lat":39.999,"lng":116.2825}},
+        {"id":"d4-e12","type":"transport","mode":"subway","label":"地铁 4 号线到北京南站","durationMinutes":60,"distanceKm":23},
+        {"id":"d4-e13","type":"place","name":"北京南站","category":"station","plannedStart":"17:00","stayMinutes":60,"notes":"国庆返程票紧张，候补下单","geo":{"lat":39.8652,"lng":116.3786}},
+        {"id":"d4-e14","type":"transport","mode":"rail","label":"高铁回上海虹桥","durationMinutes":270,"distanceKm":1318}
+      ]
+    }
+  ],
+  "createdAt": "2026-09-01T12:00:00.000Z",
+  "updatedAt": "2026-09-30T05:00:00.000Z"
+}

@@ -1,0 +1,116 @@
+{
+  "schemaVersion": "0.3",
+  "id": "sample-bali-island",
+  "title": "巴厘岛海岛度假",
+  "destination": "巴厘岛",
+  "startDate": "2026-07-12",
+  "endDate": "2026-07-16",
+  "theme": "离岛夏日",
+  "seed": 682093558,
+  "status": "closed",
+  "days": [
+    {
+      "index": 1,
+      "date": "2026-07-12",
+      "title": "飞巴厘岛，住进乌布",
+      "city": "geo",
+      "lodging": "乌布",
+      "entries": [
+        {"id":"d1-e0","type":"place","name":"上海浦东国际机场","category":"airport","plannedStart":"08:30","stayMinutes":125,"geo":{"lat":31.1443,"lng":121.8083}},
+        {"id":"d1-e1","type":"transport","mode":"flight","label":"上海浦东飞巴厘岛","durationMinutes":370,"distanceKm":4490},
+        {"id":"d1-e2","type":"place","name":"巴厘岛国际机场","category":"airport","plannedStart":"16:45","stayMinutes":60,"notes":"落地签提前在网上办好，入境时还要交旅游税；巴厘岛和上海没有时差","geo":{"lat":-8.7482,"lng":115.1675}},
+        {"id":"d1-e3","type":"transport","mode":"car","label":"酒店接机车，傍晚堵车","durationMinutes":90,"distanceKm":38},
+        {"id":"d1-e4","type":"place","name":"乌布山谷酒店","category":"hotel","stayMinutes":45,"notes":"泳池对着丛林","geo":{"lat":-8.501,"lng":115.256}},
+        {"id":"d1-e5","type":"transport","mode":"walk","label":"步行","durationMinutes":25,"distanceKm":1.9},
+        {"id":"d1-e6","type":"place","name":"脏鸭餐","category":"food","stayMinutes":75,"notes":"脆皮鸭配稻田景","visited":true,"visitedAt":"2026-07-12T12:35:00.000Z","geo":{"lat":-8.514,"lng":115.264}},
+        {"id":"d1-e7","type":"transport","mode":"taxi","label":"打车回酒店","durationMinutes":10,"distanceKm":2.8},
+        {"id":"d1-e8","type":"place","name":"乌布山谷酒店","category":"hotel","geo":{"lat":-8.501,"lng":115.256}}
+      ]
+    },
+    {
+      "index": 2,
+      "date": "2026-07-13",
+      "title": "乌布的梯田、圣泉寺和猴林",
+      "city": "geo",
+      "lodging": "乌布",
+      "entries": [
+        {"id":"d2-e0","type":"place","name":"乌布山谷酒店","category":"hotel","plannedStart":"07:30","stayMinutes":5,"notes":"包车一天，司机在大堂等","geo":{"lat":-8.501,"lng":115.256}},
+        {"id":"d2-e1","type":"transport","mode":"car","label":"包车","durationMinutes":35,"distanceKm":13},
+        {"id":"d2-e2","type":"place","name":"德格拉朗梯田","category":"sight","plannedStart":"08:10","stayMinutes":90,"notes":"早去人少，梯田里的秋千要另外付钱","visited":true,"visitedAt":"2026-07-13T00:20:00.000Z","geo":{"lat":-8.4312,"lng":115.2793}},
+        {"id":"d2-e3","type":"transport","mode":"car","label":"包车","durationMinutes":25,"distanceKm":12},
+        {"id":"d2-e4","type":"place","name":"圣泉寺","category":"sight","stayMinutes":90,"notes":"下水净身要租纱笼，按顺序过泉眼","visited":true,"visitedAt":"2026-07-13T02:15:00.000Z","geo":{"lat":-8.4153,"lng":115.3153}},
+        {"id":"d2-e5","type":"transport","mode":"car","label":"包车","durationMinutes":30,"distanceKm":16},
+        {"id":"d2-e6","type":"place","name":"乌布皇宫","category":"sight","stayMinutes":30,"notes":"晚上这里有黎弓舞表演","visited":true,"visitedAt":"2026-07-13T04:15:00.000Z","geo":{"lat":-8.5068,"lng":115.2624}},
+        {"id":"d2-e7","type":"transport","mode":"walk","label":"步行","durationMinutes":3,"distanceKm":0.2},
+        {"id":"d2-e8","type":"place","name":"乌布传统市场","category":"shop","stayMinutes":45,"notes":"藤编包和纱笼，砍价从一半开始","visited":true,"visitedAt":"2026-07-13T04:48:00.000Z","geo":{"lat":-8.5074,"lng":115.263}},
+        {"id":"d2-e9","type":"transport","mode":"walk","label":"沿猴林路往南走","durationMinutes":20,"distanceKm":1.5},
+        {"id":"d2-e10","type":"place","name":"乌布圣猴森林","category":"sight","stayMinutes":75,"notes":"眼镜和帽子收好，猴子会抢","visited":true,"visitedAt":"2026-07-13T05:53:00.000Z","geo":{"lat":-8.5188,"lng":115.2585}},
+        {"id":"d2-e11","type":"transport","mode":"taxi","label":"打车","durationMinutes":12,"distanceKm":3.5},
+        {"id":"d2-e12","type":"place","name":"坎普汉山脊步道","category":"sight","plannedStart":"17:00","stayMinutes":60,"notes":"日落前走一段，来回一小时","visited":true,"visitedAt":"2026-07-13T09:10:00.000Z","geo":{"lat":-8.503,"lng":115.254}},
+        {"id":"d2-e13","type":"transport","mode":"walk","label":"步行回酒店","durationMinutes":15,"distanceKm":1},
+        {"id":"d2-e14","type":"place","name":"乌布山谷酒店","category":"hotel","geo":{"lat":-8.501,"lng":115.256}}
+      ]
+    },
+    {
+      "index": 3,
+      "date": "2026-07-14",
+      "title": "快船去佩尼达岛，晚上换到金巴兰",
+      "city": "geo",
+      "lodging": "金巴兰",
+      "entries": [
+        {"id":"d3-e0","type":"place","name":"乌布山谷酒店","category":"hotel","plannedStart":"06:00","stayMinutes":5,"notes":"6 点退房，行李让包车司机先送到金巴兰的酒店","geo":{"lat":-8.501,"lng":115.256}},
+        {"id":"d3-e1","type":"transport","mode":"car","label":"包车","durationMinutes":50,"distanceKm":26},
+        {"id":"d3-e2","type":"place","name":"沙努尔码头","category":"port","plannedStart":"07:00","stayMinutes":30,"notes":"快船在沙滩上直接上，穿能湿的鞋","geo":{"lat":-8.677,"lng":115.263}},
+        {"id":"d3-e3","type":"transport","mode":"ship","label":"快船去佩尼达岛","durationMinutes":40,"distanceKm":25},
+        {"id":"d3-e4","type":"place","name":"佩尼达岛码头","category":"port","stayMinutes":15,"geo":{"lat":-8.6815,"lng":115.4865}},
+        {"id":"d3-e5","type":"transport","mode":"car","label":"岛上包车，路很颠","durationMinutes":75,"distanceKm":20},
+        {"id":"d3-e6","type":"place","name":"精灵坠崖","category":"sight","stayMinutes":60,"notes":"下到沙滩要一小时，很陡，在崖顶拍就够了","visited":true,"visitedAt":"2026-07-14T01:50:00.000Z","geo":{"lat":-8.7497,"lng":115.4747},"kind":"beach"},
+        {"id":"d3-e7","type":"transport","mode":"car","label":"包车","durationMinutes":45,"distanceKm":12},
+        {"id":"d3-e8","type":"place","name":"破碎海滩","category":"sight","stayMinutes":40,"notes":"海水从拱洞里涌进圆形的海湾","visited":true,"visitedAt":"2026-07-14T03:35:00.000Z","geo":{"lat":-8.7302,"lng":115.4502}},
+        {"id":"d3-e9","type":"transport","mode":"walk","label":"步行","durationMinutes":5,"distanceKm":0.3},
+        {"id":"d3-e10","type":"place","name":"天使浴池","category":"sight","stayMinutes":30,"notes":"浪太大，没敢下去","geo":{"lat":-8.7291,"lng":115.4508}},
+        {"id":"d3-e11","type":"transport","mode":"car","label":"包车回码头","durationMinutes":50,"distanceKm":14},
+        {"id":"d3-e12","type":"place","name":"佩尼达岛码头","category":"port","plannedStart":"15:30","stayMinutes":30,"notes":"赶 16 点的回程快船","geo":{"lat":-8.6815,"lng":115.4865}},
+        {"id":"d3-e13","type":"transport","mode":"ship","label":"快船回沙努尔","durationMinutes":40,"distanceKm":25},
+        {"id":"d3-e14","type":"place","name":"沙努尔码头","category":"port","stayMinutes":10,"geo":{"lat":-8.677,"lng":115.263}},
+        {"id":"d3-e15","type":"transport","mode":"car","label":"包车去金巴兰，傍晚机场路很堵","durationMinutes":55,"distanceKm":28},
+        {"id":"d3-e16","type":"place","name":"金巴兰海滩海鲜","category":"food","plannedStart":"19:00","stayMinutes":90,"notes":"沙滩上的海鲜大排档，按斤称，脚踩着沙子吃","visited":true,"visitedAt":"2026-07-14T11:10:00.000Z","geo":{"lat":-8.77,"lng":115.166}},
+        {"id":"d3-e17","type":"transport","mode":"walk","label":"步行","durationMinutes":15,"distanceKm":1.2},
+        {"id":"d3-e18","type":"place","name":"金巴兰海湾酒店","category":"hotel","geo":{"lat":-8.78,"lng":115.164}}
+      ]
+    },
+    {
+      "index": 4,
+      "date": "2026-07-15",
+      "title": "乌鲁瓦图：冲浪海滩和断崖神庙",
+      "city": "geo",
+      "lodging": "金巴兰",
+      "entries": [
+        {"id":"d4-e0","type":"place","name":"金巴兰海湾酒店","category":"hotel","plannedStart":"09:30","stayMinutes":5,"geo":{"lat":-8.78,"lng":115.164}},
+        {"id":"d4-e1","type":"transport","mode":"taxi","label":"网约车","durationMinutes":30,"distanceKm":14},
+        {"id":"d4-e2","type":"place","name":"帕当帕当海滩","category":"sight","stayMinutes":150,"notes":"从岩缝里的台阶下去，适合游泳","visited":true,"visitedAt":"2026-07-15T02:15:00.000Z","geo":{"lat":-8.8113,"lng":115.103}},
+        {"id":"d4-e3","type":"transport","mode":"taxi","label":"网约车","durationMinutes":15,"distanceKm":5},
+        {"id":"d4-e4","type":"place","name":"Single Fin 冲浪酒吧","category":"food","stayMinutes":90,"notes":"悬崖上看冲浪，点一杯椰子","visited":true,"visitedAt":"2026-07-15T05:00:00.000Z","geo":{"lat":-8.815,"lng":115.0885}},
+        {"id":"d4-e5","type":"transport","mode":"taxi","label":"网约车","durationMinutes":12,"distanceKm":4},
+        {"id":"d4-e6","type":"place","name":"乌鲁瓦图断崖神庙","category":"sight","plannedStart":"17:00","stayMinutes":90,"notes":"18 点有凯卡克火舞，提前买票，坐西侧能同时看日落；猴子抢眼镜","visited":true,"visitedAt":"2026-07-15T09:10:00.000Z","geo":{"lat":-8.8291,"lng":115.0849}},
+        {"id":"d4-e7","type":"transport","mode":"taxi","label":"网约车回酒店","durationMinutes":35,"distanceKm":18},
+        {"id":"d4-e8","type":"place","name":"金巴兰海湾酒店","category":"hotel","geo":{"lat":-8.78,"lng":115.164}}
+      ]
+    },
+    {
+      "index": 5,
+      "date": "2026-07-16",
+      "title": "回上海",
+      "city": "geo",
+      "entries": [
+        {"id":"d5-e0","type":"place","name":"金巴兰海湾酒店","category":"hotel","plannedStart":"09:00","stayMinutes":120,"notes":"早上游泳，11 点退房","geo":{"lat":-8.78,"lng":115.164}},
+        {"id":"d5-e1","type":"transport","mode":"taxi","label":"网约车去机场","durationMinutes":25,"distanceKm":11},
+        {"id":"d5-e2","type":"place","name":"巴厘岛国际机场","category":"airport","plannedStart":"11:30","stayMinutes":120,"notes":"国际出发提前 2 小时到","geo":{"lat":-8.7482,"lng":115.1675}},
+        {"id":"d5-e3","type":"transport","mode":"flight","label":"巴厘岛飞上海浦东","durationMinutes":350,"distanceKm":4490},
+        {"id":"d5-e4","type":"place","name":"上海浦东国际机场","category":"airport","plannedStart":"19:20","geo":{"lat":31.1443,"lng":121.8083}}
+      ]
+    }
+  ],
+  "createdAt": "2026-05-20T09:30:00.000Z",
+  "updatedAt": "2026-07-17T02:10:00.000Z"
+}

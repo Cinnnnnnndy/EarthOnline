@@ -1,0 +1,8 @@
+# 由 XcodeGen 生成（project.yml 才是源）
+EarthOnline.xcodeproj/
+EarthOnline/Info.plist
+# 构建与截图
+build/
+DerivedData/
+screenshots/
+*.xcresult

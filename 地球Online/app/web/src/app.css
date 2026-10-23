@@ -1,0 +1,401 @@
+/* 地球Online · 设计系统（第五轮）。变量由 shared/world/tokens.ts 注入（--c-* 颜色、--t-* 字阶、--s-* 间距、--r-* 圆角、--g-* 玻璃）。
+   按手机 App 的习惯：安全区、44pt 触控、16pt 边距；主界面是地球 / 世界，内容放在底部抽屉；展开态抽屉停靠成左页。
+   材质：液态玻璃（半透明 + 背景模糊提饱和 + 一道亮边），不用渐变填充、不用大阴影。 */
+
+html{font-family:var(--font);-webkit-text-size-adjust:100%}
+body{font-family:var(--font);font-size:var(--t-body-size);line-height:var(--t-body-lh);color:var(--c-ink);-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit}
+h1,h2,h3,h4,h5{margin:0;font-weight:600}
+
+/* ---------- 字阶 */
+.t-large{font-size:var(--t-title-size);line-height:var(--t-title-lh);font-weight:600}
+.t-title{font-size:var(--t-title-size);line-height:var(--t-title-lh);font-weight:600}
+.t-headline{font-size:var(--t-headline-size);line-height:var(--t-headline-lh);font-weight:600}
+.t-body{font-size:var(--t-body-size);line-height:var(--t-body-lh);font-weight:400}
+.t-sub{font-size:var(--t-sub-size);line-height:var(--t-sub-lh);color:var(--c-mist)}
+.t-caption{font-size:var(--t-caption-size);line-height:var(--t-caption-lh);color:var(--c-mist)}
+.num{font-variant-numeric:tabular-nums}
+.st-live{color:var(--c-dawnInk)} .st-soon{color:var(--c-lake)} .st-done{color:var(--c-mist)}
+
+/* ---------- 液态玻璃 */
+.lg{background:var(--g-fill);-webkit-backdrop-filter:blur(var(--g-blur)) saturate(var(--g-sat));backdrop-filter:blur(var(--g-blur)) saturate(var(--g-sat));
+  box-shadow:var(--g-shadow);position:relative;isolation:isolate;color:var(--c-ink)}
+.lg::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;z-index:1;
+  background:linear-gradient(155deg,var(--g-rim) 0%,var(--g-rim-soft) 28%,rgba(255,255,255,0) 50%,var(--g-rim-soft) 78%,rgba(255,255,255,.55) 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.lg.strong{background:var(--g-fill-strong)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.lg{background:var(--c-sheet)}}
+
+/* ---------- 浮动按钮（44pt 圆）与竖排按钮组 */
+.fab{width:44px;height:44px;min-width:44px;border-radius:50%;display:grid;place-items:center;border:none;padding:0;color:var(--c-ink);cursor:pointer;box-shadow:var(--g-shadow)}
+.fab:active{transform:scale(.94)} .fab .ic{width:20px;height:20px}
+.fab.sm{width:32px;height:32px;min-width:32px;box-shadow:none;background:var(--c-fill)} .fab.sm .ic{width:16px;height:16px}
+.fab-bar{position:fixed;left:0;right:0;top:0;padding:calc(env(safe-area-inset-top) + 10px) 16px 0;display:flex;align-items:center;gap:8px;z-index:20;pointer-events:none}
+.fab-bar > *{pointer-events:auto} .fab-bar .grow{flex:1;pointer-events:none}
+.wordmark{font-size:var(--t-headline-size);line-height:44px;font-weight:600;color:#fff;text-shadow:0 1px 8px rgba(20,24,60,.35);padding:0 4px}
+.pill{display:flex;flex-direction:column;border-radius:22px;overflow:hidden;box-shadow:var(--g-shadow)}
+.pill > button{width:44px;height:44px;display:grid;place-items:center;background:none;border:none;border-radius:0;padding:0;color:var(--c-ink);box-shadow:none}
+.pill > button + button{border-top:.5px solid var(--c-line)} .pill > button .ic{width:19px;height:19px} .pill > button.on{color:var(--c-ink);background:var(--c-fill)}
+.fab-col{position:fixed;right:16px;top:calc(env(safe-area-inset-top) + 64px);z-index:20;display:flex;flex-direction:column;gap:10px}
+
+/* ---------- 底部抽屉（紧凑：手机 / 折叠外屏）；展开态停靠成左页 */
+.bsheet{position:fixed;left:0;right:0;bottom:0;z-index:15;border-radius:var(--r-sheet) var(--r-sheet) 0 0;display:flex;flex-direction:column;
+  height:var(--sheet-h,42%);max-height:calc(100% - env(safe-area-inset-top) - 64px);transition:height .34s cubic-bezier(.2,.8,.2,1);touch-action:none}
+.bsheet.dragging{transition:none}
+.bsheet .grab{align-self:center;width:44px;height:22px;display:grid;place-items:center;border:none;background:none;padding:0;cursor:grab;flex:0 0 auto}
+.bsheet .grab::after{content:"";width:36px;height:5px;border-radius:3px;background:var(--c-grab)}
+.bsheet .sh-head{padding:0 16px 10px;display:flex;align-items:flex-start;gap:12px;flex:0 0 auto}
+.bsheet .sh-head .ttl{flex:1;min-width:0} .bsheet .sh-head .ttl > *{display:block}
+.bsheet .sh-body{flex:1;min-height:0;overflow:auto;padding:0 16px calc(env(safe-area-inset-bottom) + 16px);overscroll-behavior:contain;touch-action:pan-y}
+.bsheet .sh-foot{flex:0 0 auto;padding:8px 16px calc(env(safe-area-inset-bottom) + 12px)}
+/* 两页（阔折叠 / 书式折叠展开、横持平板）与三页（三折叠全开、宽桌面，D90）：抽屉停靠成左页，宽度按分页变量（shape.ts 写的 --pane-n-x / --pane-n-w），不跨折痕 */
+html[data-shape="spread"] .bsheet,html[data-shape="triple"] .bsheet{left:16px;top:calc(env(safe-area-inset-top) + 16px);bottom:16px;right:auto;width:min(400px,calc(var(--pane-1-w) - 32px));height:auto;max-height:none;border-radius:var(--r-l);transition:none}
+html[data-shape="spread"] .bsheet .grab,html[data-shape="triple"] .bsheet .grab{visibility:hidden;height:12px}
+html[data-shape="spread"] .fab-bar,html[data-shape="triple"] .fab-bar{left:calc(var(--pane-2-x) + 12px)}
+/* 三页：右页放弹层（站点详情、清单、设置……不再盖在世界上），图标列贴中页的右边 */
+html[data-shape="triple"] .fab-col{right:calc(100% - var(--pane-2-x) - var(--pane-2-w) + 16px)}
+html[data-shape="triple"] .sheet-wrap{align-items:flex-start;justify-content:flex-end;background:rgba(20,24,48,.12)!important;padding:calc(env(safe-area-inset-top) + 16px) 16px 16px 0}
+html[data-shape="triple"] .sheet{width:calc(var(--pane-3-w) - 32px)!important;max-width:none;max-height:calc(100vh - env(safe-area-inset-top) - 32px)!important;border-radius:var(--r-l)!important;animation:none}
+/* 悬停（半开横放桌面）：上半屏世界，下半屏抽屉；抓手没用了 */
+html[data-shape="hover"] .bsheet{top:calc(var(--pane-2-x) + 8px);height:auto;max-height:none;border-radius:var(--r-l) var(--r-l) 0 0;transition:none}
+html[data-shape="hover"] .bsheet .grab{visibility:hidden;height:12px}
+html[data-shape="hover"] .sheet{max-height:calc(var(--pane-2-w) - 8px)!important}
+
+/* ---------- 列表（分组、行高 ≥ 44pt、细分隔线从文字处开始） */
+.group{margin:12px 0 0} .group > .gh{font-size:var(--t-sub-size);line-height:var(--t-sub-lh);color:var(--c-mist);padding:0 4px 6px}
+.list{border-radius:var(--r-m);background:var(--c-list);overflow:hidden}
+.lg.strong .list{background:var(--c-list-strong)}
+.row{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:8px 12px 8px 14px;background:none;border:none;border-radius:0;box-shadow:none;text-align:left;color:inherit;position:relative;cursor:pointer;font-size:var(--t-body-size)}
+.row + .row::before{content:"";position:absolute;top:0;left:var(--sep-left,56px);right:0;border-top:.5px solid var(--c-line)}
+.row:active{background:var(--c-press)}
+.row .lead{flex:0 0 auto;width:28px;height:28px;display:grid;place-items:center;font-size:var(--t-sub-size);font-weight:400;color:var(--c-ink2);background:none}
+.row .lead.soft{color:var(--c-mist)} .row .lead.ink{color:var(--c-ink)} .row .lead .ic,.row .lead svg{width:18px;height:18px;color:inherit}
+.row .lead.cover{width:30px;height:40px;border-radius:3px 6px 6px 3px;background:var(--grain),linear-gradient(170deg,var(--cover-a),var(--cover-b));background-blend-mode:soft-light,normal}
+.row .main{flex:1;min-width:0;display:flex;flex-direction:column}
+.row .main .tt{font-size:var(--t-body-size);line-height:var(--t-body-lh);font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .main .mt{font-size:var(--t-sub-size);line-height:var(--t-sub-lh);color:var(--c-mist);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .trail{flex:0 0 auto;font-size:var(--t-sub-size);color:var(--c-mist);display:flex;align-items:center;gap:4px}
+.row .chev{color:var(--c-mist2);width:14px;height:14px}
+.row.leg{min-height:32px;padding:2px 12px 2px 58px;cursor:default;font-size:var(--t-sub-size);color:var(--c-mist)} .row.leg .ic{width:14px;height:14px;margin-right:4px;vertical-align:-2px}
+.row.leg::before,.row.leg + .row::before{display:none}
+.row.today .mt{color:var(--c-dawnInk)}
+.row.action .main .tt{color:var(--c-ink)}
+
+/* ---------- 按钮（第七轮：精简、不用蓝色填充）
+   主按钮：墨色小胶囊（白天深墨底白字，夜里白底深字），高 36、随内容宽，一屏最多一个；
+   次按钮：玻璃小胶囊（浅填充 + 墨字）；再次：纯文字。点击区靠 ::after 撑到 44。 */
+.btn,button.primary,.sheet button.primary{position:relative;height:36px;min-height:36px;border-radius:18px;border:none;padding:0 16px;font-size:var(--t-sub-size);line-height:1;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;box-shadow:none;white-space:nowrap;width:auto;flex:0 0 auto}
+.btn::after,button.primary::after{content:"";position:absolute;inset:-4px -2px}
+.btn .ic,.btn svg{width:16px;height:16px}
+.btn.primary,button.primary,.sheet button.primary,button.primary:hover,.btn.primary:hover{background:var(--c-ink);color:var(--c-paper);filter:none}
+.btn.primary:active,button.primary:active{opacity:.82}
+.btn.tinted,.btn.glass{background:var(--c-fill);color:var(--c-ink)} .btn.tinted:active,.btn.glass:active{background:var(--c-press)}
+.btn.wide{width:100%}
+.btn-row{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:4px}
+.tbtn{min-height:44px;padding:0 6px;border:none;background:none;box-shadow:none;color:var(--c-ink2);font-size:var(--t-body-size);font-weight:400;cursor:pointer;display:inline-flex;align-items:center;gap:2px}
+.tbtn .ic{width:18px;height:18px}
+.seg{display:flex;background:var(--c-fill);border-radius:9px;padding:2px;gap:2px}
+.seg button{flex:1;min-width:0;height:32px;padding:0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-radius:7px;border:none;background:none;box-shadow:none;font-size:var(--t-sub-size);font-weight:400;color:var(--c-ink)}
+.seg button.on{font-weight:600;background:var(--c-seg-on);box-shadow:0 1px 3px rgba(30,38,64,.14)}
+
+/* ---------- 弹层（模态抽屉）：抓手 + 居中标题 + 右上「完成」 */
+.sheet-wrap{background:rgba(20,24,48,.28)!important;align-items:flex-end}
+.sheet{border-radius:var(--r-sheet) var(--r-sheet) 0 0!important;padding:6px 16px calc(env(safe-area-inset-bottom) + 20px)!important;background:var(--c-sheet)!important;color:var(--c-ink);
+  -webkit-backdrop-filter:blur(24px) saturate(1.6);backdrop-filter:blur(24px) saturate(1.6);box-shadow:none!important;max-height:88vh!important}
+.sheet::before{content:"";display:block;width:36px;height:5px;border-radius:3px;background:var(--c-grab);margin:0 auto 10px}
+.sheet header{position:relative;justify-content:center!important;min-height:44px;margin-bottom:8px!important}
+.sheet header h3{font-size:var(--t-headline-size)!important;font-weight:600}
+.sheet header button.icon{position:absolute;right:-4px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:var(--c-fill);border:none;font-size:14px;color:var(--c-mist)}
+html[data-shape="spread"] .sheet-wrap{align-items:center}
+html[data-shape="spread"] .sheet{border-radius:var(--r-l)!important;max-height:80vh!important}
+html[data-shape="triple"] .sheet header{margin-top:4px}
+.sheet input,.sheet select,.sheet textarea{min-height:44px;border-radius:10px;background:var(--c-field);color:var(--c-ink);border:.5px solid var(--c-line);font-size:var(--t-body-size);padding:10px 12px}
+.sheet .field .lbl{font-size:var(--t-sub-size);color:var(--c-mist);font-weight:400}
+.sheet .col > button.primary{align-self:flex-end}
+
+/* ---------- 提示：顶部横幅 */
+.toast-host{top:calc(env(safe-area-inset-top) + 64px)!important;bottom:auto!important}
+.toast{background:rgba(30,38,64,.86)!important;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-radius:14px!important;font-size:var(--t-sub-size)!important;padding:10px 14px!important}
+
+/* ---------- 地球上的标签：小块玻璃，无圆点、无阴影 */
+.glabel{background:var(--c-label)!important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:none!important;border-radius:8px!important;padding:4px 8px!important;box-shadow:none!important;font-size:var(--t-caption-size)!important;font-weight:400;color:var(--c-ink)!important;gap:6px}
+.glabel .dot{display:none!important}
+.glabel.gl-book{padding:6px 10px!important;font-size:var(--t-sub-size)!important} .glabel.gl-book b{font-weight:600}
+.glabel.gl-book em{font-style:normal;font-size:var(--t-caption-size);background:none!important;padding:0!important}
+.glabel.gl-book em.live{color:var(--c-dawnInk)!important} .glabel.gl-book em.soon{color:var(--c-lake)!important}
+.glabel.gl-day b{color:var(--c-lake);font-weight:600}
+.glabel.gl-home{background:rgba(30,38,64,.82)!important;color:#fff!important}
+.glabel.gl-flag.many{background:var(--c-dawn)!important;color:#3b2a00!important}
+.glabel.gl-leg{background:rgba(30,38,64,.7)!important;color:#fff!important}
+
+/* ---------- 旧页面里残留的胶囊 / 卡片：统一成玻璃，去掉眉题式小字 */
+.hud .k{letter-spacing:0!important}
+*{letter-spacing:0!important;text-transform:none!important}
+
+/* ---------- 星空模式（地球页）：只留星空画布，白天的云、岛、太阳收起 */
+.bd-space{position:absolute;inset:0;display:none;overflow:hidden} .bd-space > canvas{display:block;width:100%!important;height:100%!important}
+.backdrop[data-mode="space"] .bd-space{display:block}
+.backdrop[data-mode="space"] .bd-sky,.backdrop[data-mode="space"] .bd-layer,.backdrop[data-mode="space"] .bd-grain{display:none}
+.bd-tw{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;box-shadow:0 0 6px 2px rgba(255,255,255,.7);animation:bd-tw 3.6s ease-in-out infinite}
+@keyframes bd-tw{0%,100%{opacity:.15;transform:scale(.6)}50%{opacity:1;transform:scale(1.1)}}
+.bd-meteor{position:absolute;left:72%;top:6%;width:2px;height:120px;border-radius:2px;background:linear-gradient(#fff0,#e8fff2 60%,#fff);transform:rotate(-38deg);opacity:0;animation:bd-meteor 17s linear infinite 6s}
+@keyframes bd-meteor{0%,92%{opacity:0;translate:0 0}93%{opacity:.9}100%{opacity:0;translate:-160px 200px}}
+.bd-orbit{position:absolute;left:0;top:0;transform-origin:50% 50%;pointer-events:none;will-change:transform} .bd-orbit canvas{display:block}
+.bd-stars{position:absolute;inset:-5%;pointer-events:none;transition:transform 1.2s cubic-bezier(.2,.8,.2,1)} .bd-stars canvas{display:block;width:100%!important;height:100%!important}
+.backdrop[data-phase="day"] .bd-tw:nth-of-type(n+4){display:none} .backdrop[data-phase="day"] .bd-tw{background:#fff;opacity:.6} .backdrop[data-phase="dusk"] .bd-tw:nth-of-type(n+6){display:none}
+@media (prefers-reduced-motion:reduce){.bd-tw,.bd-meteor{animation:none}}
+.globe-host{background:var(--space-bg,#141a4a)!important;transition:background .6s}
+
+/* ---------- 色卡页 */
+.tk{max-width:720px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 16px 40px;display:flex;flex-direction:column;gap:22px;background:var(--c-paper);min-height:100%}
+.tk-nav{display:flex;align-items:center;gap:8px;min-height:44px} .tk-nav h1{flex:1;text-align:center;margin-right:60px}
+.tk section{display:flex;flex-direction:column;gap:8px}
+.tk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.tk-sw{display:flex;gap:10px;align-items:center;background:var(--c-field);border-radius:12px;padding:8px} .tk-sw i{width:40px;height:40px;border-radius:10px;flex:0 0 auto;box-shadow:inset 0 0 0 .5px rgba(30,38,64,.15)}
+.tk-sw div{display:flex;flex-direction:column;min-width:0} .tk-sw b{font-size:var(--t-sub-size);font-weight:600}
+.tk-glass{padding:28px 16px;border-radius:16px;background:linear-gradient(135deg,#1E2640,#A3A9BC 55%,#F0B03A)} .tk-card{border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:4px}
+
+/* ---------- 某一天（手机骨架） */
+.day .bsheet .next{margin-bottom:8px} .day .bsheet .next .tt .k{font-weight:400;color:var(--c-mist);margin-right:6px} .day .bsheet .next .mt .ic{display:inline-block;vertical-align:-2px;color:var(--c-ink2)}
+.day .bsheet .timeline{position:relative!important;left:auto!important;bottom:auto!important;transform:none!important;width:auto!important;margin:6px 0 4px;padding:8px 12px 26px!important;background:var(--c-list)!important;border:none!important;box-shadow:none!important;border-radius:var(--r-m)!important}
+.day .bsheet .quest{position:static!important;width:auto!important;max-height:none!important;background:var(--c-list)!important;border:none!important;box-shadow:none!important;border-radius:var(--r-m);display:block!important;padding:4px 0}
+.day .bsheet .quest .entries{max-height:none!important;padding:0 8px}
+.quest-add{display:flex;gap:8px;flex-wrap:wrap;padding:10px 12px 8px} .quest-add button,.quest-add button:hover{height:32px;border-radius:16px;border:none;background:var(--c-fill);color:var(--c-ink);font-weight:400;font-size:var(--t-sub-size);padding:0 12px;box-shadow:none;filter:none}
+.day .caption{position:fixed;top:calc(env(safe-area-inset-top) + 64px);bottom:auto;border-radius:14px;background:rgba(30,38,64,.82);font-size:var(--t-sub-size)}
+.day.ui-hidden .bsheet,.day.ui-hidden .fab-col,.day.ui-hidden .fab-bar{opacity:0;pointer-events:none;transition:opacity .3s}
+.day .show-ui{position:fixed;right:16px;bottom:calc(env(safe-area-inset-bottom) + 16px);width:44px;height:44px;border-radius:50%}
+.day .fab-col{top:calc(env(safe-area-inset-top) + 10px)}
+html[data-shape="spread"] .day .fab-bar,html[data-shape="triple"] .day .fab-bar{left:calc(var(--pane-2-x) + 12px)}
+
+/* ---------- 普通页面（设置、色卡）：导航栏 + 分组列表，底色是纸 */
+.spg{max-width:640px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top) + 4px) 16px calc(env(safe-area-inset-bottom) + 32px);background:var(--c-paper);color:var(--c-ink)}
+.navbar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;min-height:44px;margin:0 -6px 8px} .navbar > :first-child{justify-self:start} .navbar h1{text-align:center}
+.list.pad{padding:8px}
+.gf{font-size:var(--t-caption-size);line-height:var(--t-caption-lh);color:var(--c-mist);padding:6px 4px 0;margin:0} .gf.center{text-align:center;padding-top:24px}
+.row.danger .tt{color:var(--c-danger)} .row .lead.warn{background:rgba(209,75,94,.12);color:var(--c-danger)}
+
+/* ---------- 旅行日记（封底）：统计是 SAS 式的两列格子（数值与说明同字号，靠字重与颜色分），日记是分组列表里的可编辑段落 */
+html:has(.spg),html:has(.spg) body{background:var(--c-paper)}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;padding:4px 0} .stat-grid .stat{display:flex;flex-direction:column;padding:10px 16px;background:none;border-radius:0;box-shadow:none}
+.stat-grid .stat b{font-size:var(--t-body-size);line-height:var(--t-body-lh);font-weight:600} .stat-grid .stat span{font-size:var(--t-body-size);line-height:var(--t-body-lh);color:var(--c-mist)}
+.stat-grid .stat:nth-child(n+3){border-top:.5px solid var(--c-line)}
+.diary-row{display:flex;flex-direction:column;gap:2px;padding:10px 14px 12px} .diary-row + .diary-row{border-top:.5px solid var(--c-line)}
+.diary-row .dr-head{display:flex;align-items:center;gap:8px;min-height:32px} .diary-row .dr-head .tt{flex:1;min-width:0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .diary-row .dr-head .tbtn{min-height:32px;font-size:var(--t-sub-size)}
+.diary-ta{margin-top:6px;min-height:96px;border-radius:10px;border:.5px solid var(--c-line);background:var(--c-field);color:var(--c-ink);font-size:var(--t-sub-size);line-height:var(--t-sub-lh);padding:10px 12px;resize:vertical;width:100%}
+.spg-foot{margin-top:auto;position:sticky;bottom:0;padding:12px 0 calc(env(safe-area-inset-bottom) + 8px);background:linear-gradient(to top,var(--c-paper) 70%,transparent)}
+
+/* ---------- 第六轮：首页按旅程阶段（随内容大小的卡片 + 悬浮图标 + 悬浮的新建按钮） */
+.fab-group{display:flex;align-items:center;gap:0;border-radius:24px;padding:2px;box-shadow:var(--g-shadow)}
+.fab-group > button{width:44px;height:44px;border-radius:50%;border:none;background:none;display:grid;place-items:center;color:var(--c-ink);cursor:pointer;padding:0}
+.fab-group > button:active{background:var(--c-press)} .fab-group .ic{width:19px;height:19px}
+.home-dock{position:fixed;left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom) + 16px);z-index:15;display:flex;flex-direction:column;align-items:center;gap:14px;pointer-events:none}
+.home-dock > *{pointer-events:auto}
+.state-card{width:100%;max-width:420px;border-radius:22px;padding:10px 12px 10px 16px;display:flex;align-items:center;gap:12px}
+.state-card .sc-main{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:2px 0;border:none;background:none;box-shadow:none;border-radius:0;text-align:left;color:inherit;cursor:pointer;font-size:var(--t-sub-size);line-height:var(--t-sub-lh)}
+.state-card .sc-main:hover{background:none}
+.state-card .sc-title{font-size:var(--t-headline-size);line-height:var(--t-headline-lh);font-weight:600;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.state-card .sc-line{display:flex;align-items:center;gap:6px;max-width:100%;color:var(--c-mist);white-space:nowrap} .state-card .sc-line .ic,.state-card .sc-line svg{width:14px;height:14px;flex:0 0 auto}
+.state-card .sc-ell{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.state-card .st-live,.state-card .st-soon,.state-card .t-sub{font-size:var(--t-sub-size);line-height:var(--t-sub-lh)}
+.chip-card{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 12px 0 16px;border-radius:20px;border:none;color:var(--c-ink);font-size:var(--t-sub-size);cursor:pointer;max-width:100%}
+.chip-card .chev{color:var(--c-mist2);width:14px;height:14px}
+.dream-btn{position:relative;isolation:isolate;overflow:hidden;height:44px;min-width:0;padding:0 20px 0 16px;border-radius:22px;border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  color:#1E2640;font-size:var(--t-sub-size);font-weight:600;text-shadow:none;background-size:cover;background-position:center;background-color:#F0B84A;
+  box-shadow:0 8px 22px rgba(230,160,50,.35),0 2px 6px rgba(0,0,0,.1)}
+/* 第八轮：「新建旅程」是全应用唯一带颜色的按钮——蜜 → 晨 → 琥珀，只有晨色一个色相（珊瑚那一端和天空打架，去掉了），墨色字保证对比；夜里底深一档，字仍是墨 */
+html[data-theme="dark"] .dream-btn{background-color:#DFA53C;box-shadow:0 8px 22px rgba(0,0,0,.3)}
+.dream-btn::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;background:linear-gradient(160deg,rgba(255,255,255,.85),rgba(255,255,255,.12) 40%,rgba(255,255,255,0) 60%,rgba(255,255,255,.45));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.dream-btn::after{content:"";position:absolute;inset:-40% -60%;z-index:-1;background:linear-gradient(100deg,transparent 42%,rgba(255,255,255,.28) 50%,transparent 58%);transform:translateX(-60%);animation:dream-shine 6s ease-in-out infinite 1.2s}
+.dream-btn .ic,.dream-btn svg{width:17px;height:17px} .dream-btn:active{transform:scale(.97)}
+@keyframes dream-shine{0%,70%{transform:translateX(-60%)}100%{transform:translateX(60%)}}
+@media (prefers-reduced-motion:reduce){.dream-btn::after{animation:none}}
+/* 展开（阔折叠内屏、iPhone Duo 内屏）：卡片只在折痕左边那一半，地球在右半 */
+html[data-shape="spread"] .home-dock,html[data-shape="triple"] .home-dock{right:auto;width:calc(var(--pane-1-w) - 32px);align-items:stretch} html[data-shape="spread"] .home-dock .dream-btn,html[data-shape="spread"] .home-dock .chip-card,html[data-shape="triple"] .home-dock .dream-btn,html[data-shape="triple"] .home-dock .chip-card{align-self:center}
+html[data-shape="spread"] .bsheet.fit,html[data-shape="triple"] .bsheet.fit{bottom:auto;max-height:calc(100% - env(safe-area-inset-top) - 32px);height:auto}
+.bsheet[hidden],.home-dock[hidden]{display:none!important}
+/* hidden 属性一律生效（.col / .bsheet 等带 display 的类会盖掉浏览器默认的 display:none） */
+[hidden]{display:none!important}
+
+/* 新建旅程：最上面一行是语音入口（像一个大按钮，但是玻璃行，不抢地球的风头） */
+.voice-entry{display:flex;align-items:center;gap:12px;width:100%;min-height:48px;padding:6px 12px 6px 8px;border:none;border-radius:var(--r-m);text-align:left;cursor:pointer;color:var(--c-ink);background:var(--c-list-strong);box-shadow:none;font-size:var(--t-body-size)}
+.voice-entry .ve-mic{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:var(--c-paper);background:var(--c-ink);flex:0 0 auto}
+.voice-entry .ve-mic .ic,.voice-entry .ve-mic svg{width:17px;height:17px} .voice-entry .ve-text{flex:1;min-width:0} .voice-entry .chev{color:var(--c-mist2);width:14px;height:14px}
+.row .main .mt.wrap{white-space:normal;overflow:visible} .row[disabled]{opacity:.55;cursor:default}
+/* 手机没有悬停：旧样式里按钮悬停变浅灰白的规则只留给有鼠标的设备；列表行在任何设备上悬停都不变底色（按下用 :active） */
+@media (hover:none){button:hover{background-color:unset;filter:none}}
+button.row:hover{background-color:transparent}
+
+/* ---------- 第八轮去色：曾经的「湖」色（蓝紫）全部换成墨（夜里白）。令牌 --c-lake 的值已经等于墨，这里只处理还写死颜色的地方 */
+.st-soon{color:var(--c-ink2)}
+.glabel.gl-book em.soon{color:var(--c-ink2)!important}
+/* ---------- 第七轮：选项小块与搜索建议，选中用墨色（与主按钮同一套），不用蓝底 */
+.chips button,.chips button:hover{height:32px;padding:0 12px;border-radius:16px;border:none;background:var(--c-fill);color:var(--c-ink);font-size:var(--t-sub-size);box-shadow:none;filter:none}
+.chips button.on,.chips button.on:hover{background:var(--c-ink);color:var(--c-paper)}
+/* 捏人面板的形态格子（D94）：小图 + 名字，选中是白块加一圈墨 */
+.form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:6px}
+.form-tile{display:flex;flex-direction:column;align-items:center;gap:2px;min-height:84px;padding:6px 2px 4px;border-radius:var(--r-m);border:none;background:var(--c-fill);color:var(--c-ink);cursor:pointer;box-shadow:none}
+.form-tile .pic{width:52px;height:52px;display:grid;place-items:center;color:var(--c-ink2)} .form-tile .pic img{width:52px;height:52px;object-fit:contain}
+.form-tile .nm{font-size:var(--t-sub-size);line-height:var(--t-sub-lh);white-space:nowrap}
+.form-tile.on{background:var(--c-seg-on);box-shadow:inset 0 0 0 2px var(--c-ink)}
+.chips.wrap{display:flex;flex-wrap:wrap;gap:6px}
+.sug,.sug:hover{flex-direction:row!important;align-items:center!important;gap:6px;height:32px;padding:0 12px!important;border-radius:16px!important;border:none!important;background:var(--c-fill)!important;color:var(--c-ink)!important;box-shadow:none;filter:none}
+.sug small{display:none}
+.sug.on,.sug.on:hover{background:var(--c-ink)!important;color:var(--c-paper)!important}
+.sheet .tabs2{margin:0}
+
+/* ---------- 第七轮：抽屉标题行（标题 + 一行日期与状态，右边是主按钮和关闭），列表行的右侧是日期或时间 */
+.bsheet .sh-head{align-items:center}
+.bsheet .sh-head .ttl .meta{display:flex;gap:8px;flex-wrap:wrap}
+.bsheet .sh-head .fab.sm{flex:0 0 auto}
+.row .trail.num{font-variant-numeric:tabular-nums}
+.row.today .trail{color:var(--c-dawnInk)}
+.row.leg{color:var(--c-mist)}
+/* 日记：平时两行预览，点开才是文本框 */
+.diary-row .dr-head .t-sub{flex:0 0 auto}
+.dr-prev{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;width:100%;padding:2px 0 0;border:none;background:none;box-shadow:none;border-radius:0;text-align:left;color:var(--c-mist);font-size:var(--t-sub-size);line-height:var(--t-sub-lh);cursor:text}
+.dr-prev:hover{background:none}
+/* 某一天：时间轴只留点和小人（站名、时间都在下面的行程列表里，轴上再写一遍就挤）；抽屉标题一行 */
+.day .bsheet .timeline{padding:12px 14px!important}
+.day .bsheet .timeline .tl-track{margin:9px 6px}
+.day .bsheet .timeline .tl-node span,.day .bsheet .timeline .tl-seg{display:none}
+.bsheet .sh-head .ttl h2{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ---------- 第八轮：图标按钮。编辑、删除、清除、重写、导入、导出这类通用操作一律用图标：32 的圆（工具行里 28），点击区撑到 44，带 aria-label */
+.ibtn{position:relative;width:32px;height:32px;min-width:32px;border-radius:50%;border:none;padding:0;display:inline-grid;place-items:center;background:var(--c-fill);color:var(--c-ink);cursor:pointer;box-shadow:none;flex:0 0 auto}
+.ibtn::after{content:"";position:absolute;inset:-6px}
+.ibtn .ic{width:16px;height:16px} .ibtn:hover{background:var(--c-fill);filter:none} .ibtn:active{background:var(--c-press)}
+.ibtn.plain,.ibtn.plain:hover{background:none;color:var(--c-ink2)} .ibtn.plain.on{color:var(--c-ink)}
+.ibtn.danger,.ibtn.danger:hover{color:var(--c-danger);background:rgba(209,75,94,.12)}
+.ibtn[disabled]{opacity:.35;cursor:default}
+.ibtn.sm{width:28px;height:28px;min-width:28px} .ibtn.sm .ic{width:14px;height:14px}
+.tools .ibtn{padding:0;border-radius:50%}
+.navbar .ibtn{justify-self:end}
+/* ---------- 第八轮：标签（类名 .tg——世界层标牌已经占了 tag 这个名字、带 position:absolute）。同一类信息用同一种小标签：字 12、高 20、胶囊、浅填充墨字；「现在」用晨色；不用别的颜色。
+   层级只有四层：标题（17 / 22，600）、正文（17）、次要（15，雾）、标签（12）。 */
+.tg{display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 7px;border-radius:10px;background:var(--c-fill);color:var(--c-ink2);font-size:var(--t-caption-size);line-height:20px;font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums;vertical-align:middle;flex:0 0 auto}
+.tg.live{background:var(--c-dawnSoft);color:var(--c-dawnInk)} .tg.ink{background:var(--c-ink);color:var(--c-paper)} .tg .ic{width:12px;height:12px}
+.tgs{display:flex;gap:6px;flex-wrap:wrap;align-items:center;min-width:0}
+.row .lead.auto{width:auto;min-width:28px;justify-content:flex-start}
+.state-card .tg{align-self:flex-start;margin-bottom:2px}
+h2 .tg,.t-title .tg{vertical-align:4px;margin-right:6px}
+/* ---------- 第八轮：待办 */
+.todo-row .tt.done{text-decoration:line-through;color:var(--c-mist)}
+.todo-tg{margin-left:6px;vertical-align:2px} .entry .name .todo-tg{vertical-align:1px}
+.todo-add{gap:8px} .sheet .todo-add input{flex:1;min-width:0;width:auto} .sheet .todo-add select{width:auto;flex:0 0 auto;padding-right:28px}
+
+/* ---- 第八轮校准（无障碍）：焦点环一律墨色 2px（夜里是白），不再用晨色（在玻璃上只有 1.5 的对比度）；
+   占位与 chevron 用雾（雾·浅只剩禁用态）；28 / 32 的小控件把点击区补到 44；提示条是读屏的 status 区 */
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--c-ink);outline-offset:2px}
+::placeholder{color:var(--c-mist);opacity:1}
+.row .chev,.chip-card .chev{color:var(--c-mist)}
+.sheet header button.icon{color:var(--c-ink2);display:grid;place-items:center} .sheet header button.icon .ic{width:16px;height:16px} .sheet header button.icon::after{content:"";position:absolute;inset:-6px}
+.ibtn.sm::after{inset:-8px}
+.fab{position:relative} .fab.sm::after{content:"";position:absolute;inset:-6px;border-radius:50%}
+.chips button,.sug,.seg button{position:relative} .chips button::after,.sug::after,.seg button::after{content:"";position:absolute;inset:-6px 0}
+.chip-card,.fp-chip{min-height:44px}
+
+/* ---- 行程从上往下有顺序：站点行左边是序号（墨底白字的小圆，和浮岛上的针一样），一条细线把序号串起来；组图标挪到名字前 */
+.row .lead.seq{width:22px;height:22px;margin:0 3px;border-radius:50%;background:var(--c-ink);color:var(--c-paper);font-size:var(--t-caption-size);font-weight:600;line-height:22px;position:relative;z-index:1}
+.row .main .tt .kic{display:inline-block;width:14px;height:14px;margin-right:6px;vertical-align:-2px;color:var(--c-ink2)} .row .main .tt .kic .ic{display:block}
+.list.itin{position:relative} .list.itin::before{content:"";position:absolute;left:27px;top:26px;bottom:26px;width:2px;border-radius:1px;background:var(--c-line);pointer-events:none}
+.entry .name .kic{display:inline-block;width:13px;height:13px;margin-right:5px;vertical-align:-2px;color:var(--c-ink2)} .entry .name .kic .ic{display:block}
+
+/* ---- 第八轮末（D69 / D70）：字号只有两档 17 / 13；行内的图标与标签一律 vertical-align:middle，不再逐处调像素；
+   间距只用 4 / 8 / 12 / 16 / 24：行的左缩进 16、图标到文字 12、行内图标到文字 8、标签间 4 */
+.btn,button.primary,.sheet button.primary,.chip-card,.toast,.day .caption,.diary-ta{font-size:var(--t-body-size)!important}
+.row{padding:8px 12px 8px 16px}
+.row + .row::before{left:var(--sep-left,56px)}
+.row.leg{padding:4px 12px 4px 56px}
+.list.itin::before{left:29px}
+.row .trail{color:var(--c-ink2)}
+.group > .gh{padding:0 4px 8px}
+.tg{padding:0 8px;line-height:19px;vertical-align:middle;position:relative;top:0}   /* 量过：19 的行盒在 20 的盒子里，字的墨正好居中 */
+h2 .tg,.t-title .tg{vertical-align:middle;margin-right:8px}
+.todo-tg{vertical-align:middle;margin-left:8px}
+.row .main .tt .kic,.row.leg .ic,.day .bsheet .next .mt .ic,.icw,.hud .w .ic{vertical-align:middle}
+.row .main .tt .kic{width:16px;height:16px;margin-right:8px;position:relative;top:-1px}
+.state-card{padding:12px 12px 12px 16px}
+.sheet{padding:8px 16px calc(env(safe-area-inset-bottom) + 20px)!important}
+.toast{padding:12px 16px!important}
+.dream-btn{gap:8px}
+
+/* ---- 某一天的行程列表（第八轮末，D71）：和书里的一天同一个列表。状态：到了的名字变雾色，打过卡的序号圆是晨色，正在这一站的行有一层浅底；编辑态右边是四个图标按钮 */
+.row.current{background:var(--c-press)} .row.done .tt{color:var(--c-mist)} .row.visited .lead.seq{background:var(--c-dawn);color:var(--c-ink)}
+.row .trail.tools{display:flex;gap:0;margin-right:-8px} .row.leg .grow{flex:1;min-width:0} .row.leg .trail.tools{margin-left:auto}
+.list.itin.editing .row{cursor:default}
+.ibtn.plain.on{background:var(--c-fill);color:var(--c-ink)}
+
+/* ---- 票（第八轮末，D74）：每一趟旅程都是一张白底黑字的纸票。四角与撕线上下各一个缺口（mask 挖掉），右边一截票根隔着虚线；
+   票面印字用等宽、大写、字距（票是印刷品，这几样在界面文案里仍然不用）。撕票根 = 进入：票根转着飞出去。白天夜里都是白纸墨字 */
+.ticket{--tk-r:10px;--tk-stub:76px;--tk-ink:#1D1E23;--tk-ink2:#45464D;--tk-line:rgba(29,30,35,.22);--tk-mono:ui-monospace,"SF Mono",Menlo,"Roboto Mono",monospace;
+  width:100%;max-width:420px;filter:drop-shadow(0 10px 18px rgba(30,38,64,.22));color:var(--tk-ink)}
+.ticket .tk-paper{position:relative;display:flex;min-height:132px;background:#FFFFFF;background-size:cover;
+  -webkit-mask-image:linear-gradient(#000 0 0),radial-gradient(circle var(--tk-r) at 0 0,#000 98%,transparent 100%),radial-gradient(circle var(--tk-r) at 100% 0,#000 98%,transparent 100%),radial-gradient(circle var(--tk-r) at 0 100%,#000 98%,transparent 100%),radial-gradient(circle var(--tk-r) at 100% 100%,#000 98%,transparent 100%),radial-gradient(circle 7px at calc(100% - var(--tk-stub)) 0,#000 98%,transparent 100%),radial-gradient(circle 7px at calc(100% - var(--tk-stub)) 100%,#000 98%,transparent 100%);
+  -webkit-mask-composite:xor;mask-image:linear-gradient(#000 0 0),radial-gradient(circle var(--tk-r) at 0 0,#000 98%,transparent 100%),radial-gradient(circle var(--tk-r) at 100% 0,#000 98%,transparent 100%),radial-gradient(circle var(--tk-r) at 0 100%,#000 98%,transparent 100%),radial-gradient(circle var(--tk-r) at 100% 100%,#000 98%,transparent 100%),radial-gradient(circle 7px at calc(100% - var(--tk-stub)) 0,#000 98%,transparent 100%),radial-gradient(circle 7px at calc(100% - var(--tk-stub)) 100%,#000 98%,transparent 100%);
+  mask-composite:exclude}
+.ticket .tk-face{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between;gap:6px;padding:14px 12px 14px 18px;border:none;background:none;box-shadow:none;border-radius:0;text-align:left;color:inherit;cursor:pointer;font:inherit}
+.ticket .tk-face:hover{background:none;filter:none}
+.ticket .tk-stamp{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+.ticket .tk-id{display:flex;align-items:baseline;gap:8px;min-width:0;white-space:nowrap;overflow:hidden}
+.ticket .tk-brand{font-size:13px;line-height:18px;font-weight:600;color:var(--tk-ink2)}
+.ticket .tk-mono{font:400 13px/18px var(--tk-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--tk-ink2);white-space:nowrap;position:relative;top:1px}
+.ticket .tk-stamp .tg{flex:0 0 auto}
+.ticket .tk-title{display:block;font-size:22px;line-height:28px;font-weight:700;color:var(--tk-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ticket .tk-line{display:flex;align-items:center;gap:6px;font-size:13px;line-height:18px;font-variant-numeric:tabular-nums;color:var(--tk-ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.ticket .tk-line .sc-line{display:flex;align-items:center;gap:6px;min-width:0} .ticket .tk-line .sc-ell{min-width:0;overflow:hidden;text-overflow:ellipsis} .ticket .tk-line .ic,.ticket .tk-line svg{width:14px;height:14px;flex:0 0 auto;color:var(--tk-ink2)}
+.ticket .tk-stub{position:relative;flex:0 0 var(--tk-stub);display:grid;place-items:center;border:none;border-left:2px dashed var(--tk-line);background:none;box-shadow:none;border-radius:0;padding:0;color:var(--tk-ink);cursor:pointer;overflow:hidden;transform-origin:0 100%}
+.ticket .tk-stub:hover{background:none;filter:none} .ticket .tk-stub:active{background:var(--c-press)} .ticket .tk-stub[disabled]{cursor:default;opacity:1}
+.ticket .tk-stub-in{display:grid;place-items:center;width:100%;height:100%;min-height:inherit}
+.ticket .tk-vert{display:block;white-space:nowrap;transform:rotate(90deg);font-size:13px;line-height:1;font-weight:600;position:relative;z-index:1}
+/* 票是印刷品：印章行与票根的字用大写与字距，全局的「不用大写、不用字距」在这里例外 */
+.ticket .tk-mono,.ticket .tk-vert{text-transform:uppercase!important} .ticket .tk-mono{letter-spacing:.06em!important} .ticket .tk-vert{letter-spacing:.12em!important}
+.ticket .tk-wm{position:absolute;left:50%;top:50%;font:600 40px/1 var(--tk-mono);color:rgba(30,38,64,.07);transform:translate(-50%,-50%) rotate(90deg);pointer-events:none;white-space:nowrap}
+.ticket .tg{background:rgba(30,38,64,.08);color:var(--tk-ink2)} .ticket .tg.live{background:rgba(240,176,58,.22);color:#754A00}
+.ticket.compact{--tk-stub:56px;filter:drop-shadow(0 6px 12px rgba(30,38,64,.16))} .ticket.compact .tk-paper{min-height:88px} .ticket.compact .tk-face{padding:10px 10px 10px 16px;gap:2px}
+.ticket.compact .tk-title{font-size:17px;line-height:22px;font-weight:700} .ticket.compact .tk-wm{font-size:28px}
+.tk-stack{display:flex;flex-direction:column;gap:12px;padding:4px 0}
+.ticket.tear .tk-stub{animation:tk-tear .55s cubic-bezier(.3,.6,.2,1) forwards} .ticket.tear .tk-face{animation:tk-nudge .55s ease forwards}
+@keyframes tk-tear{30%{transform:translate(2px,0) rotate(2deg)}100%{transform:translate(30px,16px) rotate(14deg);opacity:0}}
+@keyframes tk-nudge{30%{transform:translateX(-3px)}100%{transform:none}}
+@media (prefers-reduced-motion:reduce){.ticket.tear .tk-stub,.ticket.tear .tk-face{animation:none}}
+.bsheet .sh-head .ttl .ticket{max-width:none}
+
+/* 票不放在卡片上：书的页面里票自己浮在抽屉上方（随抽屉高度挪），抽屉只装天的列表 */
+.tk-dock{position:fixed;left:16px;right:16px;bottom:16px;z-index:16;display:flex;justify-content:center;pointer-events:none;transition:bottom .25s ease}
+.tk-dock > *{pointer-events:auto} .tk-dock[hidden]{display:none!important}
+html[data-shape="spread"] .tk-dock,html[data-shape="triple"] .tk-dock{right:auto;width:calc(var(--pane-1-w) - 32px)}
+@media (prefers-reduced-motion:reduce){.tk-dock{transition:none}}
+
+/* ---- 行李箱（D75）：日记页顶上的那张图 */
+.case-wrap{margin:0 0 16px} .case-3d{aspect-ratio:4/5;border-radius:14px;overflow:hidden;background:radial-gradient(120% 90% at 50% 30%,#FFFFFF 0%,#F1F3F8 70%,#E6E9F1 100%);box-shadow:var(--g-shadow)} .case-cap{margin:6px 4px 0}
+.case-styles{display:flex;align-items:center;gap:2px;padding:2px 0 0 4px} .case-styles>.t-sub{margin-right:6px}
+.case-sw{width:44px;height:44px;border:none;background:none;padding:0;display:grid;place-items:center;border-radius:50%;cursor:pointer}
+.case-sw::before{content:"";width:24px;height:24px;border-radius:50%;background:var(--sw);border:3px solid var(--sw2);box-sizing:border-box}
+.case-sw.on::before{outline:2px solid var(--c-ink);outline-offset:2px}
+.case-edit{padding:8px 0 0}
+/* 清单（D84）：一格一格类 emoji 的图标；在箱子里的右上角一个勾，面板里是叉（点了拿出来） */
+.case-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:8px 4px}
+.case-item{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 2px 4px;border:none;background:none;border-radius:14px;cursor:pointer;color:var(--c-ink);min-width:0;-webkit-tap-highlight-color:transparent}
+.case-item:active{background:var(--c-fill)}
+.case-item .ci-pic{position:relative;width:62px;height:62px;display:grid;place-items:center}
+.case-item .ci-img{width:62px;height:62px;object-fit:contain;display:none;pointer-events:none}
+.case-item .ci-ph{width:44px;height:44px;border-radius:14px;background:var(--c-fill)}
+.case-item.ready .ci-img{display:block} .case-item.ready .ci-ph{display:none}
+.case-item.noicon .ci-ph{background:none}
+.case-item .ci-label{font-size:12px;line-height:16px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.case-item .ci-sub{font-size:11px;line-height:14px;color:var(--c-mist);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.case-item .ci-badge{position:absolute;right:0;top:0;width:18px;height:18px;border-radius:9px;display:none;place-items:center;background:var(--c-ink);color:var(--c-paper)}
+.case-item.in .ci-badge{display:grid} .case-item.rm .ci-badge{background:var(--c-fill);color:var(--c-ink2)} .case-item.rm .ci-badge .ic{width:12px;height:12px}
+.case-item.in:not(.rm) .ci-label{font-weight:600}
+.case-list{display:flex;flex-direction:column;gap:8px;max-height:min(72vh,720px)}
+.sheet.solid{background:var(--c-paper)!important;-webkit-backdrop-filter:none;backdrop-filter:none}   /* 一格一格的图要实底，不透出后面的箱子 */
+.case-search-row{display:flex;gap:6px;align-items:center;flex:0 0 auto}
+.case-search{flex:1;min-width:0;height:40px;border-radius:12px;border:none;background:var(--c-fill);padding:0 12px;font:inherit;font-size:15px;color:var(--c-ink);-webkit-appearance:none;appearance:none}
+.case-search::placeholder{color:var(--c-mist)}
+.case-scenes{display:flex;gap:6px;overflow-x:auto;padding:0 0 2px;scrollbar-width:none;flex:0 0 auto}   /* 清单长了也不许被挤扁 */ .case-scenes::-webkit-scrollbar{display:none}
+.case-scene{flex:0 0 auto;height:32px;padding:0 12px;border-radius:16px;border:.5px solid var(--c-line);background:none;color:var(--c-ink);font-size:13px;cursor:pointer;box-shadow:none}
+.case-list-body{overflow:auto;min-height:0;flex:1;padding-bottom:8px;overscroll-behavior:contain}
+.case-group{margin-top:4px} .cg-title{margin:6px 2px 2px} .case-empty{margin:16px 4px}
+.case-actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;position:relative} .case-actions input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.case-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 4px 0} .case-tools{display:flex;gap:4px} .ibtn.on{background:var(--s-fill,rgba(29,30,35,.08))}

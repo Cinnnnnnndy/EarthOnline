@@ -1,0 +1,21 @@
+node_modules/
+web/dist/
+*.log
+.DS_Store
+# 世界层拷进原生壳的那份（npm run sync:shells 生成）
+harmony/entry/src/main/resources/rawfile/world/
+android/app/src/main/assets/world/
+# 安卓构建产物
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+# 鸿蒙构建产物
+harmony/.hvigor/
+harmony/build/
+harmony/entry/build/
+harmony/oh_modules/
+harmony/local.properties
+android/.idea/
+harmony/.idea/
+*.iml

@@ -1,0 +1,9 @@
+{
+  "name": "entry",
+  "version": "0.1.0",
+  "description": "地球Online 的入口模块：世界层（Web）+ 原生界面",
+  "main": "",
+  "author": "",
+  "license": "",
+  "dependencies": {}
+}

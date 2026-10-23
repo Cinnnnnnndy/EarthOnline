@@ -1,0 +1,414 @@
+{
+  "schemaVersion": "0.1",
+  "title": "关西七日",
+  "destination": {
+    "country": "日本",
+    "region": "关西"
+  },
+  "startDate": "2026-11-14",
+  "endDate": "2026-11-20",
+  "theme": "红叶古都",
+  "seed": "kansai-7d-demo",
+  "status": "planning",
+  "days": [
+    {
+      "index": 1,
+      "date": "2026-11-14",
+      "title": "大阪 · 抵达",
+      "city": "osaka",
+      "entries": [
+        {
+          "type": "place",
+          "order": 0,
+          "name": "关西机场",
+          "category": "sight",
+          "plannedStart": "13:30"
+        },
+        {
+          "type": "transport",
+          "order": 1,
+          "mode": "JR 关空快速",
+          "durationText": "50 分钟"
+        },
+        {
+          "type": "lodging",
+          "order": 2,
+          "name": "难波 · 酒店 check-in"
+        },
+        {
+          "type": "transport",
+          "order": 3,
+          "mode": "步行",
+          "durationText": "8 分钟"
+        },
+        {
+          "type": "place",
+          "order": 4,
+          "name": "道顿堀",
+          "category": "sight",
+          "plannedStart": "17:00"
+        },
+        {
+          "type": "transport",
+          "order": 5,
+          "mode": "步行",
+          "durationText": "10 分钟"
+        },
+        {
+          "type": "place",
+          "order": 6,
+          "name": "心斋桥",
+          "category": "sight",
+          "plannedStart": "18:30"
+        }
+      ],
+      "lodging": "难波"
+    },
+    {
+      "index": 2,
+      "date": "2026-11-15",
+      "title": "大阪 · 城与塔",
+      "city": "osaka",
+      "entries": [
+        {
+          "type": "transport",
+          "order": 0,
+          "mode": "地铁",
+          "durationText": "20 分钟"
+        },
+        {
+          "type": "place",
+          "order": 1,
+          "name": "大阪城",
+          "category": "sight",
+          "plannedStart": "09:30"
+        },
+        {
+          "type": "transport",
+          "order": 2,
+          "mode": "地铁",
+          "durationText": "15 分钟"
+        },
+        {
+          "type": "place",
+          "order": 3,
+          "name": "梅田空中庭园",
+          "category": "sight",
+          "plannedStart": "13:00"
+        },
+        {
+          "type": "transport",
+          "order": 4,
+          "mode": "地铁御堂筋线",
+          "durationText": "20 分钟"
+        },
+        {
+          "type": "place",
+          "order": 5,
+          "name": "新世界 · 通天阁",
+          "category": "sight",
+          "plannedStart": "16:30"
+        }
+      ],
+      "lodging": "难波"
+    },
+    {
+      "index": 3,
+      "date": "2026-11-16",
+      "title": "京都 · 东山",
+      "city": "kyoto",
+      "entries": [
+        {
+          "type": "transport",
+          "order": 0,
+          "mode": "JR 京都线新快速",
+          "durationText": "30 分钟"
+        },
+        {
+          "type": "place",
+          "order": 1,
+          "name": "京都站 · 寄存行李",
+          "category": "sight",
+          "plannedStart": "09:00"
+        },
+        {
+          "type": "transport",
+          "order": 2,
+          "mode": "JR 奈良线",
+          "durationText": "5 分钟"
+        },
+        {
+          "type": "place",
+          "order": 3,
+          "name": "伏见稻荷",
+          "category": "sight",
+          "plannedStart": "09:40"
+        },
+        {
+          "type": "transport",
+          "order": 4,
+          "mode": "JR + 步行",
+          "durationText": "25 分钟"
+        },
+        {
+          "type": "place",
+          "order": 5,
+          "name": "清水寺",
+          "category": "sight",
+          "plannedStart": "12:00"
+        },
+        {
+          "type": "transport",
+          "order": 6,
+          "mode": "步行",
+          "durationText": "20 分钟"
+        },
+        {
+          "type": "place",
+          "order": 7,
+          "name": "祇园",
+          "category": "sight",
+          "plannedStart": "15:00"
+        },
+        {
+          "type": "lodging",
+          "order": 8,
+          "name": "京都站前 · 酒店"
+        }
+      ],
+      "lodging": "京都站前"
+    },
+    {
+      "index": 4,
+      "date": "2026-11-17",
+      "title": "京都 · 洛西",
+      "city": "kyoto",
+      "entries": [
+        {
+          "type": "transport",
+          "order": 0,
+          "mode": "巴士 205 路",
+          "durationText": "40 分钟"
+        },
+        {
+          "type": "place",
+          "order": 1,
+          "name": "金阁寺",
+          "category": "sight",
+          "plannedStart": "09:30"
+        },
+        {
+          "type": "transport",
+          "order": 2,
+          "mode": "巴士",
+          "durationText": "30 分钟"
+        },
+        {
+          "type": "place",
+          "order": 3,
+          "name": "岚山竹林 · 渡月桥",
+          "category": "sight",
+          "plannedStart": "11:30"
+        },
+        {
+          "type": "transport",
+          "order": 4,
+          "mode": "JR 嵯峨野线",
+          "durationText": "15 分钟"
+        },
+        {
+          "type": "place",
+          "order": 5,
+          "name": "二条城",
+          "category": "sight",
+          "plannedStart": "15:00"
+        },
+        {
+          "type": "lodging",
+          "order": 6,
+          "name": "京都站前 · 酒店"
+        }
+      ],
+      "lodging": "京都站前"
+    },
+    {
+      "index": 5,
+      "date": "2026-11-18",
+      "title": "奈良 · 一日往返",
+      "city": "nara",
+      "entries": [
+        {
+          "type": "transport",
+          "order": 0,
+          "mode": "近铁京都线",
+          "durationText": "45 分钟"
+        },
+        {
+          "type": "place",
+          "order": 1,
+          "name": "近铁奈良",
+          "category": "sight",
+          "plannedStart": "09:30"
+        },
+        {
+          "type": "transport",
+          "order": 2,
+          "mode": "步行",
+          "durationText": "10 分钟"
+        },
+        {
+          "type": "place",
+          "order": 3,
+          "name": "兴福寺",
+          "category": "sight",
+          "plannedStart": "09:50"
+        },
+        {
+          "type": "transport",
+          "order": 4,
+          "mode": "步行",
+          "durationText": "20 分钟"
+        },
+        {
+          "type": "place",
+          "order": 5,
+          "name": "东大寺",
+          "category": "sight",
+          "plannedStart": "10:40"
+        },
+        {
+          "type": "transport",
+          "order": 6,
+          "mode": "步行",
+          "durationText": "25 分钟"
+        },
+        {
+          "type": "place",
+          "order": 7,
+          "name": "春日大社",
+          "category": "sight",
+          "plannedStart": "13:00"
+        },
+        {
+          "type": "transport",
+          "order": 8,
+          "mode": "近铁",
+          "durationText": "45 分钟回京都"
+        },
+        {
+          "type": "lodging",
+          "order": 9,
+          "name": "京都站前 · 酒店"
+        }
+      ],
+      "lodging": "京都站前"
+    },
+    {
+      "index": 6,
+      "date": "2026-11-19",
+      "title": "神户 · 港与山手",
+      "city": "kobe",
+      "entries": [
+        {
+          "type": "transport",
+          "order": 0,
+          "mode": "JR 神户线新快速",
+          "durationText": "50 分钟"
+        },
+        {
+          "type": "place",
+          "order": 1,
+          "name": "三宫",
+          "category": "sight",
+          "plannedStart": "10:00"
+        },
+        {
+          "type": "transport",
+          "order": 2,
+          "mode": "步行上坡",
+          "durationText": "15 分钟"
+        },
+        {
+          "type": "place",
+          "order": 3,
+          "name": "北野异人馆",
+          "category": "sight",
+          "plannedStart": "10:30"
+        },
+        {
+          "type": "transport",
+          "order": 4,
+          "mode": "步行",
+          "durationText": "20 分钟"
+        },
+        {
+          "type": "place",
+          "order": 5,
+          "name": "南京町",
+          "category": "sight",
+          "plannedStart": "12:30"
+        },
+        {
+          "type": "transport",
+          "order": 6,
+          "mode": "步行",
+          "durationText": "15 分钟"
+        },
+        {
+          "type": "place",
+          "order": 7,
+          "name": "神户港塔 · 美利坚公园",
+          "category": "sight",
+          "plannedStart": "15:00"
+        },
+        {
+          "type": "lodging",
+          "order": 8,
+          "name": "三宫 · 酒店"
+        }
+      ],
+      "lodging": "三宫"
+    },
+    {
+      "index": 7,
+      "date": "2026-11-20",
+      "title": "大阪 · 返程",
+      "city": "osaka",
+      "entries": [
+        {
+          "type": "transport",
+          "order": 0,
+          "mode": "JR 神户线",
+          "durationText": "25 分钟"
+        },
+        {
+          "type": "transport",
+          "order": 1,
+          "mode": "地铁中央线",
+          "durationText": "20 分钟"
+        },
+        {
+          "type": "place",
+          "order": 2,
+          "name": "海游馆",
+          "category": "sight",
+          "plannedStart": "09:30"
+        },
+        {
+          "type": "transport",
+          "order": 3,
+          "mode": "南海空港线",
+          "durationText": "45 分钟"
+        },
+        {
+          "type": "place",
+          "order": 4,
+          "name": "关西机场 ✈",
+          "category": "sight",
+          "plannedStart": "14:00"
+        }
+      ],
+      "lodging": null
+    }
+  ]
+}

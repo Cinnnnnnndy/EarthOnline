@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 只给窗口底色与启动图标用；界面颜色在生成的 gen/Shared.kt（Tokens） -->
+<resources>
+    <color name="space_night">#FF141A4A</color>
+    <color name="ink">#FF1D1E23</color>
+    <color name="dawn">#FFF0B03A</color>
+    <color name="ic_launcher_background">#FF141A4A</color>
+</resources>

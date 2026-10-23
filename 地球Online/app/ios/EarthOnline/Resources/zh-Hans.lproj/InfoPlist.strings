@@ -1,0 +1,6 @@
+/* 地球Online · Info.plist 的本地化（简体中文，源语言） */
+"CFBundleDisplayName" = "地球Online";
+"NSMicrophoneUsageDescription" = "用麦克风听你说想去哪里，帮你规划旅程。";
+"NSSpeechRecognitionUsageDescription" = "在手机上把你说的话转成文字，用来规划旅程。";
+"NSLocationWhenInUseUsageDescription" = "用当前位置标注你的家，地球外的天色会跟着你那里的日出日落。";
+"地球Online 旅程" = "地球Online 旅程";

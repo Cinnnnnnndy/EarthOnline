@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "0.3",
+  "id": "sample-paris-weekend",
+  "title": "巴黎城市漫步周末",
+  "destination": "巴黎",
+  "startDate": "2026-10-23",
+  "endDate": "2026-10-25",
+  "theme": "都市霓虹",
+  "seed": 3304028597,
+  "status": "planning",
+  "days": [
+    {
+      "index": 1,
+      "date": "2026-10-23",
+      "title": "欧洲之星到巴黎，西岱岛和左岸",
+      "city": "geo",
+      "lodging": "玛黑区",
+      "entries": [
+        {"id":"d1-e0","type":"transport","mode":"rail","label":"欧洲之星，伦敦圣潘克拉斯到巴黎北站","durationMinutes":136,"distanceKm":492},
+        {"id":"d1-e1","type":"place","name":"巴黎北站","category":"station","plannedStart":"11:20","stayMinutes":15,"notes":"出站后在自动售票机买 Navigo Easy 卡，一次充 10 张地铁票","geo":{"lat":48.8809,"lng":2.3553}},
+        {"id":"d1-e2","type":"transport","mode":"subway","label":"地铁 4 号线转 1 号线，到圣保罗站","durationMinutes":22,"distanceKm":4.3},
+        {"id":"d1-e3","type":"place","name":"玛黑区酒店","category":"hotel","stayMinutes":20,"notes":"先寄存行李，15 点后才能入住","geo":{"lat":48.8566,"lng":2.3622}},
+        {"id":"d1-e4","type":"transport","mode":"walk","label":"步行","durationMinutes":6,"distanceKm":0.45},
+        {"id":"d1-e5","type":"place","name":"玛黑区法拉费小店","category":"food","stayMinutes":40,"notes":"蔷薇街上排队最长的那家，外带边走边吃","geo":{"lat":48.8574,"lng":2.3591}},
+        {"id":"d1-e6","type":"transport","mode":"walk","label":"步行过圣路易岛","durationMinutes":18,"distanceKm":1.4},
+        {"id":"d1-e7","type":"place","name":"巴黎圣母院","category":"sight","plannedStart":"13:30","stayMinutes":60,"notes":"2024 年底重新开放，免费，官网可以预约入场时段","geo":{"lat":48.853,"lng":2.3499}},
+        {"id":"d1-e8","type":"transport","mode":"walk","label":"步行","durationMinutes":6,"distanceKm":0.4},
+        {"id":"d1-e9","type":"place","name":"圣礼拜堂","category":"sight","plannedStart":"14:45","stayMinutes":50,"notes":"买带时段的票，和司法宫一起过安检","geo":{"lat":48.8554,"lng":2.345}},
+        {"id":"d1-e10","type":"transport","mode":"walk","label":"步行过小桥到左岸","durationMinutes":8,"distanceKm":0.6},
+        {"id":"d1-e11","type":"place","name":"莎士比亚书店","category":"shop","stayMinutes":30,"notes":"店里不能拍照，楼上有座位可以翻书","geo":{"lat":48.8526,"lng":2.3471}},
+        {"id":"d1-e12","type":"transport","mode":"walk","label":"步行","durationMinutes":18,"distanceKm":1.3},
+        {"id":"d1-e13","type":"place","name":"卢森堡公园","category":"sight","stayMinutes":60,"notes":"美第奇喷泉旁边有绿色铁椅，随便坐","geo":{"lat":48.8462,"lng":2.3372}},
+        {"id":"d1-e14","type":"transport","mode":"walk","label":"步行","durationMinutes":12,"distanceKm":0.9},
+        {"id":"d1-e15","type":"place","name":"花神咖啡馆","category":"food","plannedStart":"18:30","stayMinutes":90,"notes":"晚饭，圣日耳曼大街上，热巧克力比咖啡出名","geo":{"lat":48.8541,"lng":2.3326}},
+        {"id":"d1-e16","type":"transport","mode":"taxi","label":"出租车回酒店","durationMinutes":15,"distanceKm":3.1},
+        {"id":"d1-e17","type":"place","name":"玛黑区酒店","category":"hotel","notes":"办入住","geo":{"lat":48.8566,"lng":2.3622}}
+      ]
+    },
+    {
+      "index": 2,
+      "date": "2026-10-24",
+      "title": "卢浮宫到埃菲尔铁塔",
+      "city": "geo",
+      "lodging": "玛黑区",
+      "entries": [
+        {"id":"d2-e0","type":"place","name":"玛黑区酒店","category":"hotel","plannedStart":"08:30","stayMinutes":10,"geo":{"lat":48.8566,"lng":2.3622}},
+        {"id":"d2-e1","type":"transport","mode":"subway","label":"地铁 1 号线到王宫卢浮宫站","durationMinutes":12,"distanceKm":2.3},
+        {"id":"d2-e2","type":"place","name":"卢浮宫","category":"sight","plannedStart":"09:00","stayMinutes":180,"notes":"9 点开门，提前在官网买定时票；周二闭馆","geo":{"lat":48.8606,"lng":2.3376}},
+        {"id":"d2-e3","type":"transport","mode":"walk","label":"步行","durationMinutes":8,"distanceKm":0.6},
+        {"id":"d2-e4","type":"place","name":"杜乐丽花园","category":"sight","stayMinutes":30,"geo":{"lat":48.8635,"lng":2.3275}},
+        {"id":"d2-e5","type":"transport","mode":"walk","label":"步行","durationMinutes":6,"distanceKm":0.5},
+        {"id":"d2-e6","type":"place","name":"协和广场","category":"sight","stayMinutes":15,"geo":{"lat":48.8656,"lng":2.3212}},
+        {"id":"d2-e7","type":"transport","mode":"walk","label":"沿香榭丽舍大街走上去","durationMinutes":30,"distanceKm":2.2},
+        {"id":"d2-e8","type":"place","name":"凯旋门","category":"sight","plannedStart":"14:30","stayMinutes":50,"notes":"从地下通道过环岛，登顶要爬 284 级台阶","geo":{"lat":48.8738,"lng":2.295}},
+        {"id":"d2-e9","type":"transport","mode":"subway","label":"地铁 6 号线到比尔哈克姆站","durationMinutes":12,"distanceKm":3},
+        {"id":"d2-e10","type":"place","name":"埃菲尔铁塔","category":"sight","plannedStart":"16:00","stayMinutes":150,"notes":"订 16 点的电梯票上二层；天黑后每个整点闪灯 5 分钟","geo":{"lat":48.8584,"lng":2.2945}},
+        {"id":"d2-e11","type":"transport","mode":"walk","label":"步行","durationMinutes":8,"distanceKm":0.5},
+        {"id":"d2-e12","type":"place","name":"埃菲尔铁塔游船码头","category":"port","plannedStart":"19:00","stayMinutes":10,"geo":{"lat":48.86,"lng":2.2918}},
+        {"id":"d2-e13","type":"transport","mode":"ship","label":"塞纳河夜游船，一小时绕西岱岛一圈","durationMinutes":60,"distanceKm":7.5},
+        {"id":"d2-e14","type":"place","name":"埃菲尔铁塔游船码头","category":"port","stayMinutes":5,"notes":"游船回到上船的码头","geo":{"lat":48.86,"lng":2.2918}},
+        {"id":"d2-e15","type":"transport","mode":"taxi","label":"出租车回酒店","durationMinutes":22,"distanceKm":6.2},
+        {"id":"d2-e16","type":"place","name":"玛黑区酒店","category":"hotel","geo":{"lat":48.8566,"lng":2.3622}}
+      ]
+    },
+    {
+      "index": 3,
+      "date": "2026-10-25",
+      "title": "蒙马特和歌剧院，傍晚回伦敦",
+      "city": "geo",
+      "entries": [
+        {"id":"d3-e0","type":"place","name":"玛黑区酒店","category":"hotel","plannedStart":"09:00","stayMinutes":10,"notes":"今天凌晨夏令时结束，时钟拨回一小时；退房，只带一个登机箱","geo":{"lat":48.8566,"lng":2.3622}},
+        {"id":"d3-e1","type":"transport","mode":"subway","label":"地铁 1 号线转 12 号线，到阿贝斯站","durationMinutes":28,"distanceKm":5.2},
+        {"id":"d3-e2","type":"place","name":"圣心大教堂","category":"sight","plannedStart":"10:00","stayMinutes":50,"notes":"阿贝斯站很深，等电梯别爬楼梯；台阶上当心往手腕上系绳子的人","geo":{"lat":48.8867,"lng":2.3431}},
+        {"id":"d3-e3","type":"transport","mode":"walk","label":"步行","durationMinutes":5,"distanceKm":0.3},
+        {"id":"d3-e4","type":"place","name":"小丘广场","category":"sight","stayMinutes":45,"notes":"画家广场，画像先问价","geo":{"lat":48.8865,"lng":2.3408}},
+        {"id":"d3-e5","type":"transport","mode":"walk","label":"步行下山","durationMinutes":15,"distanceKm":1.1},
+        {"id":"d3-e6","type":"place","name":"红磨坊","category":"sight","stayMinutes":15,"notes":"白天只在门口拍风车","geo":{"lat":48.8841,"lng":2.3322}},
+        {"id":"d3-e7","type":"transport","mode":"bus","label":"公交车到歌剧院","durationMinutes":18,"distanceKm":2.2},
+        {"id":"d3-e8","type":"place","name":"巴黎歌剧院","category":"sight","plannedStart":"12:30","stayMinutes":60,"notes":"加尼叶宫，看夏加尔画的穹顶","geo":{"lat":48.872,"lng":2.3316}},
+        {"id":"d3-e9","type":"transport","mode":"walk","label":"步行","durationMinutes":4,"distanceKm":0.3},
+        {"id":"d3-e10","type":"place","name":"老佛爷百货","category":"shop","stayMinutes":120,"notes":"午饭在美食馆解决；顶楼露台免费；退税带护照","geo":{"lat":48.8738,"lng":2.332}},
+        {"id":"d3-e11","type":"transport","mode":"taxi","label":"出租车到北站","durationMinutes":15,"distanceKm":2.4},
+        {"id":"d3-e12","type":"place","name":"巴黎北站","category":"station","plannedStart":"17:00","notes":"欧洲之星提前 90 分钟到，要过法国和英国两道边检","geo":{"lat":48.8809,"lng":2.3553}},
+        {"id":"d3-e13","type":"transport","mode":"rail","label":"欧洲之星回伦敦","durationMinutes":136,"distanceKm":492}
+      ]
+    }
+  ],
+  "createdAt": "2026-09-12T12:20:00.000Z",
+  "updatedAt": "2026-09-12T12:20:00.000Z"
+}
