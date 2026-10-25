@@ -7440,6 +7440,74 @@
           }
         }
       }
+    },
+    "先在地球上放下你的家": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "First, put your home on the globe"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "まず地球に家を置こう"
+          }
+        }
+      }
+    },
+    "旅程从这里出发，回来也落在这里；地球外的天色跟着家的日出日落。": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every trip starts here and comes back here. The sky around the globe follows sunrise and sunset at home."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "旅はここから始まり、ここに帰ってくる。地球のまわりの空は家の日の出と日の入りに合わせて変わります。"
+          }
+        }
+      }
+    },
+    "或者搜一个城市": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Or search for a city"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "または都市を検索"
+          }
+        }
+      }
+    },
+    "在地球上点一下": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap on the globe"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "地球をタップ"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

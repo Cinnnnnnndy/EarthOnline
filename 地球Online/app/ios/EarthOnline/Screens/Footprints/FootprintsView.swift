@@ -140,7 +140,12 @@ enum LocationOnce {
     static func fetch(timeout: Duration = .seconds(8)) async -> CLLocation? {
         let m = manager ?? CLLocationManager()
         manager = m
-        if m.authorizationStatus == .notDetermined { m.requestWhenInUseAuthorization() }
+        if m.authorizationStatus == .notDetermined {
+            // 先等用户在系统弹窗里答完（最多 60 秒）再开始计时，免得弹窗还在、8 秒就到了
+            m.requestWhenInUseAuthorization()
+            for _ in 0..<300 where m.authorizationStatus == .notDetermined { try? await Task.sleep(for: .milliseconds(200)) }
+        }
+        guard m.authorizationStatus == .authorizedWhenInUse || m.authorizationStatus == .authorizedAlways else { return nil }
         return await withTaskGroup(of: CLLocation?.self) { group in
             group.addTask {
                 do {

@@ -50,6 +50,8 @@ final class TripStore: ObservableObject {
     }
 
     var samplesInstalled: Bool { state.samplesInstalled }
+    var homeAsked: Bool { state.homeAsked }
+    func markHomeAsked() { guard !state.homeAsked else { return }; state.homeAsked = true; scheduleSave() }
 
     /// 第一次启动的示例（D100）：按给的顺序放在书架最前，已有同 id 的不重复装；只装一次。
     /// 和鸿蒙、安卓一样直接放进去、不走付费墙，但它们照常占名额（与网页一致）

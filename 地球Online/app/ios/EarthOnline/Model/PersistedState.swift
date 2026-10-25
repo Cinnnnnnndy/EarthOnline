@@ -52,6 +52,8 @@ struct PersistedState: Codable, Sendable {
     var deletedTripIDs: [String] = []
     /// 第一次启动的两本示例（冰岛 + 北欧、关西七日）装过了（D100）；删掉以后不再装回来
     var samplesInstalled = false
+    /// 第一次打开问过「家在哪」了（D100）：放了、跳过、去地球上点，都只问这一次
+    var homeAsked = false
 
     init() {}
 
@@ -68,6 +70,7 @@ struct PersistedState: Codable, Sendable {
         planted = (try? c.decodeIfPresent([String].self, forKey: .planted)) ?? []
         deletedTripIDs = (try? c.decodeIfPresent([String].self, forKey: .deletedTripIDs)) ?? []
         samplesInstalled = (try? c.decodeIfPresent(Bool.self, forKey: .samplesInstalled)) ?? false
+        homeAsked = (try? c.decodeIfPresent(Bool.self, forKey: .homeAsked)) ?? false
     }
 }
 
