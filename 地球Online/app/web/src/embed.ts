@@ -2,7 +2,7 @@
  *  原生通过 window.EarthWorld.send 发消息（ShellToEmbed 由这里处理，其余 NativeToWorld 交给世界层），
  *  回传走 webkit.messageHandlers.world（iOS）/ harmonyBridge.postMessage（鸿蒙）/ androidBridge.postMessage（安卓）/ 父窗口 postMessage。界面（卡片、按钮）都在原生那边。 */
 import { World } from "../../shared/world/world.ts";
-import { GlobeView } from "../../shared/world/globe.ts";
+import { GlobeView, easeOut } from "../../shared/world/globe.ts";
 import { CITY_JSON } from "./cities.ts";
 import { tripToGlobe } from "./globe-data.ts";
 import { dayScene } from "./world-instance.ts";
@@ -100,7 +100,7 @@ function handleShell(m: ShellToEmbed) {
     case "focus-home": ensureGlobe().focusHome(m.animate, [m.lat, m.lng]); break;
     case "focus-book": ensureGlobe().focusBook(m.id, m.animate); break;
     case "focus-day": ensureGlobe().focusDay(m.id, m.dayIndex, m.animate); break;
-    case "fly-to": ensureGlobe().flyTo({ lat: m.lat, lng: m.lng, alt: m.alt, tilt: 0, heading: 0 }, 1400); break;
+    case "fly-to": ensureGlobe().flyTo({ lat: m.lat, lng: m.lng, alt: m.alt, tilt: 0, heading: 0 }, 1000, undefined, 0.6, easeOut); break;   // 新建旅程选了地方：1 秒、只减速，跟手
     case "set-home": ensureGlobe().setHome(m.home); break;
     case "set-footprints": ensureGlobe().setFootprints(m.flags, m.fresh); break;
     case "set-insets": { const i = { left: m.left, bottom: m.bottom, right: m.right, top: m.top }; globe?.setInsets(i); world?.setInsets(i); break; }

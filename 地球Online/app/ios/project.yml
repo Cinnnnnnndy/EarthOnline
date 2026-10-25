@@ -36,6 +36,9 @@ targets:
         excludes:
           - "**/*.md"
           - "Info.plist"
+      # 第一次启动装的示例「关西七日」（D100，和网页同一份；另一本「冰岛 + 北欧」从 World/assets/samples 的行程页导入）
+      - path: ../shared/golden/trips/kansai-7d.v0.1.json
+        buildPhase: resources
     info:
       path: EarthOnline/Info.plist
       properties:

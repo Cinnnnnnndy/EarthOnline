@@ -30,6 +30,8 @@ export function ll2v(lat: number, lng: number, r = R): THREE.Vector3 {
   return new THREE.Vector3(-r * Math.sin(phi) * Math.cos(th), r * Math.cos(phi), r * Math.sin(phi) * Math.sin(th));
 }
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+/** 只减速不加速：一出手就转过去、最后轻轻停住（选目的地时的转向用它，跟手） */
+export const easeOut = (t: number) => 1 - (1 - t) ** 3;
 const wrap = (d: number) => ((((d + 180) % 360) + 360) % 360) - 180;
 /** 让一个半径 km 的范围装进视野需要的离地高度（地球半径单位） */
 export function altFor(radiusKm: number, fovDeg = 32) { const ang = Math.min(1.2, radiusKm / 6371); return Math.max(0.018, (Math.sin(ang) / Math.tan((fovDeg * D2R) / 2)) * 1.25 - (1 - Math.cos(ang))); }
@@ -44,7 +46,7 @@ export class GlobeView {
   private books: GlobeBook[] = []; private focus: { book?: string; day?: number } = {};
   private hero: Hero; private heroAt: LatLng | null = null;
   cam: CamState = { lat: 30, lng: 60, alt: 2.4, tilt: 0, heading: 0 };
-  private anim: { from: CamState; to: CamState; t: number; dur: number; hop: number; done?: () => void } | null = null;
+  private anim: { from: CamState; to: CamState; t: number; dur: number; hop: number; ease: (t: number) => number; done?: () => void } | null = null;
   private vel = { lat: 0, lng: 0 }; private dragging = false; private idle = 0; private active = true; private raf = 0; private last = 0;
   private w = 1; private h = 1; private ro: ResizeObserver; private lineMats: LineMaterial[] = []; private stopMeshes: THREE.Mesh[] = [];
   autoRotate = true;
@@ -77,9 +79,11 @@ export class GlobeView {
     const mat = new THREE.MeshStandardMaterial({ color: 0x3a8ed0, roughness: 0.5, metalness: 0 });
     this.earth = new THREE.Mesh(new THREE.SphereGeometry(R, 192, 128), mat); this.root.add(this.earth);
     loadGlobeGeo(this.base).then((g) => {
-      const { color, rough, bump } = paintEarth(g.land50!, { width: 4096, height: 2048, borders: g.borders50, shelf: 0.5 });
+      // 手机（触屏）上用 2048×1024：整颗地球在屏幕上也就一千来像素宽，四分之一的像素量让三张贴图上传与生成 mipmap 快得多；拉近时有 detailPatch 补细节
+      const big = !(typeof navigator !== "undefined" && navigator.maxTouchPoints > 0);
+      const { color, rough, bump } = paintEarth(g.land50!, { width: big ? 4096 : 2048, height: big ? 2048 : 1024, borders: g.borders50, shelf: 0.5 });
       const tex = new THREE.CanvasTexture(color); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
-      mat.map = tex; mat.roughnessMap = new THREE.CanvasTexture(rough); mat.bumpMap = new THREE.CanvasTexture(bump); mat.bumpScale = 3.5; mat.color.set(0xffffff); mat.roughness = 1; mat.needsUpdate = true;
+      mat.map = tex; mat.roughnessMap = new THREE.CanvasTexture(rough); mat.bumpMap = new THREE.CanvasTexture(bump); mat.bumpScale = 0.8; mat.color.set(0xffffff); mat.roughness = 1; mat.needsUpdate = true;
     }).catch((e) => console.warn("地球贴图加载失败", e));
     // 云 + 云影（同一张云图，影子层贴在地表、朝背光方向偏一点）
     const ct = new THREE.CanvasTexture(paintClouds()); ct.colorSpace = THREE.SRGBColorSpace;
@@ -201,10 +205,10 @@ export class GlobeView {
   }
   get focused() { return { ...this.focus }; }
 
-  flyTo(to: CamState, ms = 1600, done?: () => void, hopScale = 1) {
+  flyTo(to: CamState, ms = 1600, done?: () => void, hopScale = 1, easing: (t: number) => number = ease) {
     if (ms <= 0) { this.cam = { ...to }; this.anim = null; done?.(); return; }
     const from = { ...this.cam }; const ang = haversineKm([from.lat, from.lng], [to.lat, to.lng]) / 6371;
-    this.anim = { from, to: { ...to, lng: from.lng + wrap(to.lng - from.lng) }, t: 0, dur: ms / 1000, hop: Math.min(1.4, ang * 0.9) * hopScale, done };
+    this.anim = { from, to: { ...to, lng: from.lng + wrap(to.lng - from.lng) }, t: 0, dur: ms / 1000, hop: Math.min(1.4, ang * 0.9) * hopScale, ease: easing, done };
   }
 
   // ---------------- 覆盖层：路线、站点、标签、小人
@@ -368,9 +372,9 @@ export class GlobeView {
     this.raf = requestAnimationFrame(this.frame); if (!this.active) return;
     const real = Math.min(0.5, (now - this.last) / 1000 || 0.016); const dt = Math.min(0.05, real); this.last = now; this.idle += real;
     if (this.anim) {
-      const a = this.anim; a.t = Math.min(1, a.t + real / a.dur); const e = ease(a.t);
+      const a = this.anim; a.t = Math.min(1, a.t + real / a.dur); const e = a.ease(a.t);
       const L = (x: number, y: number) => x + (y - x) * e;
-      this.cam = { lat: L(a.from.lat, a.to.lat), lng: wrap(L(a.from.lng, a.to.lng)), alt: Math.exp(L(Math.log(a.from.alt), Math.log(a.to.alt))) + a.hop * Math.sin(Math.PI * a.t), tilt: L(a.from.tilt, a.to.tilt), heading: L(a.from.heading, a.to.heading + wrap(a.to.heading - a.from.heading) - (a.to.heading - a.from.heading)) };
+      this.cam = { lat: L(a.from.lat, a.to.lat), lng: wrap(L(a.from.lng, a.to.lng)), alt: Math.exp(L(Math.log(a.from.alt), Math.log(a.to.alt))) + a.hop * Math.sin(Math.PI * e), tilt: L(a.from.tilt, a.to.tilt), heading: L(a.from.heading, a.to.heading + wrap(a.to.heading - a.from.heading) - (a.to.heading - a.from.heading)) };
       if (a.t >= 1) { this.anim = null; a.done?.(); }
     } else if (!this.dragging) {
       this.cam.lat = Math.max(-80, Math.min(80, this.cam.lat + this.vel.lat * dt)); this.cam.lng = wrap(this.cam.lng + this.vel.lng * dt);

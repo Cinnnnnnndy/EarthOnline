@@ -114,6 +114,25 @@ final class AppModel: ObservableObject {
         }
         pushWorldState(animate: false)
         enterStage(.home, animate: false)
+        if !store.isEphemeral && !store.samplesInstalled { Task { await installStarterSamples() } }
+    }
+
+    /// 第一次启动装两本示例，和网页第一次打开一样（D100）：「冰岛 + 北欧」（行程页的方案二，经世界层的导入器解析）与「关西七日」。
+    /// 冰岛那本要等世界层就绪（importPage 会排队）；解析失败就只装关西，下次启动不再试。
+    private func installStarterSamples() async {
+        var trips: [Trip] = []
+        if let url = Bundle.main.url(forResource: "iceland-nordic", withExtension: "html", subdirectory: "World/assets/samples"),
+           let html = try? String(contentsOf: url, encoding: .utf8),
+           let r = await world.importPage(html: html) {
+            trips += r.trips.filter { $0.plan?.index == 2 }.map { var t = $0; t.plan = nil; return t }
+        }
+        if let url = Bundle.main.url(forResource: "kansai-7d.v0.1", withExtension: "json"),
+           let data = try? Data(contentsOf: url), let k = try? TripImporter.decode(data) {
+            trips += k
+        }
+        guard !store.samplesInstalled else { return }
+        store.installSamples(trips)
+        pushWorldState(animate: true)
     }
 
     // MARK: - 派生

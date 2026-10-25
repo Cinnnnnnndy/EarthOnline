@@ -43,6 +43,24 @@ export function drawRings(ctx: CanvasRenderingContext2D, polys: Ring[][], proj: 
   const trace = (ring: Ring, shift: number) => { ring.forEach(([lng, lat], i) => { const [x, y] = proj(lng + shift, lat); if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y); }); if (closed) ctx.closePath(); };
   for (const poly of polys) for (const r of poly) { const u = unwrap(r); if (!u.crosses) trace(r, 0); else { trace(u.ring, 0); trace(u.ring, 360); trace(u.ring, -360); } }
 }
+let blurOK: boolean | null = null;
+/** WebKit（iOS 的 WKWebView、Safari）认得 ctx.filter = "blur(…)"，但画出来不模糊：探一次，不灵就改用「缩小再平滑放大」 */
+function canvasBlurWorks(): boolean {
+  if (blurOK !== null) return blurOK;
+  const c = document.createElement("canvas"); c.width = c.height = 16; const x = c.getContext("2d", { willReadFrequently: true })!;
+  x.filter = "blur(3px)"; x.fillStyle = "#000"; x.fillRect(7, 0, 2, 16);
+  return (blurOK = x.getImageData(3, 8, 1, 1).data[3] > 0);
+}
+/** 把 src 模糊约 px 像素后画进 ctx 的 (dx, dy)（沿用 ctx 当时的不透明度与混合方式）。filter 不灵时：缩到 1/(px/3)、再减半、再平滑放大回原尺寸，近似高斯 */
+function drawBlurred(ctx: CanvasRenderingContext2D, src: HTMLCanvasElement, px: number, dx = 0, dy = 0) {
+  ctx.save();
+  if (canvasBlurWorks()) { ctx.filter = `blur(${px}px)`; ctx.drawImage(src, dx, dy); ctx.restore(); return; }
+  const f = Math.max(1, px / 3); const w = Math.max(2, Math.round(src.width / f)), h = Math.max(2, Math.round(src.height / f));
+  const a = document.createElement("canvas"); a.width = w; a.height = h; const ax = a.getContext("2d")!; ax.imageSmoothingQuality = "high"; ax.drawImage(src, 0, 0, w, h);
+  const b = document.createElement("canvas"); b.width = Math.max(1, w >> 1); b.height = Math.max(1, h >> 1); const bx = b.getContext("2d")!; bx.imageSmoothingQuality = "high"; bx.drawImage(a, 0, 0, b.width, b.height);
+  ax.clearRect(0, 0, w, h); ax.drawImage(b, 0, 0, w, h);
+  ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high"; ctx.drawImage(a, dx, dy, src.width, src.height); ctx.restore();
+}
 function rng(seed: number) { let a = seed >>> 0; return () => { a = (a + 0x6d2b79f5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 
 export interface EarthOpts { width: number; height: number; bbox?: { minLng: number; maxLng: number; minLat: number; maxLat: number }; shelf?: number; borders?: Ring[]; seed?: number }
@@ -64,7 +82,7 @@ export function paintEarth(land: Ring[][], o: EarthOpts): { color: HTMLCanvasEle
   c.fillStyle = og; c.fillRect(0, 0, W, H);
   // 近岸浅水：模糊遮罩着青绿色
   const blur = Math.max(2, (o.shelf ?? 0.35) * pxPerDeg);
-  const shelfA = mk(); const sa = shelfA.getContext("2d")!; sa.filter = `blur(${blur}px)`; sa.drawImage(maskA, 0, 0); sa.globalAlpha = 0.4; sa.drawImage(maskA, 0, 0); sa.filter = "none"; sa.globalAlpha = 1;
+  const shelfA = mk(); const sa = shelfA.getContext("2d")!; drawBlurred(sa, maskA, blur); sa.globalAlpha = 0.4; sa.drawImage(maskA, 0, 0); sa.globalAlpha = 1;
   sa.globalCompositeOperation = "source-in"; sa.fillStyle = "rgb(150,210,228)"; sa.fillRect(0, 0, W, H);
   c.globalAlpha = 0.7; c.drawImage(shelfA, 0, 0); c.globalAlpha = 1;
   // 地表：纬度带 + 干旱带 + 斑驳
@@ -80,17 +98,38 @@ export function paintEarth(land: Ring[][], o: EarthOpts): { color: HTMLCanvasEle
   // 山脊：像手绘地图的晕渲，西北侧受光、东南侧背光
   const bump = mk(); const bu = bump.getContext("2d")!; bu.fillStyle = "#000"; bu.fillRect(0, 0, W, H);
   const lw = (w: number) => Math.max(2, w * pxPerDeg);
+  // 每条山脊先描在只包住它的小画布上，再整块模糊着贴回去（不用 ctx.filter：WebKit 上它不模糊，山脊会变成硬边的管子）
   const ridge = (ctx: CanvasRenderingContext2D, pts: [number, number][], shift: [number, number], style: string, width: number, blurPx: number) => {
-    ctx.save(); ctx.filter = `blur(${blurPx}px)`; ctx.strokeStyle = style; ctx.lineWidth = width; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.beginPath();
-    pts.forEach(([lng, lat], i) => { const [x, y] = proj(lng, lat); if (i) ctx.lineTo(x + shift[0], y + shift[1]); else ctx.moveTo(x + shift[0], y + shift[1]); }); ctx.stroke(); ctx.restore();
+    const P = pts.map(([lng, lat]) => proj(lng, lat)); const pad = width + blurPx * 3;
+    const x0 = Math.floor(Math.min(...P.map((p) => p[0])) + shift[0] - pad), y0 = Math.floor(Math.min(...P.map((p) => p[1])) + shift[1] - pad);
+    const x1 = Math.ceil(Math.max(...P.map((p) => p[0])) + shift[0] + pad), y1 = Math.ceil(Math.max(...P.map((p) => p[1])) + shift[1] + pad);
+    const t = document.createElement("canvas"); t.width = Math.max(1, x1 - x0); t.height = Math.max(1, y1 - y0); const tx = t.getContext("2d")!;
+    tx.strokeStyle = style; tx.lineWidth = width; tx.lineCap = "round"; tx.lineJoin = "round"; tx.beginPath();
+    P.forEach(([x, y], i) => { if (i) tx.lineTo(x + shift[0] - x0, y + shift[1] - y0); else tx.moveTo(x + shift[0] - x0, y + shift[1] - y0); }); tx.stroke();
+    drawBlurred(ctx, t, blurPx, x0, y0);
   };
   for (const [w, pts] of MOUNTAINS) {
     const o = Math.max(1, w * pxPerDeg * 0.35);
     ridge(bx, pts, [o, o], "rgba(74,70,120,0.07)", lw(w * 1.3), Math.max(2, w * pxPerDeg * 0.6));
     ridge(bx, pts, [-o * 0.6, -o * 0.6], "rgba(255,250,236,0.10)", lw(w * 0.8), Math.max(2, w * pxPerDeg * 0.5));
     if (w > 2.1) ridge(bx, pts, [0, 0], "rgba(246,248,252,0.22)", lw(w * 0.3), Math.max(1.5, w * pxPerDeg * 0.25));
-    ridge(bu, pts, [0, 0], "rgba(255,255,255,0.9)", lw(w * 1.1), Math.max(2, w * pxPerDeg * 0.6));
   }
+  // 起伏（bumpMap）：先在一张不透明的白描稿上画「中间粗、两头细」的山脊，再整张模糊后半透明叠上去——
+  // 读起来是一片隆起的晕渲，而不是一根根等粗的管子（D100）。分段描是为了逐段收窄；描稿不透明，段与段的圆头重叠处不会叠出珠子。
+  const hill = mk(); const hl = hill.getContext("2d")!; hl.strokeStyle = "#fff"; hl.lineCap = "round"; hl.lineJoin = "round";
+  for (const [w, pts] of MOUNTAINS) {
+    const P = pts.map(([lng, lat]) => proj(lng, lat)); const seg: number[] = [0];
+    for (let i = 1; i < P.length; i++) seg.push(seg[i - 1] + Math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1]));
+    const total = seg[seg.length - 1] || 1; const SUB = 6;
+    for (let i = 1; i < P.length; i++) for (let k = 0; k < SUB; k++) {
+      const a0 = k / SUB, a1 = (k + 1) / SUB; const t = (seg[i - 1] + (seg[i] - seg[i - 1]) * (a0 + a1) / 2) / total;
+      hl.lineWidth = lw(w * 1.6) * (0.25 + 0.75 * Math.sin(Math.PI * t) ** 0.7);   // 两端收到四分之一宽
+      hl.beginPath(); hl.moveTo(P[i - 1][0] + (P[i][0] - P[i - 1][0]) * a0, P[i - 1][1] + (P[i][1] - P[i - 1][1]) * a0);
+      hl.lineTo(P[i - 1][0] + (P[i][0] - P[i - 1][0]) * a1, P[i - 1][1] + (P[i][1] - P[i - 1][1]) * a1); hl.stroke();
+    }
+  }
+  bu.save(); bu.globalAlpha = 0.55; drawBlurred(bu, hill, Math.max(3, pxPerDeg * 1.1));   // 宽而软的一层
+  bu.globalAlpha = 0.3; drawBlurred(bu, hill, Math.max(2, pxPerDeg * 0.45)); bu.restore();   // 脊上稍微收一点
   // 点彩：和平面插画层同一种颗粒
   for (let i = 0, n = Math.round((W * H) / 260); i < n; i++) { const x = R() * W, y = R() * H; bx.fillStyle = R() < 0.55 ? "rgba(255,255,240,0.10)" : "rgba(30,40,70,0.07)"; bx.fillRect(x, y, 1.2, 1.2); }
   bx.globalCompositeOperation = "destination-in"; bx.drawImage(maskA, 0, 0);

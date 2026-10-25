@@ -49,6 +49,18 @@ final class TripStore: ObservableObject {
         return t
     }
 
+    var samplesInstalled: Bool { state.samplesInstalled }
+
+    /// 第一次启动的示例（D100）：按给的顺序放在书架最前，已有同 id 的不重复装；只装一次。
+    /// 和鸿蒙、安卓一样直接放进去、不走付费墙，但它们照常占名额（与网页一致）
+    func installSamples(_ trips: [Trip]) {
+        guard !state.samplesInstalled else { return }
+        let fresh = trips.filter { t in !state.trips.contains { $0.id == t.id } }
+        state.trips.insert(contentsOf: fresh, at: 0)
+        state.samplesInstalled = true
+        scheduleSave()
+    }
+
     /// 同 id 的替换，否则插到最前（导入行程页时用）
     func upsert(_ trip: Trip) {
         if let i = state.trips.firstIndex(where: { $0.id == trip.id }) { state.trips[i] = trip } else { state.trips.insert(trip, at: 0) }

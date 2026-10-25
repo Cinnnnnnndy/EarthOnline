@@ -50,6 +50,8 @@ struct PersistedState: Codable, Sendable {
     var planted: [String] = []
     /// 删掉的书（iCloud 同步时把远端那份也删掉）
     var deletedTripIDs: [String] = []
+    /// 第一次启动的两本示例（冰岛 + 北欧、关西七日）装过了（D100）；删掉以后不再装回来
+    var samplesInstalled = false
 
     init() {}
 
@@ -65,6 +67,7 @@ struct PersistedState: Codable, Sendable {
         pins = (try? c.decodeIfPresent([ManualFlag].self, forKey: .pins)) ?? []
         planted = (try? c.decodeIfPresent([String].self, forKey: .planted)) ?? []
         deletedTripIDs = (try? c.decodeIfPresent([String].self, forKey: .deletedTripIDs)) ?? []
+        samplesInstalled = (try? c.decodeIfPresent(Bool.self, forKey: .samplesInstalled)) ?? false
     }
 }
 

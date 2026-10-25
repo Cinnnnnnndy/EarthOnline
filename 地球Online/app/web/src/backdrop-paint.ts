@@ -18,7 +18,8 @@ const rgba = (c: string, a: number) => { const [r, g, b] = hex(c); return `rgba(
 
 function mk(w: number, h: number, dpr: number) {
   const c = document.createElement("canvas"); c.width = Math.round(w * dpr); c.height = Math.round(h * dpr); c.style.width = `${w}px`; c.style.height = `${h}px`;
-  const ctx = c.getContext("2d")!; ctx.scale(dpr, dpr); return { c, ctx };
+  // 这些画布都要逐像素加颗粒（getImageData）：willReadFrequently 让它留在 CPU 上画，免得 WebKit 把排队的几千笔先在 GPU 上画完再整张读回（iOS 上一次 3 秒多）
+  const ctx = c.getContext("2d", { willReadFrequently: true })!; ctx.scale(dpr, dpr); return { c, ctx };
 }
 
 /** 点彩颗粒：在当前裁剪区内撒亮点和暗点（大小 0.6–1.6 px），密度按面积算 */
