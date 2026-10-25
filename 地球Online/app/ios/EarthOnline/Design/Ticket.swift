@@ -128,6 +128,7 @@ struct TicketView: View {
             .opacity(tearing ? 0 : 1)
         }
         .frame(minHeight: compact ? 88 : 132)
+        .fixedSize(horizontal: false, vertical: true)   // 票根的 maxHeight: .infinity 只撑到票面高，不撑满整屏
         .background {
             ZStack {
                 Color.white

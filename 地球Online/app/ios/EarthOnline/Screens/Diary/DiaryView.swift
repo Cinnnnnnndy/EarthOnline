@@ -152,7 +152,7 @@ struct DiaryView: View {
         defer { exporting = false }
         // 先用嵌入页的长图（D96：每天一张世界层的渲染图，和网页、鸿蒙、安卓同一份排版）；拿不到再用原生的文字版
         if let png = await app.world.exportLongImage(trip: trip) {
-            let url = LongImageExporter.directory().appendingPathComponent("\(LongImageExporter.safeName(trip.title)).png")
+            let url = ExportFiles.directory().appendingPathComponent("\(ExportFiles.safeName(trip.title)).png")
             if (try? png.write(to: url, options: .atomic)) != nil { share = ShareBox(items: [url]); return }
         }
         let hd = app.entitlements.allows(.hdExport)

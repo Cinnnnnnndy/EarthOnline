@@ -44,11 +44,12 @@ enum Gazetteer {
             if names.contains(where: { !$0.isEmpty && n.contains($0) }) { return 3 }
             return 9
         }
-        return places.map { ($0, score($0)) }
-            .filter { $0.1 < 9 }
-            .sorted { $0.1 != $1.1 ? $0.1 < $1.1 : ($0.0.kind == .city && $1.0.kind != .city) }
-            .prefix(limit)
-            .map(\.0)
+        let scored: [(Place, Int)] = places.map { ($0, score($0)) }.filter { $0.1 < 9 }
+        let ranked = scored.sorted { (a: (Place, Int), b: (Place, Int)) -> Bool in
+            if a.1 != b.1 { return a.1 < b.1 }
+            return a.0.kind == .city && b.0.kind != .city
+        }
+        return ranked.prefix(limit).map { $0.0 }
     }
 
     /// 站点名 → 坐标（名字互相包含即可；取最长匹配）
