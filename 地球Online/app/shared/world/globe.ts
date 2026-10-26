@@ -179,23 +179,39 @@ export class GlobeView {
   pickPoint(cb: ((lat: number, lng: number) => void) | null) { this.pickCb = cb; this.renderer.domElement.style.cursor = cb ? "crosshair" : ""; }
   get homePlace() { return this.home; }
   /** 横纵两个方向里较窄的那个视角（装东西以它为准） */
-  private fitFov() { const v = this.camera.fov; const hz = (2 * Math.atan(Math.tan((v / 2) * D2R) * this.camera.aspect)) / D2R; return Math.min(v, hz); }
+  /** 只算露出来的那块（被底部卡片 / 侧页挡住的不算）：卡片盖住大半屏时，书要装进上面那一小块 */
+  private fitFov() {
+    const v = this.camera.fov, { left, bottom, right, top } = this.insets; const tv = Math.tan((v / 2) * D2R);
+    const fy = Math.max(0.2, (this.h - bottom - top) / (this.h || 1)), fx = Math.max(0.2, (this.w - left - right) / (this.w || 1));
+    const vt = (2 * Math.atan(tv * fy)) / D2R, hz = (2 * Math.atan(tv * this.camera.aspect * fx)) / D2R; return Math.min(vt, hz);
+  }
   /** 回到整颗地球。at = 要对准的地方（没有行程时是家）；不给就对准第一本书那一带 */
   focusHome(animate = true, at?: [number, number]) {
     this.focus = {}; this.rebuildOverlay(); this.detailPatch(null);
     const alt = Math.max(2.4, 1 / Math.sin((this.fitFov() / 2) * D2R) * 1.3 - 1);   // 地球占约四分之三，四周留出宇宙
-    if (at) { this.flyTo({ lat: Math.max(-50, Math.min(60, at[0] - 4)), lng: at[1], alt, tilt: 0, heading: 0 }, animate ? 1800 : 0); return; }
+    if (at) { this.flyTo({ lat: Math.max(-50, Math.min(60, at[0] - 4)), lng: at[1], alt, tilt: 0, heading: 0 }, animate ? 1200 : 0, undefined, 1, easeOut); return; }
     const c = this.books[0]?.center ?? [30, 60];
-    this.flyTo({ lat: Math.max(-40, Math.min(50, c[0] - 8)), lng: c[1] - 15, alt, tilt: 0, heading: 0 }, animate ? 1800 : 0);
+    this.flyTo({ lat: Math.max(-40, Math.min(50, c[0] - 8)), lng: c[1] - 15, alt, tilt: 0, heading: 0 }, animate ? 1200 : 0, undefined, 1, easeOut);
   }
+  /** 转向书 / 某一天：一出手就转（只减速），1.2 秒左右到位 */
   focusBook(id: string, animate = true, done?: () => void) {
     const b = this.books.find((x) => x.id === id); if (!b) return; this.focus = { book: id }; this.rebuildOverlay(); this.detailPatch(b);
-    this.flyTo({ lat: b.center[0] - 1, lng: b.center[1], alt: altFor(b.radiusKm, this.fitFov()) * 1.05, tilt: 18, heading: 0 }, animate ? 2400 : 0, done);
+    this.flyTo(this.bookCam(b), animate ? 1300 : 0, done, 1, easeOut);
   }
   focusDay(id: string, dayIdx: number, animate = true, done?: () => void) {
     const b = this.books.find((x) => x.id === id); const d = b?.days[dayIdx]; if (!b || !d) return; this.focus = { book: id, day: dayIdx }; this.rebuildOverlay();
     if (!this.patch) this.detailPatch(b);
-    this.flyTo({ lat: d.center[0] - 0.15 * Math.min(4, d.radiusKm / 60), lng: d.center[1], alt: altFor(Math.max(18, d.radiusKm), this.fitFov()) * 1.1, tilt: 38, heading: 0 }, animate ? 1800 : 0, done);
+    this.flyTo(this.dayCam(d), animate ? 1100 : 0, done, 1, easeOut);
+  }
+  /** 往南挪一点（俯角从南边看过去，路线落在画面中间偏上）；挪多少跟范围走，关西这种 50 公里的书只挪几公里，不再一律挪 1° 把整条路线挪出画面 */
+  private bookCam(b: GlobeBook): CamState { return { lat: b.center[0] - Math.min(1, b.radiusKm / 400), lng: b.center[1], alt: altFor(b.radiusKm, this.fitFov()) * 1.15, tilt: 18, heading: 0 }; }
+  private dayCam(d: GlobeDay): CamState { return { lat: d.center[0] - 0.15 * Math.min(4, d.radiusKm / 60), lng: d.center[1], alt: altFor(Math.max(18, d.radiusKm), this.fitFov()) * 1.1, tilt: 38, heading: 0 }; }
+  /** 卡片高度变了（换成某一天的卡、天列表变长）：聚焦着书 / 某一天时把相机目标重算一遍，免得被卡片盖住 */
+  private refit() {
+    const b = this.books.find((x) => x.id === this.focus.book); if (!b || this.dragging) return;
+    const d = this.focus.day !== undefined ? b.days[this.focus.day] : undefined; const to = d ? this.dayCam(d) : this.bookCam(b);
+    if (this.anim) { this.anim.to = { ...to, lng: this.anim.from.lng + wrap(to.lng - this.anim.from.lng) }; return; }
+    this.flyTo(to, 400, undefined, 0, easeOut);
   }
   /** 潜入：从当前视角往这一天的中心俯冲 */
   dive(done: () => void) {
@@ -255,7 +271,7 @@ export class GlobeView {
       b.days.forEach((d, di) => {
         const on = this.focus.day === undefined || this.focus.day === di;
         for (const leg of d.legs) this.line(this.legPoints(leg), d.color, on ? (this.focus.day === di ? 4 : 3) : 2, leg.mode === "flight" || leg.mode === "ship", on ? 1 : 0.3);
-        if (this.focus.day === undefined) this.addLabel(`day-${di}`, `<b>${esc(d.label)}</b>${esc(d.title)}`, ll2v(d.center[0], d.center[1], R * 1.004), "day", 1 + di * 0.01, () => this.ev.pickDay?.(b.id, di));
+        if (this.focus.day === undefined) this.addLabel(`day-${di}`, `<b>${esc(d.label)}</b><span class="t">${esc(d.title)}</span>`, ll2v(d.center[0], d.center[1], R * 1.004), "day", 1 + di * 0.01, () => this.ev.pickDay?.(b.id, di));
         if (this.focus.day === di) {
           d.stops.forEach((s, si) => {
             const col = KIND[s.kind] || d.color; const p = ll2v(s.lat, s.lng, R * 1.002);
@@ -354,7 +370,11 @@ export class GlobeView {
     return { x: (c.x + 1) / 2 * this.w, y: (1 - c.y) / 2 * this.h, r };
   }
   /** 被面板挡住的四边（D90：三页时左右都让，悬停时让下半）：视觉中心挪到露出来的那块 */
-  setInsets(i: { left: number; bottom: number; right?: number; top?: number }) { this.insets = { left: i.left, bottom: i.bottom, right: i.right ?? 0, top: i.top ?? 0 }; this.applyInsets(); }
+  setInsets(i: { left: number; bottom: number; right?: number; top?: number }) {
+    const n = { left: i.left, bottom: i.bottom, right: i.right ?? 0, top: i.top ?? 0 }, o = this.insets;
+    this.insets = n; this.applyInsets();
+    if (n.left !== o.left || n.bottom !== o.bottom || n.right !== o.right || n.top !== o.top) this.refit();
+  }
   private applyInsets() {
     const { left, bottom, right, top } = this.insets; if (!left && !bottom && !right && !top) { this.camera.clearViewOffset(); return; }
     this.camera.setViewOffset(this.w, this.h, (right - left) / 2, (bottom - top) / 2, this.w, this.h);
@@ -422,7 +442,15 @@ export class GlobeView {
         // 书签：先试着往下挪，再试往上；都不行就让它压着（书签必须看得见）
         const free = (yy: number) => !placed.some((r) => lx < r.x + r.w + 4 && lx + w + 4 > r.x && yy < r.y + r.h + 3 && yy + h + 3 > r.y) && yy > 4 && yy + h < this.h - 4;
         let y2 = ly; for (let k = 1; k < 8 && !free(y2); k++) { const d = (h + 6) * Math.ceil(k / 2) * (k % 2 ? 1 : -1); y2 = ly + d; } if (free(y2)) ly = y2;
+      } else if (l.kind === "day") {
+        // 同一座城住好几天（大阪 D1 / D2 / D7）：撞了就只留「D2」，再上下找空位；都不行才藏
+        l.el.classList.add("short"); const sw = l.el.offsetWidth, sh = l.el.offsetHeight; const sx = x - sw / 2;
+        const free = (yy: number) => !placed.some((r) => sx < r.x + r.w + 3 && sx + sw + 3 > r.x && yy < r.y + r.h + 2 && yy + sh + 2 > r.y);
+        let y2 = y - sh - 8; for (let k = 1; k < 7 && !free(y2); k++) y2 = y - sh - 8 + (sh + 4) * Math.ceil(k / 2) * (k % 2 ? 1 : -1);
+        if (!free(y2)) { l.el.classList.remove("short"); l.el.style.display = "none"; continue; }
+        l.el.style.display = ""; l.el.style.transform = `translate(${Math.round(sx)}px, ${Math.round(y2)}px)`; placed.push({ x: sx, y: y2, w: sw, h: sh }); continue;
       } else { l.el.style.display = "none"; continue; } }
+      if (l.kind === "day") l.el.classList.remove("short");
       l.el.style.display = ""; l.el.style.transform = `translate(${Math.round(lx)}px, ${Math.round(ly)}px)`; placed.push({ x: lx, y: ly, w, h });
     }
   }

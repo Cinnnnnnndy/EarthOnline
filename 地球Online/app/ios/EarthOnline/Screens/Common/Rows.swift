@@ -5,11 +5,25 @@ import UIKit
 struct DayRow: View {
     let day: Day
     let isToday: Bool
+    /// 大票里：一行——标签、标题、右边日期
+    var dense = false
 
     var body: some View {
         HStack(spacing: 12) {
             TagView(text: "D\(day.index)", live: isToday)
                 .frame(minWidth: 36, alignment: .leading)
+            if dense {
+                Text(plain(day.title))
+                    .font(.eoBody)
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+                Spacer(minLength: 8)
+                Text(meta)
+                    .font(.eoSub)
+                    .foregroundStyle(isToday ? Color.eoDawnInk : Color.secondary)
+                    .monospacedDigit()
+                    .lineLimit(1)
+            } else {
             VStack(alignment: .leading, spacing: 2) {
                 Text(plain(day.title))
                     .font(.eoBody)
@@ -22,6 +36,7 @@ struct DayRow: View {
                     .lineLimit(1)
             }
             Spacer(minLength: 8)
+            }
             Image(systemName: "chevron.right")
                 .font(.eoCaption)
                 .foregroundStyle(.tertiary)
