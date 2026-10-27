@@ -204,9 +204,12 @@ struct AvatarView: View {
                 TextField("名字", text: $avatar.name)
             }
             Section {
-                // 形态（D86）：小人、八只动物、三只自建 IP（嵌入页按 form 建角色）
+                // 形态（D86 / D101）：小人、仓库主人一家（小王、小伍、福贵）、动物、自建 IP（嵌入页按 form 建角色）
                 Picker("形态", selection: Binding(get: { avatar.form ?? "human" }, set: { avatar.form = $0 == "human" ? nil : $0 })) {
                     Text("小人").tag("human")
+                    Text("小王").tag("xiaowang")
+                    Text("小伍").tag("xiaowu")
+                    Text("福贵").tag("fugui")
                     Text("狐狸").tag("fox")
                     Text("猫").tag("cat")
                     Text("柴犬").tag("shiba")

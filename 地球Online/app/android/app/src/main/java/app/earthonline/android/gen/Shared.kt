@@ -7,7 +7,7 @@ import androidx.compose.ui.unit.sp
 
 object Shared {
     const val SCHEMA_VERSION = "0.3"
-    val AVATAR_FORMS = listOf("human", "fox", "cat", "shiba", "bear", "rabbit", "penguin", "panda", "duck", "seal", "otter", "capybara", "bean", "cloud", "pebble")
+    val AVATAR_FORMS = listOf("human", "xiaowang", "xiaowu", "fugui", "fox", "cat", "shiba", "bear", "rabbit", "penguin", "panda", "duck", "seal", "otter", "capybara", "bean", "cloud", "pebble")
     val SUITCASE_STYLES = listOf("sand", "ink", "canvas", "trunk")
     /** 状态型消息的频道与重放顺序（shared/spec/channels.ts） */
     val REPLAY_ORDER = listOf("palette", "sky", "post", "avatar", "trips", "home", "footprints", "insets", "layout", "mode", "view", "camera", "pick")
