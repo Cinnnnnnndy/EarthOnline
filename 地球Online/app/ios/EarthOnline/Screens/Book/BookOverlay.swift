@@ -92,14 +92,10 @@ struct BookCard: View {
         let today = app.today
         let ti = trip.todayIndex(today: today)
         let phase = trip.phase(today: today)
-        // 这趟旅程的票浮在卡片上方，不放在卡片上（D74）：撕票根 = 进入今天 / 从 D1 开始 / 写旅行日记；卡片里只有天的列表
-        VStack(spacing: 12) {
-            TicketView(trip: trip, status: statusText(phase, today: ti), live: isTraveling(phase), stubLabel: actionTitle(phase),
-                       onStub: { primaryAction(phase) })
-            GlassCard {
-                DayList(trip: trip, todayIndex: ti)
-            }
-        }
+        // 一张大票（D101）：票头压成两行，撕线下面接着天的列表，不再是「票 + 一张玻璃卡」两块；撕票根 = 进入今天 / 从 D1 开始 / 写旅行日记
+        TicketView(trip: trip, status: statusText(phase, today: ti), live: isTraveling(phase), stubLabel: actionTitle(phase),
+                   onStub: { primaryAction(phase) },
+                   below: AnyView(DayList(trip: trip, todayIndex: ti, dense: true)))
     }
 
     private func statusText(_ phase: TripPhase, today ti: Int?) -> String {
@@ -134,6 +130,8 @@ struct BookCard: View {
 struct DayList: View {
     let trip: Trip
     let todayIndex: Int?
+    /// 在大票里：一天一行（日期放右边），列表矮一截
+    var dense = false
     @EnvironmentObject private var app: AppModel
     @State private var contentHeight: CGFloat = 0
 
@@ -143,11 +141,11 @@ struct DayList: View {
                 VStack(spacing: 0) {
                     ForEach(Array(trip.days.enumerated()), id: \.element.index) { i, d in
                         Button { app.selectBookDay(i) } label: {
-                            DayRow(day: d, isToday: i == todayIndex)
+                            DayRow(day: d, isToday: i == todayIndex, dense: dense)
                         }
                         .buttonStyle(.plain)
                         .id(i)
-                        if i < trip.days.count - 1 { Divider().padding(.leading, 48) }
+                        if i < trip.days.count - 1 { Divider().padding(.leading, dense ? 0 : 48) }
                     }
                 }
                 .onGeometryChange(for: CGFloat.self) { proxy in
@@ -163,8 +161,8 @@ struct DayList: View {
         }
     }
 
-    /// 天列表最多占屏幕的 36%
-    private var maxListHeight: CGFloat { max(160, UIScreenHeight.value * 0.36) }
+    /// 天列表最多占屏幕的 36%（大票里 30%：票头已经压矮，地图多露一些）
+    private var maxListHeight: CGFloat { max(160, UIScreenHeight.value * (dense ? 0.30 : 0.36)) }
 }
 
 /// 某一天的预览（仍在地球上）

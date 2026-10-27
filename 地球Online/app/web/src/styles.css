@@ -145,6 +145,7 @@ h1,h2,h3{margin:0;line-height:1.2} .muted{color:var(--ink-2)} .tiny{font-size:va
 .glabel{position:absolute;left:0;top:0;display:flex;align-items:center;gap:6px;white-space:nowrap;pointer-events:auto;border:none;font:inherit;color:#1d2842;background:rgba(255,255,255,.9);border-radius:999px;padding:5px 10px;font-size:var(--t-caption-size);box-shadow:0 6px 16px rgba(20,40,70,.18)}
 .glabel .dot{width:10px;height:10px;border-radius:50%;display:inline-block;box-shadow:0 0 0 2px #fff}
 .glabel.gl-book{flex-direction:row;gap:8px;padding:8px 12px;border-radius:14px;cursor:pointer;font-size:var(--t-sub-size)} .glabel.gl-book small{color:#5b6782} .glabel.gl-book em{font-style:normal;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:2px 7px;font-size:var(--t-caption-size);font-weight:600} .glabel.gl-book em.live{background:var(--gold-soft);color:var(--gold-ink)}
+.glabel.short .t{display:none}
 .glabel.gl-day{cursor:pointer} .glabel.gl-day b{margin-right:2px}
 .glabel .n{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;color:#fff;font-size:var(--t-caption-size);font-weight:600}
 .glabel.gl-stop.hotel,.glabel.gl-stop.airport,.glabel.gl-stop.port{background:#1d2842;color:#fff}
