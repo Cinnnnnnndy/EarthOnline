@@ -72,7 +72,7 @@ npm run preview    # 预览构建产物 web/dist/
 | 行李箱 | 旅行日记页顶上 | 世界层里的 3D 箱子（`shared/world/suitcase-scene.ts`）：下半每天一座名胜小模型，上半站着这趟穿搭的小人（或捏人面板里选的形态：十一只 Q 版动物、三只自建 IP，`shared/world/mascot.ts`，D86 / D89b）、目的地的特色物件（`souvenir-models.ts` + `souvenir-models-more.ts`，109 样、64 国，同一国家的第二段拿第二样）与一本厚日记；物件都过一道潮玩质感的上色工序（`shared/world/look.ts`：哑光、上下渐变、透射玻璃、清漆亮球）；四款样式可选（存在小人的档案里）；东西可以自己加减——增减面板是一格一格类 emoji 的物件图标（`shared/world/item-icons.ts`：库里的模型从一个固定的好角度离屏渲染，透明底、脚下一圈影子），「清单」弹层像打包清单：搜索框打一句话或一个词（`shared/algo/case-search.ts`：认国家、场景词、名字，中英日）、场景标签、按组一格一格地放进去或拿出来（后排最多 4、前排最多 3），放一张照片进去抠成立牌（`case-cards.ts`，书里的 `suitcase` 字段：`hidden` / `picks` / `gear` / `cards`）；不放票、登机牌、明信片；「让 AI 装箱」再加最多三样小东西（本机规则 `shared/algo/pack-extras.ts`，有规划服务就问 `/v1/pack`）；拖一下可以转着看；导出 1080 × 1350 的 PNG；iOS 通过嵌入页（`?mode=suitcase`）用同一只（视觉文档 15.15） |
 | 景点待办 | 某一天 → 点一个站点 → 「待办」一行 | 站点详情里只有一行入口（数量标签 + 最近一件），点开是待办的抽屉：一行一件（勾选、文字、到期日标签、删除），添加时选提前 1 个月 / 2 周 / 1 周 / 1 天 / 当天；提示跟着站点：书里一天的站点行与某一天的站点条，名字旁一个带勾的数量标签，第二行是最近要做的一件。备注同样是一行入口（「添加备注」） |
 | 设置 | `#/settings` | 天色、色调、画质、语言（分段控件）；小人（捏人面板最上面是「形态」：十五格小图加名字，D94）、足迹与家、只看列表；导出、示例、Pro、色卡、重置 |
-| 小人实验页 | `hero-lab.html` | URL 参数：`form=xiaowang|xiaowu|fugui|fox|cat|shiba|bear|rabbit|penguin|panda|duck|seal|otter|capybara|bean|cloud|pebble`（D86 / D89b 的形态，不给是小人）、`lm=forms`（全部形态排一排）、`view=front|side|back|three`、`outfit=puffer|dress`、`hat=cap|straw|none`（cap 是毛线帽）、`hair=bun|long|short`、`color=0..5`、`vehicle=car|boat|plane`、`walk=1` |
+| 小人实验页 | `hero-lab.html` | URL 参数：`form=fox|cat|shiba|bear|rabbit|penguin|panda|duck|seal|otter|capybara|bean|cloud|pebble`（D86 / D89b 的形态，不给是小人）、`lm=forms`（全部形态排一排）、`view=front|side|back|three`、`outfit=puffer|dress`、`hat=cap|straw|none`（cap 是毛线帽）、`hair=bun|long|short`、`color=0..5`、`vehicle=car|boat|plane`、`walk=1` |
 
 ## 导入你自己的行程
 

@@ -1,6 +1,6 @@
 /** 自动生成（tools/export-shared.ts），勿改；改源头（shared/）再跑 npm run export:shared */
 export const SCHEMA_VERSION: string = '0.3';
-export const AVATAR_FORMS: string[] = ['human', 'xiaowang', 'xiaowu', 'fugui', 'fox', 'cat', 'shiba', 'bear', 'rabbit', 'penguin', 'panda', 'duck', 'seal', 'otter', 'capybara', 'bean', 'cloud', 'pebble'];
+export const AVATAR_FORMS: string[] = ['human', 'fox', 'cat', 'shiba', 'bear', 'rabbit', 'penguin', 'panda', 'duck', 'seal', 'otter', 'capybara', 'bean', 'cloud', 'pebble'];
 export const SUITCASE_STYLES: string[] = ['sand', 'ink', 'canvas', 'trunk'];
 /** 状态型消息的频道与重放顺序（shared/spec/channels.ts） */
 export const REPLAY_ORDER: string[] = ['palette', 'sky', 'post', 'avatar', 'trips', 'home', 'footprints', 'insets', 'layout', 'mode', 'view', 'camera', 'pick'];

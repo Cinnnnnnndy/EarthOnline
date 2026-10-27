@@ -28,7 +28,7 @@ scene.add(new THREE.HemisphereLight(0xdcecff, 0xb8c8a0, 1.1));
 const sun = new THREE.DirectionalLight(0xfff0dc, 2.6); sun.position.set(-3, 6, 5); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); scene.add(sun);
 const rim = new THREE.DirectionalLight(0xffd2a8, 2.2); rim.position.set(4, 4, -5); scene.add(rim);
 const ground = new THREE.Mesh(new THREE.CircleGeometry(3, 64), new THREE.MeshStandardMaterial({ color: 0xcfe7b0, roughness: 0.95 })); ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
-// ?form=xiaowang|xiaowu|fugui（D101，仓库主人一家）|fox|cat|shiba|bear|rabbit|penguin|panda|duck|bean|cloud|pebble：Q 版的动物 / 自建 IP（D86）；不给是小人
+// ?form=fox|cat|shiba|bear|rabbit|penguin|panda|duck|bean|cloud|pebble：Q 版的动物 / 自建 IP（D86）；不给是小人
 const av: Avatar = { ...DEFAULT_AVATAR, hat: (q.get("hat") as Avatar["hat"]) ?? DEFAULT_AVATAR.hat, hair: (q.get("hair") as Avatar["hair"]) ?? DEFAULT_AVATAR.hair, dress: +(q.get("color") ?? 0), form: (q.get("form") as AvatarForm) ?? "human" };
 const hero: Character = makeCharacter(av, import.meta.env.BASE_URL + "assets/hero_face.png", 0.36);
 hero.setAvatar(av, (q.get("outfit") as Outfit) ?? "puffer"); hero.setVehicle((q.get("vehicle") as Vehicle) ?? null); scene.add(hero.group);
@@ -44,16 +44,16 @@ renderer.domElement.addEventListener("pointerdown", (e) => (drag = e.clientX)); 
 addEventListener("pointermove", (e) => { if (drag !== null) { az -= (e.clientX - drag) * 0.01; drag = e.clientX; place(); } });
 // ?lm=kind：所有类型的通用模型排成一格一格；?lm=famous：已做的名胜模型
 const lmMode = q.get("lm"); const lmUpd: ((t: number) => void)[] = [];
-// ?lm=forms：全部形态排一排（D86）：小人 + 仓库主人一家三口 + 十一只动物 + 三只自建 IP，各戴各的帽子
+// ?lm=forms：全部形态排一排（D86）：小人 + 八只动物 + 三只自建 IP，各戴各的帽子
 const chars: Character[] = [];
 if (lmMode === "forms") {
   hero.group.visible = false; ground.visible = false;
-  const cols = 5, sp = 2.5, rsp = 3.4; const rows = Math.ceil(AVATAR_FORMS.length / cols);   // 18 只：五列四行   // 行距比列距大：镜头偏低，后排不能被前排挡住
+  const cols = 5, sp = 2.5, rsp = 3.4; const rows = Math.ceil(AVATAR_FORMS.length / cols);   // 15 只：五列三行   // 行距比列距大：镜头偏低，后排不能被前排挡住
   const plane = new THREE.Mesh(new THREE.PlaneGeometry(cols * sp + 2, rows * rsp + 2), new THREE.MeshStandardMaterial({ color: 0xd8ecc4, roughness: 0.95 })); plane.rotation.x = -Math.PI / 2; plane.receiveShadow = true; scene.add(plane);
   const placed: [string, THREE.Vector3][] = [];
   AVATAR_FORMS.forEach((form, i) => {
     // 帽子轮着戴；会把特征挡住的（海獭的蛤蜊、水豚的柚子、海豹的斑点、云团整朵）不戴，草帽只给头大的几只
-    const bare = ["xiaowang", "xiaowu", "fugui", "seal", "otter", "capybara", "cloud", "pebble", "bean"].includes(form);
+    const bare = ["seal", "otter", "capybara", "cloud", "pebble", "bean"].includes(form);
     const a: Avatar = { ...DEFAULT_AVATAR, form, hat: bare ? "none" : (["cap", "straw", "cap", "none"] as const)[i % 4], hatColor: i % 4, dress: i % 6 };
     const c = makeCharacter(a, import.meta.env.BASE_URL + "assets/hero_face.png", 0.36); c.setAvatar(a, "puffer");
     const x = ((i % cols) - (cols - 1) / 2) * sp, z = (Math.floor(i / cols) - (rows - 1) / 2) * rsp; c.group.position.set(x, 0, z); c.group.rotation.y = 0.25; scene.add(c.group); chars.push(c);

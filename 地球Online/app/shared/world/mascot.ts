@@ -3,7 +3,6 @@
  *  某一天的世界、行李箱、实验台都能换着用：
  *  - 动物十一只：狐狸、猫、柴犬、小熊、兔子、企鹅、熊猫、小鸭（圆身、大头、短腿；四条腿的走路摆腿，两条腿的摇摇摆摆），
  *    加仓库主人点名的三只（D89b，「我喜欢海豹还有海獭。还有 capybara。」）：海豹（一身斑点、两只鳍、胡须）、海獭（抱着一只蛤蜊）、水豚（头顶一颗柚子）；
- *  - 仓库主人一家三口（D101）：小王、小伍和他们的猫福贵（照着一张 Q 版合照拼，见下面 chibi / fugui）；
  *  - 自建 IP 三只（不是任何现成的角色）：豆丁（一粒发了芽的豆子，头顶两片叶子）、云团（一朵会飘的小云，没有脚）、石头精（长着一簇青苔的圆石头，苔上一朵小白花）。
  *  帽子（毛线帽 / 草帽）与围巾跟着捏人面板的颜色；潮玩质感（look.ts）；眨眼、呼吸、摇尾巴；坐车 / 坐船 / 坐飞机用积木拼的小载具。 */
 import * as THREE from "three";
@@ -40,12 +39,8 @@ interface AnimalSpec {
   whiskers?: RGB;
   /** 抱着 / 顶着的东西：clam 胸前一只蛤蜊（海獭），yuzu 头顶一颗柚子（水豚泡温泉的那个样子） */
   held?: "clam" | "yuzu";
-  /** 长毛（福贵）：身子、头、尾巴用起伏的球，毛茸茸的 */
-  fluffy?: boolean;
-  /** 眼珠的颜色（福贵的绿眼睛）：一圈彩色虹膜里一颗黑瞳孔 */
-  iris?: RGB;
 }
-const ANIMALS: Record<Exclude<MascotForm, "bean" | "cloud" | "pebble" | "xiaowang" | "xiaowu" | "fugui">, AnimalSpec> = {
+const ANIMALS: Record<Exclude<MascotForm, "bean" | "cloud" | "pebble">, AnimalSpec> = {
   fox: { fur: [236, 126, 54], belly: CREAM, body: { r: 0.42, sy: 1.05, y: 0.62 }, head: { r: 0.46, y: 1.2, sy: 0.9 }, ears: { kind: "point", dx: 0.3, y: 0.3, s: 1, inner: CREAM },
     muzzle: { r: 0.2, y: -0.1, z: 0.34, c: CREAM, nose: INK, sx: 1.3 }, eyes: { dx: 0.17, y: 0.06, z: 0.4, r: 0.055 }, cheeks: [240, 160, 120],
     legs: { n: 4, r: 0.1, h: 0.34, dx: 0.22, dz: 0.16, c: [70, 46, 40] }, tail: { kind: "bushy", tip: CREAM } },
@@ -82,13 +77,12 @@ const ANIMALS: Record<Exclude<MascotForm, "bean" | "cloud" | "pebble" | "xiaowan
     legs: { n: 4, r: 0.1, h: 0.26, dx: 0.24, dz: 0.18, c: [150, 108, 66] }, tail: { kind: "stub", c: [150, 108, 66] }, held: "yuzu" },
 };
 
-interface Parts { root: THREE.Group; body: THREE.Group; head: THREE.Group; legs: THREE.Group[]; arms: THREE.Group[]; tail: THREE.Group | null; ears: THREE.Group[]; eyes: THREE.Mesh[]; headR: number; neckY: number; hover: boolean; hop: boolean; /** 小背包贴在背上的 z（没写按头的大小估） */ packZ?: number; /** 不系围巾（自己有毛衣领 / 毛领的） */ noScarf?: boolean }
+interface Parts { root: THREE.Group; body: THREE.Group; head: THREE.Group; legs: THREE.Group[]; arms: THREE.Group[]; tail: THREE.Group | null; ears: THREE.Group[]; eyes: THREE.Mesh[]; headR: number; neckY: number; hover: boolean; hop: boolean }
 
-function eyesOn(head: THREE.Group, e: AnimalSpec["eyes"], out: THREE.Mesh[], iris?: RGB) {
+function eyesOn(head: THREE.Group, e: AnimalSpec["eyes"], out: THREE.Mesh[]) {
   for (const s of [-1, 1]) {
     if (e.patch) add(head, ball(e.r * 2.2), mat(e.patch, 0.8), s * e.dx, e.y, e.z - 0.02).scale.set(1, 1.25, 0.6);
-    const eye = add(head, ball(e.r), mat(iris ?? INK, 0.25), s * e.dx, e.y, e.z); eye.userData.base = 1; out.push(eye);
-    if (iris) { const pu = new THREE.Mesh(ball(e.r * 0.62), mat(INK, 0.2)); pu.position.set(0, 0, e.r * 0.48); pu.scale.set(1, 1, 0.6); eye.add(pu); }
+    const eye = add(head, ball(e.r), mat(INK, 0.25), s * e.dx, e.y, e.z); eye.userData.base = 1; out.push(eye);
     const hl = new THREE.Mesh(ball(e.r * 0.38), mat(WHITE, 0.3)); hl.position.set(-s * e.r * 0.35, e.r * 0.35, e.r * 0.75); eye.add(hl);   // 高光
   }
 }
@@ -96,10 +90,10 @@ function eyesOn(head: THREE.Group, e: AnimalSpec["eyes"], out: THREE.Mesh[], iri
 function animal(sp: AnimalSpec): Parts {
   const root = new THREE.Group(); const body = new THREE.Group(); root.add(body);
   const fur = mat(sp.fur, 0.85), belly = mat(sp.belly ?? sp.fur, 0.9);
-  add(body, sp.fluffy ? lumpySphere(sp.body.r, 7, 0.1) : ball(sp.body.r), fur, 0, sp.body.y, 0).scale.set(1, sp.body.sy, 0.9);
+  add(body, ball(sp.body.r), fur, 0, sp.body.y, 0).scale.set(1, sp.body.sy, 0.9);
   if (sp.belly) add(body, ball(sp.body.r * 0.8), belly, 0, sp.body.y - sp.body.r * 0.08, sp.body.r * 0.36).scale.set(0.82, sp.body.sy * 0.88, 0.5);
   const head = new THREE.Group(); head.position.set(0, sp.head.y, 0.02); body.add(head);
-  add(head, sp.fluffy ? lumpySphere(sp.head.r, 8, 0.05) : ball(sp.head.r), fur, 0, 0, 0).scale.set(sp.head.sx ?? 1, sp.head.sy ?? 0.92, 1);
+  add(head, ball(sp.head.r), fur, 0, 0, 0).scale.set(sp.head.sx ?? 1, sp.head.sy ?? 0.92, 1);
   const ears: THREE.Group[] = []; const eyes: THREE.Mesh[] = [];
   if (sp.ears) {
     const e = sp.ears; const earMat = mat(e.c ?? sp.fur, 0.85);
@@ -113,7 +107,7 @@ function animal(sp: AnimalSpec): Parts {
   }
   if (sp.muzzle) { const m = sp.muzzle; add(head, ball(m.r), mat(m.c, 0.9), 0, m.y, m.z).scale.set(m.sx ?? 1, 0.8, 0.8); if (m.nose) add(head, ball(m.r * 0.38), mat(m.nose, 0.3), 0, m.y + m.r * 0.3, m.z + m.r * 0.62).scale.set(1.3, 0.8, 0.8); }
   if (sp.beak) { const b = sp.beak; if (b.flat) add(head, box(b.w * 2, 0.07, b.w * 1.2, 0.03), mat(b.c, 0.5), 0, b.y, b.z + b.w * 0.4); else add(head, cone(b.w, b.w * 2.2, 10), mat(b.c, 0.5), 0, b.y, b.z + b.w * 0.8).rotation.x = PI / 2; }
-  eyesOn(head, sp.eyes, eyes, sp.iris);
+  eyesOn(head, sp.eyes, eyes);
   if (sp.cheeks) for (const s of [-1, 1]) add(head, ball(0.07), mat(sp.cheeks, 0.9), s * 0.3, -0.06, 0.32).scale.set(1, 0.7, 0.5);
   if (sp.patches) for (const s of [-1, 1]) add(body, ball(0.18), mat(INK, 0.85), s * 0.36, sp.body.y + 0.12, 0.16).scale.set(0.7, 1.2, 0.7);   // 熊猫：肩上两块黑
   if (sp.whiskers && sp.muzzle) { const m = sp.muzzle, wm = mat(sp.whiskers, 0.6); for (const s of [-1, 1]) for (let k = 0; k < 2; k++) { const w = add(head, cyl(0.006, 0.006, 0.2, 4), wm, s * (m.r * (m.sx ?? 1) + 0.08), m.y + 0.03 - k * 0.05, m.z + 0.02); w.rotation.z = PI / 2 + s * (0.12 + k * 0.22); w.castShadow = false; } }   // 胡须：每边两根，一根平一根垂
@@ -154,7 +148,7 @@ function animal(sp: AnimalSpec): Parts {
   let tail: THREE.Group | null = null;
   if (sp.tail) {
     tail = new THREE.Group(); tail.position.set(0, sp.body.y - 0.05, -sp.body.r * 0.85); body.add(tail); const t = sp.tail; const tm = mat(t.c ?? sp.fur, 0.9);
-    if (t.kind === "bushy") { add(tail, sp.fluffy ? lumpySphere(0.22, 9, 0.14) : ball(0.2), tm, 0, 0.12, -0.26).scale.set(1, 1.1, 1.8); add(tail, ball(0.14), mat(t.tip ?? WHITE, 0.9), 0, 0.3, -0.5); }
+    if (t.kind === "bushy") { add(tail, ball(0.2), tm, 0, 0.12, -0.26).scale.set(1, 1.1, 1.8); add(tail, ball(0.14), mat(t.tip ?? WHITE, 0.9), 0, 0.3, -0.5); }
     else if (t.kind === "curl") { const r = new THREE.TorusGeometry(0.16, 0.07, 8, 16, PI * 1.5); add(tail, r, tm, 0, 0.3, -0.05).rotation.set(0.2, PI / 2, 0); if (t.tip) add(tail, ball(0.07), mat(t.tip, 0.9), 0, 0.14, 0.02); }
     else if (t.kind === "feather") { const f = add(tail, ball(0.1), tm, 0, 0.1, -0.1); f.scale.set(1.2, 0.6, 1.6); f.rotation.x = -0.6; }
     else add(tail, ball(0.1), mat(t.tip ?? sp.fur, 0.95), 0, 0.05, -0.06);
@@ -206,120 +200,7 @@ function pebble(): Parts {
   return { root, body, head, legs, arms: [], tail: null, ears: [flower], eyes, headR: 0.5, neckY: 0.3, hover: false, hop: true };
 }
 
-/** 仓库主人一家（D101，「按照我和我老公的形象生成两个」「可以，生成三个默认形态」），照着那张 Q 版合照拼：
- *  小王：齐肩的棕发、两缕挑染、大眼睛张嘴笑，驼色毛衣、奶白阔腿裤、毛绒拖鞋；
- *  小伍：乱蓬蓬的黑短发、细框眼镜、眯眼咧嘴笑，蓝色麻花毛衣、黑裤子、深灰拖鞋。
- *  大头小身子（头占一半高），两条腿摇摇摆摆地走。 */
-interface ChibiSpec {
-  skin: RGB; hair: RGB; streak?: RGB; style: "bob" | "messy";
-  top: RGB; rib: RGB; cable?: RGB; pants: RGB; wide?: boolean; slipper: RGB; fluffy?: boolean;
-  eyes: "open" | "smile"; glasses?: RGB; mouth: "open" | "grin";
-}
-const FAMILY: Record<"xiaowang" | "xiaowu", ChibiSpec> = {
-  xiaowang: { skin: [252, 226, 210], hair: [92, 60, 44], streak: [158, 104, 66], style: "bob", top: [210, 178, 146], rib: [192, 158, 126], pants: [246, 240, 230], wide: true, slipper: [242, 230, 210], fluffy: true, eyes: "open", mouth: "open" },
-  xiaowu: { skin: [252, 226, 210], hair: [34, 32, 36], style: "messy", top: [106, 126, 168], rib: [90, 108, 150], cable: [116, 138, 182], pants: [50, 50, 56], slipper: [88, 88, 94], fluffy: true, eyes: "smile", glasses: [120, 124, 132], mouth: "grin" },
-};
-function chibi(sp: ChibiSpec): Parts {
-  const root = new THREE.Group(); const body = new THREE.Group(); root.add(body);
-  const skin = mat(sp.skin, 0.75), hair = mat(sp.hair, 0.7), top = mat(sp.top, 0.95), rib = mat(sp.rib, 0.95), pants = mat(sp.pants, 0.9);
-  // 腿：裤腿 + 拖鞋（毛绒的用起伏的球）
-  const legs: THREE.Group[] = [];
-  for (const s of [-1, 1]) {
-    const g = new THREE.Group(); g.position.set(s * 0.13, 0.4, 0); body.add(g); legs.push(g);
-    add(g, cyl(sp.wide ? 0.11 : 0.095, sp.wide ? 0.135 : 0.1, 0.34, 12), pants, 0, -0.17, 0);
-    const f = add(g, sp.fluffy ? lumpySphere(0.13, s > 0 ? 3 : 4, 0.1) : ball(0.13), mat(sp.slipper, 1), 0, -0.34, 0.05); f.scale.set(1, 0.62, 1.45);
-  }
-  // 毛衣：圆圆的身子，下摆、领口、袖口一圈罗纹；麻花毛衣胸前两条麻花
-  add(body, ball(0.3), top, 0, 0.6, 0).scale.set(1.08, 1.0, 0.95);
-  add(body, new THREE.TorusGeometry(0.27, 0.045, 8, 24), rib, 0, 0.4, 0).rotation.x = PI / 2;
-  add(body, new THREE.TorusGeometry(0.11, 0.035, 8, 18), rib, 0, 0.86, 0.02).rotation.x = PI / 2;
-  if (sp.cable) { const cm = mat(sp.cable, 0.95); for (const s of [-1, 1]) for (let k = 0; k < 4; k++) { const b = add(body, ball(0.032), cm, s * 0.1, 0.5 + k * 0.075, 0.275 - Math.abs(k - 1.5) * 0.012); b.scale.set(0.8, 1.7, 0.35); b.rotation.z = (k % 2 ? 0.6 : -0.6); } }
-  const arms: THREE.Group[] = [];
-  for (const s of [-1, 1]) {
-    const g = new THREE.Group(); g.position.set(s * 0.3, 0.74, 0); body.add(g); arms.push(g);
-    const a = add(g, ball(0.1), top, s * 0.05, -0.15, 0); a.scale.set(0.85, 1.9, 0.9); a.rotation.z = s * 0.35;
-    add(g, ball(0.075), rib, s * 0.1, -0.31, 0).scale.set(1, 0.6, 1);
-    add(g, ball(0.065), skin, s * 0.11, -0.37, 0);
-  }
-  // 头
-  const head = new THREE.Group(); head.position.set(0, 1.2, 0.02); body.add(head);
-  add(head, ball(0.46), skin, 0, 0, 0).scale.set(1.04, 0.96, 0.95);
-  const eyes: THREE.Mesh[] = [];
-  if (sp.eyes === "open") for (const s of [-1, 1]) {   // 大眼睛：深棕的眼珠、两个高光、一道眼线
-    const e = add(head, ball(0.07), mat([54, 34, 30], 0.25), s * 0.17, -0.03, 0.4); e.scale.set(0.9, 1.15, 0.55); e.userData.base = 1; eyes.push(e);
-    const hl = new THREE.Mesh(ball(0.026), mat(WHITE, 0.3)); hl.position.set(-s * 0.02, 0.03, 0.06); e.add(hl);
-    const hl2 = new THREE.Mesh(ball(0.012), mat(WHITE, 0.3)); hl2.position.set(s * 0.025, -0.03, 0.06); e.add(hl2);
-    const lash = add(head, new THREE.TorusGeometry(0.068, 0.012, 6, 14, PI * 0.8), mat(INK, 0.6), s * 0.17, -0.03, 0.418); lash.rotation.z = PI * 0.1 + (s > 0 ? -0.08 : 0.08); lash.scale.set(1, 1.18, 0.6);   // 上眼线
-  } else for (const s of [-1, 1]) {   // 眯着的笑眼：两道弯
-    const e = add(head, new THREE.TorusGeometry(0.055, 0.014, 6, 14, PI), mat(INK, 0.5), s * 0.17, -0.03, 0.43); e.userData.base = 1; eyes.push(e);
-  }
-  if (sp.glasses) {   // 细框眼镜：两个圆框、鼻梁、两条镜腿
-    const gm = mat(sp.glasses, 0.35, { metalness: 0.5 });
-    for (const s of [-1, 1]) {
-      add(head, new THREE.TorusGeometry(0.105, 0.012, 6, 28), gm, s * 0.18, -0.03, 0.455).scale.set(1.12, 0.9, 1);
-      add(head, box(0.02, 0.02, 0.48, 0.008), gm, s * 0.385, -0.01, 0.225).rotation.y = -s * 0.36;   // 镜腿从镜框外沿搭到耳朵
-    }
-    add(head, cyl(0.01, 0.01, 0.1, 5), gm, 0, 0.0, 0.47).rotation.z = PI / 2;
-  }
-  for (const s of [-1, 1]) add(head, ball(0.07), mat([246, 160, 160], 0.9), s * 0.29, -0.13, 0.35).scale.set(1.1, 0.6, 0.5);
-  if (sp.mouth === "open") {   // 张着嘴笑：一瓣红、一点粉舌头
-    const m = add(head, new THREE.CircleGeometry(0.06, 20, PI, PI), mat([176, 70, 76], 0.5), 0, -0.15, 0.443); m.scale.set(1.15, 1.1, 1);   // 半圆的嘴：上沿平、下沿圆
-    add(head, new THREE.CircleGeometry(0.035, 16, PI, PI), mat([240, 140, 140], 0.6), 0, -0.19, 0.446).scale.set(1.2, 0.7, 1);
-  } else {   // 咧嘴笑：一排白牙
-    add(head, ball(0.07), mat([120, 52, 52], 0.5), 0, -0.17, 0.4).scale.set(1.5, 0.7, 0.35);
-    add(head, ball(0.06), mat(WHITE, 0.4), 0, -0.155, 0.41).scale.set(1.55, 0.45, 0.35);
-  }
-  // 耳朵（小伍的露在外面；小王的被头发盖住）
-  for (const s of [-1, 1]) add(head, ball(0.08), skin, s * 0.47, -0.04, 0.0).scale.set(0.6, 1, 0.8);
-  // 头发
-  const ears: THREE.Group[] = [];
-  if (sp.style === "bob") {
-    add(head, lumpySphere(0.5, 21, 0.04), hair, 0, 0.07, -0.07).scale.set(1.06, 0.98, 1.0);
-    add(head, lumpySphere(0.44, 22, 0.05), hair, 0, -0.22, -0.16).scale.set(1.12, 1.05, 0.8);   // 后脑勺垂到肩
-    for (const s of [-1, 1]) {
-      const lock = new THREE.Group(); lock.position.set(s * 0.4, -0.12, 0.1); head.add(lock); ears.push(lock);   // 两侧的发帘，走路时轻轻晃
-      const l = add(lock, lumpySphere(0.15, 30 + s, 0.08), hair, 0, -0.14, 0); l.scale.set(0.72, 2.0, 0.8); l.rotation.z = s * 0.12;
-      add(lock, lumpySphere(0.1, 40 + s, 0.1), hair, s * 0.06, -0.4, -0.02).scale.set(1, 0.8, 0.8);   // 发梢往外翘
-      if (sp.streak) { const st = add(lock, ball(0.045), mat(sp.streak, 0.7), 0, -0.26, 0.05); st.scale.set(0.8, 3.6, 0.6); st.rotation.z = s * 0.12; }
-    }
-    for (let i = 0; i < 5; i++) {   // 碎刘海
-      const x = (i - 2) * 0.12, b = add(head, ball(0.1), hair, x, 0.26 - Math.abs(i - 2) * 0.02, 0.33 - Math.abs(i - 2) * 0.04);
-      b.scale.set(0.8, 1.5, 0.55); b.rotation.z = (i - 2) * 0.22 + 0.15; b.rotation.x = -0.5;
-    }
-  } else {
-    add(head, lumpySphere(0.48, 51, 0.05), hair, 0, 0.12, -0.06).scale.set(1.02, 0.92, 1.0);
-    for (let i = 0; i < 14; i++) {   // 乱翘的发尖：头顶一圈往外戳
-      const th = (i / 14) * PI * 2 + (i % 3) * 0.2, ph = 0.35 + (i % 4) * 0.22;
-      const d = new THREE.Vector3(Math.sin(ph) * Math.sin(th), Math.cos(ph), Math.sin(ph) * Math.cos(th));
-      if (d.z > 0.55 && d.y < 0.8) continue;   // 脸前面留出来
-      const c = add(head, ball(0.09), hair, d.x * 0.46, 0.12 + d.y * 0.44, -0.06 + d.z * 0.46); c.scale.set(0.75, 1.9, 0.6); c.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d); c.scale.set(0.75, 1.9, 0.6);
-    }
-    for (let i = 0; i < 5; i++) {   // 刘海：几簇往下戳
-      const x = (i - 2) * 0.11, c = add(head, ball(0.08), hair, x, 0.27 - Math.abs(i - 2) * 0.015, 0.34 - Math.abs(i - 2) * 0.04);
-      c.scale.set(0.75, 1.7, 0.55); c.rotation.x = -0.5; c.rotation.z = (i - 2) * 0.28 + 0.1;
-    }
-  }
-  return { root, body, head, legs, arms, tail: null, ears, eyes, headR: 0.56, neckY: 0.84, hover: false, hop: false, packZ: -0.3, noScarf: true };
-}
-
-/** 福贵：一只银色的长毛波斯猫（金吉拉）——扁脸、小耳朵、绿眼睛、粉鼻头，额头几道浅灰虎斑，脖子一圈蓬蓬的毛领，大尾巴 */
-function fugui(): Parts {
-  const fur: RGB = [226, 222, 226], grey: RGB = [150, 146, 156];
-  const p = animal({ fur, belly: WHITE, body: { r: 0.46, sy: 0.92, y: 0.54 }, head: { r: 0.5, y: 1.1, sx: 1.12, sy: 0.86 },
-    ears: { kind: "point", dx: 0.33, y: 0.28, s: 0.62, tilt: 0.5, inner: PINK },
-    muzzle: { r: 0.11, y: -0.13, z: 0.4, c: WHITE, nose: [236, 150, 160], sx: 1.5 }, eyes: { dx: 0.19, y: 0.03, z: 0.42, r: 0.075 }, cheeks: PINK,
-    legs: { n: 4, r: 0.11, h: 0.22, dx: 0.22, dz: 0.17 }, tail: { kind: "bushy", tip: grey }, whiskers: [210, 208, 214], fluffy: true, iris: [120, 200, 150] });
-  const fm = mat([242, 240, 242], 1);   // 胸前、两腮蓬蓬的长毛
-  for (const [x, y, z, r, k] of [[0, 0.7, 0.26, 0.22, 61], [-0.18, 0.64, 0.22, 0.18, 62], [0.18, 0.64, 0.22, 0.18, 63], [0, 0.5, 0.3, 0.18, 64]] as const) add(p.body, lumpySphere(r, k, 0.1), fm, x, y, z).scale.set(1, 0.9, 0.7);
-  for (const s of [-1, 1]) add(p.head, lumpySphere(0.16, 70 + s, 0.18), mat(fur, 1), s * 0.44, -0.16, 0.02).scale.set(0.8, 1, 1);
-  const gm = mat(grey, 0.95);
-  for (const [x, y, rz] of [[0, 0.3, 0], [-0.09, 0.28, 0.3], [0.09, 0.28, -0.3]] as const) { const s = add(p.head, ball(0.04), gm, x, y, 0.33); s.scale.set(0.6, 2.4, 0.4); s.rotation.set(-0.7, 0, rz); }   // 额头的虎斑
-  p.noScarf = true; return p;
-}
-
 export function buildMascotParts(form: MascotForm): Parts {
-  if (form === "xiaowang" || form === "xiaowu") return chibi(FAMILY[form]);
-  if (form === "fugui") return fugui();
   return form === "bean" ? bean() : form === "cloud" ? cloud() : form === "pebble" ? pebble() : animal(ANIMALS[form]);
 }
 
@@ -374,8 +255,8 @@ export class Mascot {
       add(W, cyl(r * 0.97, r * 0.97, r * 0.12, 24), mat(hc, 0.7), 0, headTop - r * 0.06, 0);
     }
     // 围巾：脖子那一圈（云团没有脖子就不系）；外套色给一个小背包
-    if (!p.hover && !p.noScarf) { const sc = add(W, new THREE.TorusGeometry(r * 0.72, r * 0.16, 8, 24), mat(hc, 0.95), 0, p.neckY + 0.02, 0.02); sc.rotation.x = PI / 2; sc.scale.set(1, 1, 0.8); add(W, box(r * 0.3, r * 0.5, r * 0.12, 0.03), mat(hc, 0.95), r * 0.35, p.neckY - r * 0.22, r * 0.55); }
-    if (!p.hover) add(W, box(r * 0.7, r * 0.8, r * 0.4, 0.06), mat(dc, 0.8), 0, p.neckY - r * 0.35, (p.packZ ?? -r * 0.75) - r * 0.2);
+    if (!p.hover) { const sc = add(W, new THREE.TorusGeometry(r * 0.72, r * 0.16, 8, 24), mat(hc, 0.95), 0, p.neckY + 0.02, 0.02); sc.rotation.x = PI / 2; sc.scale.set(1, 1, 0.8); add(W, box(r * 0.3, r * 0.5, r * 0.12, 0.03), mat(hc, 0.95), r * 0.35, p.neckY - r * 0.22, r * 0.55); }
+    if (!p.hover) add(W, box(r * 0.7, r * 0.8, r * 0.4, 0.06), mat(dc, 0.8), 0, p.neckY - r * 0.35, -r * 0.95);
     W.updateMatrixWorld(true); applyToyLook(W);
   }
   setOutfit(o: Outfit) { if (o !== this.outfit && this.avatar) this.setAvatar(this.avatar, o); }
