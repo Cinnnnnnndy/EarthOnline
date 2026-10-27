@@ -93,7 +93,7 @@ export class GlobeView {
     // 云 + 云影（同一张云图，影子层贴在地表、朝背光方向偏一点）
     const ct = new THREE.CanvasTexture(paintClouds()); ct.colorSpace = THREE.SRGBColorSpace;
     this.clouds = new THREE.Mesh(new THREE.SphereGeometry(R * 1.014, 96, 64), new THREE.MeshStandardMaterial({ map: ct, transparent: true, opacity: 0.55, depthWrite: false, roughness: 1 }));
-    this.cloudShadow = new THREE.Mesh(new THREE.SphereGeometry(R * 1.0015, 96, 64), new THREE.MeshBasicMaterial({ color: 0x2a2f5a, alphaMap: ct, transparent: true, opacity: 0.07, depthWrite: false }));
+    this.cloudShadow = new THREE.Mesh(new THREE.SphereGeometry(R * 1.0015, 96, 64), new THREE.MeshBasicMaterial({ color: 0x2a2f5a, alphaMap: ct, transparent: true, opacity: 0.045, depthWrite: false }));
     this.root.add(this.cloudShadow, this.clouds);
     // 大气：沿视线积分指数衰减的空气密度（单次散射的简化版，思路同开源的 glsl-atmosphere / takram three-atmosphere），
     // 受光一侧偏白青、背光一侧偏淡紫，和插画天空同一组颜色；普通透明混合，不做加色（加色会发白发青）
@@ -426,7 +426,7 @@ export class GlobeView {
     this.camera.updateMatrixWorld(); const sd = new THREE.Vector3().setFromMatrixPosition(this.key.matrixWorld).sub(new THREE.Vector3().setFromMatrixPosition(this.key.target.matrixWorld)).normalize();
     this.atmoMat.uniforms.sunDir.value.copy(sd); this.atmoMat.uniforms.fade.value = Math.min(1, Math.max(0.25, this.cam.alt / 0.15));
     this.backGlow.visible = this.cam.alt > 0.5; (this.backGlow.material as THREE.SpriteMaterial).opacity = Math.min(1, (this.cam.alt - 0.5) / 0.8);
-    this.clouds.rotation.y += dt * 0.004; this.cloudShadow.rotation.y = this.clouds.rotation.y + 0.006; (this.clouds.material as THREE.MeshStandardMaterial).opacity = 0.55 * Math.max(0, Math.min(1, (this.cam.alt - 0.12) / 0.7)); (this.cloudShadow.material as THREE.MeshBasicMaterial).opacity = 0.07 * Math.max(0, Math.min(1, (this.cam.alt - 0.12) / 0.7));
+    this.clouds.rotation.y += dt * 0.004; this.cloudShadow.rotation.y = this.clouds.rotation.y + 0.006; (this.clouds.material as THREE.MeshStandardMaterial).opacity = 0.55 * Math.max(0, Math.min(1, (this.cam.alt - 0.12) / 0.7)); (this.cloudShadow.material as THREE.MeshBasicMaterial).opacity = 0.045 * Math.max(0, Math.min(1, (this.cam.alt - 0.12) / 0.7));
     // 站点小球：保持屏幕上的像素大小
     const pxWorld = (p: THREE.Vector3) => (this.camera.position.distanceTo(p) * Math.tan((this.camera.fov * D2R) / 2) * 2) / this.h;
     for (const m of this.stopMeshes) m.scale.setScalar(pxWorld(m.position) * (m.userData.px as number));

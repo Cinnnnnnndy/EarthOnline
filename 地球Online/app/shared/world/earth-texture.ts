@@ -52,7 +52,7 @@ function canvasBlurWorks(): boolean {
   return (blurOK = x.getImageData(3, 8, 1, 1).data[3] > 0);
 }
 /** 把 src 模糊约 px 像素后画进 ctx 的 (dx, dy)（沿用 ctx 当时的不透明度与混合方式）。filter 不灵时：缩到 1/(px/3)、再减半、再平滑放大回原尺寸，近似高斯 */
-function drawBlurred(ctx: CanvasRenderingContext2D, src: HTMLCanvasElement, px: number, dx = 0, dy = 0) {
+export function drawBlurred(ctx: CanvasRenderingContext2D, src: HTMLCanvasElement, px: number, dx = 0, dy = 0) {
   ctx.save();
   if (canvasBlurWorks()) { ctx.filter = `blur(${px}px)`; ctx.drawImage(src, dx, dy); ctx.restore(); return; }
   const f = Math.max(1, px / 3); const w = Math.max(2, Math.round(src.width / f)), h = Math.max(2, Math.round(src.height / f));
@@ -163,8 +163,10 @@ export function paintClouds(W = 1024, H = 512, seed = 3): HTMLCanvasElement {
     const u = xx / W, v = y / H; let n = 0, amp = 0.55, f = 6;
     for (let o = 0; o < 4; o++) { n += val(u, v, f) * amp; amp *= 0.5; f *= 2; }
     const lat = Math.abs(v - 0.5) * 2; const band = 0.55 + 0.25 * Math.cos(lat * Math.PI * 3);
-    const a = Math.max(0, Math.min(1, (n * band - 0.34) * 4.2));
-    const k = (y * W + xx) * 4; d[k] = d[k + 1] = d[k + 2] = 255; d[k + 3] = a * 235;
+    // D104：原来 (n·band − 0.34)·4.2 的线性陡坡 + 8 位 alpha，云影层只有 7% 不透明度，海面上就是一圈圈有硬边的深色斑；
+    // 改成更宽的 smoothstep 过渡，再逐像素抖 ±1.5 个色阶，边缘柔、没有台阶
+    const q = Math.max(0, Math.min(1, (n * band - 0.26) / 0.3)); const a = q * q * (3 - 2 * q);
+    const k = (y * W + xx) * 4; d[k] = d[k + 1] = d[k + 2] = 255; d[k + 3] = Math.max(0, Math.min(255, a * 235 + (R() - 0.5) * 3));
   }
   x.putImageData(id, 0, 0); return c;
 }
