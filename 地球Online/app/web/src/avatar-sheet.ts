@@ -8,6 +8,7 @@ import { t, type MsgKey } from "../../shared/i18n/index.ts";
 import { icon } from "../../shared/world/icons.ts";
 import { ItemIcons } from "../../shared/world/item-icons.ts";
 import { isMascotForm } from "../../shared/world/mascot.ts";
+import { AVATAR_PRESETS, applyPreset } from "../../shared/world/avatar-presets.ts";
 
 /** 形态格子的图标渲染器（第一次打开捏人面板时才建；内存与 IndexedDB 都缓存） */
 let _formIcons: ItemIcons | null = null;
@@ -42,12 +43,22 @@ export function openAvatarSheet(onChange?: (a: Avatar) => void) {
     }
     return el;
   };
-  const body = h("div", { class: "col" },
+  // 默认形象（D101）：小王、小伍、福贵；点一下整套换上，再把下面的控件按新值重画
+  const presets = () => h("div", { class: "form-grid", role: "group", "aria-label": t("avatar.presets") }, ...AVATAR_PRESETS.map((p) => {
+    const pic = h("span", { class: "pic", html: p.avatar.form ? "" : icon("person", 26) });
+    if (p.avatar.form && isMascotForm(p.avatar.form)) { const ref = { type: "form" as const, form: p.avatar.form }; const hit = formIcons().peek(ref); if (hit) pic.append(h("img", { src: hit, alt: "" })); else void formIcons().get(ref).then((u) => pic.replaceChildren(h("img", { src: u, alt: "" }))).catch(() => undefined); }
+    return h("button", { type: "button", class: "form-tile", onclick: () => { apply(applyPreset(store.avatar, p)); name.value = store.avatar.name; render(); } }, pic, h("span", { class: "nm" }, p.avatar.name));
+  }));
+  const body = h("div", { class: "col" });
+  const render = () => body.replaceChildren(
     name,
+    field(t("avatar.presets"), presets()),
     field(t("avatar.form"), forms()),
     field(t("avatar.hair"), seg<Avatar["hair"]>([["bun", t("avatar.hairBun")], ["long", t("avatar.hairLong")], ["short", t("avatar.hairShort")]], store.avatar.hair, (v) => apply({ hair: v }))),
     field(t("avatar.hat"), seg<Avatar["hat"]>([["straw", t("avatar.hatStraw")], ["cap", t("avatar.hatCap")], ["none", t("avatar.hatNone")]], store.avatar.hat, (v) => apply({ hat: v }))),
     sw(t("avatar.skin"), SKIN_COLORS, "skin"), sw(t("avatar.hairColor"), HAIR_COLORS, "hairColor"), sw(t("avatar.dress"), DRESS_COLORS, "dress"),
-    sw(t("avatar.hatColor"), HAT_COLORS, "hatColor"), sw(t("avatar.shoes"), SHOE_COLORS, "shoes"));
+    sw(t("avatar.hatColor"), HAT_COLORS, "hatColor"), sw(t("avatar.shoes"), SHOE_COLORS, "shoes"),
+    field(t("avatar.glasses"), seg<"off" | "on">([["off", t("avatar.hatNone")], ["on", t("avatar.glassesOn")]], store.avatar.glasses ? "on" : "off", (v) => apply({ glasses: v === "on" }))));
+  render();
   return sheet(t("avatar.title"), body);
 }

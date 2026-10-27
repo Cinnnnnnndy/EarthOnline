@@ -208,6 +208,8 @@ struct Avatar: Codable, Hashable, Sendable {
     var suitcase: String?
     /// 形态（D86）：human / fox / cat / shiba / bear / rabbit / penguin / panda / duck / bean / cloud / pebble；nil = 小人。嵌入页按它建角色
     var form: String?
+    /// 戴眼镜（D101）；nil = 不戴。只对小人生效
+    var glasses: Bool?
 
     init() {}
 
@@ -224,6 +226,7 @@ struct Avatar: Codable, Hashable, Sendable {
         name = try c.decodeIfPresent(String.self, forKey: .name) ?? d.name
         suitcase = try c.decodeIfPresent(String.self, forKey: .suitcase)
         form = try c.decodeIfPresent(String.self, forKey: .form)
+        glasses = try c.decodeIfPresent(Bool.self, forKey: .glasses)
     }
 
     static let `default` = Avatar()

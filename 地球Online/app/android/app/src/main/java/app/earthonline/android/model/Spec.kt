@@ -144,6 +144,8 @@ data class Avatar(
     val suitcase: String? = null,
     /** human / fox / …（Shared.AVATAR_FORMS）；没写 = 小人 */
     val form: String? = null,
+    /** 小人戴细框眼镜（D101）；没写 = 不戴 */
+    val glasses: Boolean? = null,
 ) {
     companion object {
         fun default(name: String) = Avatar(skin = 0, hair = "short", hairColor = 0, dress = 0, hat = "cap", hatColor = 0, shoes = 0, name = name)

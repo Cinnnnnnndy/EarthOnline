@@ -1,5 +1,6 @@
 /** 角色实验台：单独看小人（正面 / 四分之三 / 侧面 / 背面、走路、载具、换装），美术迭代用。URL 参数 ?view=front|three|side|back&outfit=puffer|dress&hat=cap|straw|none&vehicle=car&zoom=face */
 import * as THREE from "three";
+import { AVATAR_PRESETS, applyPreset } from "../../shared/world/avatar-presets.ts";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { DEFAULT_AVATAR, type Outfit, type Vehicle } from "../../shared/world/hero.ts";
 import { makeCharacter, type Character } from "../../shared/world/character.ts";
@@ -29,7 +30,8 @@ const sun = new THREE.DirectionalLight(0xfff0dc, 2.6); sun.position.set(-3, 6, 5
 const rim = new THREE.DirectionalLight(0xffd2a8, 2.2); rim.position.set(4, 4, -5); scene.add(rim);
 const ground = new THREE.Mesh(new THREE.CircleGeometry(3, 64), new THREE.MeshStandardMaterial({ color: 0xcfe7b0, roughness: 0.95 })); ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
 // ?form=fox|cat|shiba|bear|rabbit|penguin|panda|duck|bean|cloud|pebble：Q 版的动物 / 自建 IP（D86）；不给是小人
-const av: Avatar = { ...DEFAULT_AVATAR, hat: (q.get("hat") as Avatar["hat"]) ?? DEFAULT_AVATAR.hat, hair: (q.get("hair") as Avatar["hair"]) ?? DEFAULT_AVATAR.hair, dress: +(q.get("color") ?? 0), form: (q.get("form") as AvatarForm) ?? "human" };
+const preset = AVATAR_PRESETS.find((p) => p.id === q.get("preset"));   // ?preset=xiaowang|xiaowu|fugui 看默认形象（D101）
+const av: Avatar = preset ? applyPreset(DEFAULT_AVATAR, preset) : { ...DEFAULT_AVATAR, hat: (q.get("hat") as Avatar["hat"]) ?? DEFAULT_AVATAR.hat, hair: (q.get("hair") as Avatar["hair"]) ?? DEFAULT_AVATAR.hair, dress: +(q.get("color") ?? 0), form: (q.get("form") as AvatarForm) ?? "human" };
 const hero: Character = makeCharacter(av, import.meta.env.BASE_URL + "assets/hero_face.png", 0.36);
 hero.setAvatar(av, (q.get("outfit") as Outfit) ?? "puffer"); hero.setVehicle((q.get("vehicle") as Vehicle) ?? null); scene.add(hero.group);
 const cam = new THREE.PerspectiveCamera(28, innerWidth / innerHeight, 0.1, 100);

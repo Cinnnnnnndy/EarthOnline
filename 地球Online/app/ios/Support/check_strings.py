@@ -78,7 +78,7 @@ for dp,_,fs in os.walk(ROOT):
             if 'verbatim:' in ctx[-12:]: continue
             k=to_key(raw)
             keys.setdefault(k,[]).append(f'{f}:{line}')
-EXCLUDE = set("、 ， ・ 零 〇 一 二 两 三 四 五 六 七 八 九 十 ·、，, 小时 小旅 大阪 京都 奈良 神户 雷克雅未克 维克 特罗姆瑟 罗弗敦 罗瓦涅米 奥斯陆 卑尔根 赫尔辛基 斯德哥尔摩 巴厘岛 普吉岛 马尔代夫 三亚 檀香山 圣托里尼 那霸 海口 东京 札幌 名古屋 福冈".split())  # 数据，不是界面文字
+EXCLUDE = set("、 ， ・ 零 〇 一 二 两 三 四 五 六 七 八 九 十 ·、，, 小时 小旅 小王 小伍 福贵 大阪 京都 奈良 神户 雷克雅未克 维克 特罗姆瑟 罗弗敦 罗瓦涅米 奥斯陆 卑尔根 赫尔辛基 斯德哥尔摩 巴厘岛 普吉岛 马尔代夫 三亚 檀香山 圣托里尼 那霸 海口 东京 札幌 名古屋 福冈".split())  # 数据，不是界面文字
 
 if __name__ == '__main__':
     cat = json.load(open(os.path.join(ROOT, 'Resources', 'Localizable.xcstrings')))['strings']

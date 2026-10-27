@@ -1,6 +1,6 @@
 /** 自动生成（tools/export-shared.ts），勿改；改源头（shared/）再跑 npm run export:shared */
 export const SCHEMA_VERSION: string = '0.3';
-export const AVATAR_FORMS: string[] = ['human', 'fox', 'cat', 'shiba', 'bear', 'rabbit', 'penguin', 'panda', 'duck', 'seal', 'otter', 'capybara', 'bean', 'cloud', 'pebble'];
+export const AVATAR_FORMS: string[] = ['human', 'fox', 'cat', 'shiba', 'bear', 'rabbit', 'penguin', 'panda', 'duck', 'seal', 'otter', 'capybara', 'bean', 'cloud', 'pebble', 'persian'];
 export const SUITCASE_STYLES: string[] = ['sand', 'ink', 'canvas', 'trunk'];
 /** 状态型消息的频道与重放顺序（shared/spec/channels.ts） */
 export const REPLAY_ORDER: string[] = ['palette', 'sky', 'post', 'avatar', 'trips', 'home', 'footprints', 'insets', 'layout', 'mode', 'view', 'camera', 'pick'];
@@ -100,7 +100,7 @@ export const DREAM_NIGHT: string[] = ["#EBC25E","#DFA53C","#CF8E2C"];
 /** 捏人面板的色块：'#RRGGBB'，下标就是 Avatar 里存的数 */
 export const SKIN_COLORS: string[] = ["#F8D2BA","#ECBEA0","#CE9C78","#96684C"];
 export const HAIR_COLORS: string[] = ["#422A22","#1E1A1E","#8C5C3A","#CEA062","#683A52"];
-export const DRESS_COLORS: string[] = ["#DAA856","#4A5FB0","#EEE8DC","#86A08A","#D48490","#3A4260"];
+export const DRESS_COLORS: string[] = ["#DAA856","#4A5FB0","#EEE8DC","#86A08A","#D48490","#3A4260","#CC9C70"];
 export const HAT_COLORS: string[] = ["#F2ECE0","#4A5FB0","#E2AC46","#3A4260"];
 export const SHOES_COLORS: string[] = ["#70503E","#303240","#ECE6DA","#883E48"];
 /** 间距、圆角（vp） */

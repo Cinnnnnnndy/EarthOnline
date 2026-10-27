@@ -104,8 +104,10 @@ export interface Avatar {
   suitcase?: SuitcaseStyle;
   /** 形态（D86）：小人，或 Q 版的动物 / 自建 IP（shared/world/mascot.ts）；没写 = 小人 */
   form?: AvatarForm;
+  /** 戴眼镜（D101，细金属框）；没写 = 不戴。只对小人生效 */
+  glasses?: boolean;
 }
-export const AVATAR_FORMS = ["human", "fox", "cat", "shiba", "bear", "rabbit", "penguin", "panda", "duck", "seal", "otter", "capybara", "bean", "cloud", "pebble"] as const;   // D89b：海豹、海獭、水豚（仓库主人点名）
+export const AVATAR_FORMS = ["human", "fox", "cat", "shiba", "bear", "rabbit", "penguin", "panda", "duck", "seal", "otter", "capybara", "bean", "cloud", "pebble", "persian"] as const;   // D89b：海豹、海獭、水豚（仓库主人点名）；D101：长毛猫
 export type AvatarForm = (typeof AVATAR_FORMS)[number];
 export const SUITCASE_STYLES = ["sand", "ink", "canvas", "trunk"] as const;
 export type SuitcaseStyle = (typeof SUITCASE_STYLES)[number];

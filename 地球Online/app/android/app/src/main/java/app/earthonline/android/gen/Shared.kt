@@ -7,7 +7,7 @@ import androidx.compose.ui.unit.sp
 
 object Shared {
     const val SCHEMA_VERSION = "0.3"
-    val AVATAR_FORMS = listOf("human", "fox", "cat", "shiba", "bear", "rabbit", "penguin", "panda", "duck", "seal", "otter", "capybara", "bean", "cloud", "pebble")
+    val AVATAR_FORMS = listOf("human", "fox", "cat", "shiba", "bear", "rabbit", "penguin", "panda", "duck", "seal", "otter", "capybara", "bean", "cloud", "pebble", "persian")
     val SUITCASE_STYLES = listOf("sand", "ink", "canvas", "trunk")
     /** 状态型消息的频道与重放顺序（shared/spec/channels.ts） */
     val REPLAY_ORDER = listOf("palette", "sky", "post", "avatar", "trips", "home", "footprints", "insets", "layout", "mode", "view", "camera", "pick")
@@ -134,7 +134,7 @@ object Tokens {
     /** 捏人面板的色块，下标就是 Avatar 里存的数 */
     val SkinColors = listOf(Color(0xFFF8D2BA), Color(0xFFECBEA0), Color(0xFFCE9C78), Color(0xFF96684C))
     val HairColors = listOf(Color(0xFF422A22), Color(0xFF1E1A1E), Color(0xFF8C5C3A), Color(0xFFCEA062), Color(0xFF683A52))
-    val DressColors = listOf(Color(0xFFDAA856), Color(0xFF4A5FB0), Color(0xFFEEE8DC), Color(0xFF86A08A), Color(0xFFD48490), Color(0xFF3A4260))
+    val DressColors = listOf(Color(0xFFDAA856), Color(0xFF4A5FB0), Color(0xFFEEE8DC), Color(0xFF86A08A), Color(0xFFD48490), Color(0xFF3A4260), Color(0xFFCC9C70))
     val HatColors = listOf(Color(0xFFF2ECE0), Color(0xFF4A5FB0), Color(0xFFE2AC46), Color(0xFF3A4260))
     val ShoesColors = listOf(Color(0xFF70503E), Color(0xFF303240), Color(0xFFECE6DA), Color(0xFF883E48))
     val SpaceBg = mapOf("day" to Color(0xFF9CB4F0), "dusk" to Color(0xFF6A5A9E), "night" to Color(0xFF141A4A))
