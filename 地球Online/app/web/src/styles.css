@@ -145,6 +145,15 @@ h1,h2,h3{margin:0;line-height:1.2} .muted{color:var(--ink-2)} .tiny{font-size:va
 .glabel{position:absolute;left:0;top:0;display:flex;align-items:center;gap:6px;white-space:nowrap;pointer-events:auto;border:none;font:inherit;color:#1d2842;background:rgba(255,255,255,.9);border-radius:999px;padding:5px 10px;font-size:var(--t-caption-size);box-shadow:0 6px 16px rgba(20,40,70,.18)}
 .glabel .dot{width:10px;height:10px;border-radius:50%;display:inline-block;box-shadow:0 0 0 2px #fff}
 .glabel.gl-book{flex-direction:row;gap:8px;padding:8px 12px;border-radius:14px;cursor:pointer;font-size:var(--t-sub-size)} .glabel.gl-book small{color:#5b6782} .glabel.gl-book em{font-style:normal;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:2px 7px;font-size:var(--t-caption-size);font-weight:600} .glabel.gl-book em.live{background:var(--gold-soft);color:var(--gold-ink)}
+/* D103：地球上书的小旗（已结束红、要出发 / 计划中蓝、旅行中金 + 呼吸圈）与点开的小卡；屏幕上固定大小 */
+.glabel.gl-bookflag{background:none!important;box-shadow:none;padding:0!important;border-radius:0;cursor:pointer;filter:drop-shadow(0 2px 3px rgba(20,40,70,.28))}
+.glabel.gl-bookflag .fl{fill:#4a78d8} .glabel.gl-bookflag.f-done .fl{fill:#e0554d} .glabel.gl-bookflag.f-live .fl{fill:var(--gold,#f0b43c)}
+.glabel.gl-bookflag.f-live::after{content:"";position:absolute;left:-6px;bottom:-5px;width:18px;height:10px;border-radius:50%;border:2px solid var(--gold,#f0b43c);animation:flagPulse 1.6s ease-out infinite}
+@keyframes flagPulse{from{opacity:.9;transform:scale(.6)}to{opacity:0;transform:scale(1.8)}}
+@media (prefers-reduced-motion:reduce){.glabel.gl-bookflag.f-live::after{animation:none;opacity:.6}}
+.glabel.gl-bookcard{flex-direction:column;align-items:flex-start;gap:3px;padding:10px 14px;border-radius:14px;cursor:pointer;font-size:var(--t-sub-size);white-space:nowrap}
+.glabel.gl-bookcard em{font-style:normal;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:2px 7px;font-size:var(--t-caption-size);font-weight:600} .glabel.gl-bookcard em.live{background:var(--gold-soft);color:var(--gold-ink)} .glabel.gl-bookcard em.done{background:rgba(224,85,77,.12);color:#b8352e}
+.glabel.gl-bookcard small{color:#5b6782;font-size:var(--t-caption-size)}
 .glabel.gl-day{cursor:pointer} .glabel.gl-day b{margin-right:2px}
 .glabel .n{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;color:#fff;font-size:var(--t-caption-size);font-weight:600}
 .glabel.gl-stop.hotel,.glabel.gl-stop.airport,.glabel.gl-stop.port{background:#1d2842;color:#fff}

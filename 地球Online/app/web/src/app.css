@@ -125,6 +125,10 @@ html[data-shape="triple"] .sheet header{margin-top:4px}
 .glabel.gl-book em.live{color:var(--c-dawnInk)!important} .glabel.gl-book em.soon{color:var(--c-lake)!important}
 .glabel.gl-day b{color:var(--c-lake);font-weight:600}
 .glabel.gl-home{background:rgba(30,38,64,.82)!important;color:#fff!important}
+/* D103：书的小旗不要标签的毛玻璃底；点开的小卡圆角大一点、上下留白 */
+.glabel.gl-bookflag{background:none!important;-webkit-backdrop-filter:none;backdrop-filter:none;padding:0!important;border-radius:0!important}
+.glabel.gl-bookcard{padding:8px 12px!important;border-radius:12px!important;gap:3px} .glabel.gl-bookcard b{font-weight:600}
+.glabel.gl-bookcard em{font-style:normal;background:none!important;padding:0!important;color:var(--c-lake)!important} .glabel.gl-bookcard em.live{color:var(--c-dawnInk)!important} .glabel.gl-bookcard em.done{color:#c0453d!important}
 .glabel.gl-flag.many{background:var(--c-dawn)!important;color:#3b2a00!important}
 .glabel.gl-leg{background:rgba(30,38,64,.7)!important;color:#fff!important}
 

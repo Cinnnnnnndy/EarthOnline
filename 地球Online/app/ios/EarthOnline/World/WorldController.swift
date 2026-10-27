@@ -187,6 +187,10 @@ final class WorldController: ObservableObject {
         w.scrollView.backgroundColor = .clear
         w.scrollView.isScrollEnabled = false
         w.scrollView.bounces = false
+        // D103：整页不许双指缩放——缩放交给地球自己（相机拉近），否则标签被放大、画布被拉糊
+        w.scrollView.minimumZoomScale = 1
+        w.scrollView.maximumZoomScale = 1
+        w.scrollView.pinchGestureRecognizer?.isEnabled = false
         w.scrollView.contentInsetAdjustmentBehavior = .never
         w.allowsLinkPreview = false
         w.allowsBackForwardNavigationGestures = false

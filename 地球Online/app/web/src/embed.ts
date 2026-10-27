@@ -9,7 +9,7 @@ import { dayScene } from "./world-instance.ts";
 import { mountBackdrop, type Backdrop } from "./backdrop.ts";
 import { importRoutePage } from "../../shared/import/route-page.ts";
 import { isShellMessage, type NativeToWorld, type WorldToNative, type ShellToEmbed, type EmbedToShell } from "../../shared/spec/bridge.ts";
-import type { Palette, Trip } from "../../shared/spec/types.ts";
+import type { Avatar, Palette, Trip } from "../../shared/spec/types.ts";
 import { applyTokens, platform } from "./shape.ts";
 import { cssVars, SPACE_BG } from "../../shared/world/tokens.ts";
 import { getLocale } from "../../shared/i18n/index.ts";
@@ -70,6 +70,7 @@ world?.on(post);
 let globe: GlobeView | null = null; let globeBd: Backdrop | null = null; let phase: "day" | "dusk" | "night" = "night";
 let trips: Trip[] = [];
 /** 最近一次 show-day：长图把世界层借去逐天渲染，渲染完要把这一天建回来 */
+let lastAvatar: Avatar | null = null;
 let lastShowDay: Extract<ShellToEmbed, { kind: "show-day" }> | null = null;
 let exporting = false;
 function ensureGlobe(): GlobeView {
@@ -81,7 +82,7 @@ function ensureGlobe(): GlobeView {
     planted: (ids) => post({ kind: "flags-planted", ids }),
     moved: (c) => { globeBd?.parallax(Math.sin((c.lng * Math.PI) / 180) * 0.8, Math.max(-1, Math.min(1, c.lat / 60))); const d = g.screenDisk(); globeBd?.orbit(d.x, d.y, d.r, -c.lng * 0.2); },
   });
-  g.setPhase(phase); globe = g; return g;
+  g.setPhase(phase); if (lastAvatar) g.setAvatar(lastAvatar); globe = g; return g;
 }
 function show(which: "globe" | "day" | "suitcase") {
   globeHost.hidden = which !== "globe"; worldHost.hidden = which !== "day"; caseHost.hidden = which !== "suitcase";
@@ -199,6 +200,8 @@ function cardThumb(im: HTMLImageElement): string | undefined {
 function send(msg: string | NativeToWorld | ShellToEmbed) {
   const m = typeof msg === "string" ? (JSON.parse(msg) as NativeToWorld | ShellToEmbed) : msg;
   if (isShellMessage(m)) handleShell(m); else world?.send(m as NativeToWorld);
+  // D103：地球上也站着自己（家门口 / 旅行中的今天），所以形象也要给地球一份；地球还没建时先记着
+  if (m.kind === "set-avatar") { lastAvatar = m.avatar; globe?.setAvatar(m.avatar); }
 }
 
 window.EarthWorld = {

@@ -4,6 +4,7 @@ import { SCHEMA_VERSION } from "../../shared/spec/types.ts";
 import { migrateTrip } from "../../shared/spec/migrate.ts";
 import { validateTrip } from "../../shared/spec/validate.ts";
 import { DEFAULT_AVATAR } from "../../shared/world/hero.ts";
+import { AVATAR_PRESETS, applyPreset } from "../../shared/world/avatar-presets.ts";   // D103：第一次打开默认是「小王」
 import { hashString } from "../../shared/algo/prng.ts";
 import sample from "../../shared/golden/trips/kansai-7d.v0.1.json";
 import { importRoutePage } from "../../shared/import/route-page.ts";
@@ -34,7 +35,7 @@ class Store {
     if (!s) trips.push(migrateTrip(sample));
     const settings: Settings = { palette: "sea", post: "high", theme: "auto", lang: "auto", ...(s?.settings ?? {}) };
     setLocale(pickLocale(settings.lang));                     // 界面语言先定下来：下面小人的默认名字、以后生成的标题都按它写
-    return { trips, avatar: { ...DEFAULT_AVATAR, name: t("avatar.defaultName"), ...(s?.avatar ?? {}) }, settings, flags: { ...(s?.flags ?? {}) },
+    return { trips, avatar: s?.avatar ? { ...DEFAULT_AVATAR, name: t("avatar.defaultName"), ...(s.avatar as Partial<Avatar>) } : applyPreset(DEFAULT_AVATAR, AVATAR_PRESETS[0]), settings, flags: { ...(s?.flags ?? {}) },
       home: s?.home ?? null, pins: Array.isArray(s?.pins) ? s!.pins! : [], planted: Array.isArray(s?.planted) ? s!.planted! : [],
       entitlement: s?.entitlement && typeof s.entitlement === "object" ? s.entitlement : { plan: "free" }, usage: s?.usage && typeof s.usage === "object" ? s.usage : { month: "", aiPlans: 0 } };
   }

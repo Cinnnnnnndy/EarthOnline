@@ -8,6 +8,7 @@ import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment
 import { loadGlobeGeo, loadLand10, type Ring } from "../geo/topo.ts";
 import { paintEarth, paintClouds } from "./earth-texture.ts";
 import { Hero, DEFAULT_AVATAR, type Outfit } from "./hero.ts";
+import { makeCharacter, formOf, type Character } from "./character.ts";
 import type { Avatar } from "../spec/types.ts";
 import { greatCircle, haversineKm, type LatLng } from "../algo/geo.ts";
 import { clusterFlags, type FlagCluster, type HomePlace } from "../algo/footprints.ts";
@@ -19,12 +20,14 @@ export type StopKind = "hotel" | "airport" | "port" | "sight";
 export interface GlobeLeg { mode: string; coords: LatLng[]; label?: string }
 export interface GlobeStop { name: string; lat: number; lng: number; kind: StopKind; n: string }
 export interface GlobeDay { index: number; label: string; title: string; color: string; legs: GlobeLeg[]; stops: GlobeStop[]; center: LatLng; radiusKm: number }
-export interface GlobeBook { id: string; title: string; subtitle: string; badge?: string; badgeKind?: "live" | "soon" | "done" | "plan"; center: LatLng; radiusKm: number; color: string; days: GlobeDay[]; heroAt?: LatLng }
+export interface GlobeBook { id: string; title: string; subtitle: string; dates?: string; badge?: string; badgeKind?: "live" | "soon" | "done" | "plan"; center: LatLng; radiusKm: number; color: string; days: GlobeDay[]; heroAt?: LatLng }
 export interface CamState { lat: number; lng: number; alt: number; tilt: number; heading: number }
 export interface GlobeEvents { pickBook?: (id: string) => void; pickDay?: (bookId: string, dayIdx: number) => void; moved?: (s: CamState) => void; planted?: (ids: string[]) => void }
 export interface GlobeFlag { id: string; name: string; lat: number; lng: number }
 
 const R = 1; const D2R = Math.PI / 180;
+/** 地球上书的小旗（D103）：一根旗杆 + 三角旗面，颜色由 CSS（.gl-bookflag.f-done / f-soon / f-live）给 */
+const FLAG_SVG = `<svg width="22" height="28" viewBox="0 0 22 28" aria-hidden="true"><path d="M3 2v25" stroke="#1d2842" stroke-width="2" stroke-linecap="round"/><path class="fl" d="M4 3h14l-4 5 4 5H4z"/><circle cx="3" cy="26.5" r="1.8" fill="#1d2842"/></svg>`;
 export function ll2v(lat: number, lng: number, r = R): THREE.Vector3 {
   const phi = (90 - lat) * D2R, th = (lng + 180) * D2R;
   return new THREE.Vector3(-r * Math.sin(phi) * Math.cos(th), r * Math.cos(phi), r * Math.sin(phi) * Math.sin(th));
@@ -44,7 +47,11 @@ export class GlobeView {
   private overlay = new THREE.Group(); private labelsEl: HTMLElement; private labels: Label[] = []; private atmoMat!: THREE.ShaderMaterial; private rimMat!: THREE.ShaderMaterial; private cloudShadow!: THREE.Mesh; private backGlow!: THREE.Sprite;
   private key!: THREE.DirectionalLight; private rimLight!: THREE.DirectionalLight; private hemi!: THREE.HemisphereLight;
   private books: GlobeBook[] = []; private focus: { book?: string; day?: number } = {};
-  private hero: Hero; private heroAt: LatLng | null = null;
+  private hero: Character; private heroForm = "human"; private heroAt: LatLng | null = null; private heroAtHome = false;
+  /** 首页点开了哪本书的旗（D103）：再点一次旗或点卡片就翻开 */
+  private openFlag: string | null = null;
+  /** 手机上先用 2048 的地图，第一次拉近时换成 4096（D103） */
+  private earthBig = false; private earthGeo: Awaited<ReturnType<typeof loadGlobeGeo>> | null = null; private upgrading = false;
   cam: CamState = { lat: 30, lng: 60, alt: 2.4, tilt: 0, heading: 0 };
   private anim: { from: CamState; to: CamState; t: number; dur: number; hop: number; ease: (t: number) => number; done?: () => void } | null = null;
   private vel = { lat: 0, lng: 0 }; private dragging = false; private idle = 0; private active = true; private raf = 0; private last = 0;
@@ -70,7 +77,7 @@ export class GlobeView {
     const rim = new THREE.DirectionalLight(0xdcd2ff, 0.7); rim.position.set(3, -0.5, -2); this.camera.add(rim); rim.target.position.set(0, 0, -5); this.camera.add(rim.target); this.rimLight = rim;
     this.hemi = new THREE.HemisphereLight(0xeef4ff, 0x9a92c4, 0.75); this.scene.add(this.hemi);
     this.buildEarth();
-    this.hero = new Hero(base + "assets/hero_face.png", 1); this.hero.beforeShow = (o) => this.renderer.compileAsync(o, this.camera, this.scene); this.hero.group.visible = false; this.root.add(this.hero.group);
+    this.hero = this.makeHero(DEFAULT_AVATAR);
     this.ro = new ResizeObserver(() => this.resize()); this.ro.observe(host); this.resize();
     this.bindInput(); this.raf = requestAnimationFrame(this.frame);
   }
@@ -81,9 +88,7 @@ export class GlobeView {
     loadGlobeGeo(this.base).then((g) => {
       // 手机（触屏）上用 2048×1024：整颗地球在屏幕上也就一千来像素宽，四分之一的像素量让三张贴图上传与生成 mipmap 快得多；拉近时有 detailPatch 补细节
       const big = !(typeof navigator !== "undefined" && navigator.maxTouchPoints > 0);
-      const { color, rough, bump } = paintEarth(g.land50!, { width: big ? 4096 : 2048, height: big ? 2048 : 1024, borders: g.borders50, shelf: 0.5 });
-      const tex = new THREE.CanvasTexture(color); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
-      mat.map = tex; mat.roughnessMap = new THREE.CanvasTexture(rough); mat.bumpMap = new THREE.CanvasTexture(bump); mat.bumpScale = 0.8; mat.color.set(0xffffff); mat.roughness = 1; mat.needsUpdate = true;
+      this.earthGeo = g; this.paintEarthTex(big);
     }).catch((e) => console.warn("地球贴图加载失败", e));
     // 云 + 云影（同一张云图，影子层贴在地表、朝背光方向偏一点）
     const ct = new THREE.CanvasTexture(paintClouds()); ct.colorSpace = THREE.SRGBColorSpace;
@@ -103,18 +108,21 @@ export class GlobeView {
           float tca = -dot(ro, rd); float b2 = dot(ro, ro) - tca * tca; if (b2 > Ra * Ra) discard;
           float dA = sqrt(max(Ra * Ra - b2, 0.0)); float t0 = max(0.0, tca - dA); float t1 = tca + dA;
           bool hit = b2 < Rp * Rp; if (hit) t1 = tca - sqrt(max(Rp * Rp - b2, 0.0)); if (t1 <= t0) discard;
-          float ds = (t1 - t0) / 16.0; float od = 0.0; vec3 acc = vec3(0.0);
-          for (int i = 0; i < 16; i++) {
-            vec3 p = ro + rd * (t0 + ds * (float(i) + 0.5)); float r = length(p);
+          float ds = (t1 - t0) / 32.0; float od = 0.0; vec3 acc = vec3(0.0);
+          float jit = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453);   // 每个像素错开采样位置：32 步之间不出一圈圈的台阶
+          for (int i = 0; i < 32; i++) {
+            vec3 p = ro + rd * (t0 + ds * (float(i) + jit)); float r = length(p);
             float dens = exp(-max(r - Rp, 0.0) / H); float mu = dot(p / r, sunDir);
             float lit = smoothstep(-0.45, 0.6, mu); vec3 c = mix(cNight, mix(cEdge, cDay, smoothstep(0.2, 0.9, mu)), lit);
             acc += c * dens * ds; od += dens * ds;
           }
-          float a = 1.0 - exp(-od * k * (hit ? diskK : 1.0));
+          // D103：地球盘面内外的浓度系数原来在边缘一刀切（hit ? diskK : 1），边上一圈硬硬的紫边；改成跨边缘平滑过渡
+          float a = 1.0 - exp(-od * k * mix(diskK, 1.0, smoothstep(Rp * 0.97, Rp * 1.005, sqrt(b2))));
           vec3 col = acc / max(od, 1e-5);
           // 迎光的一侧边缘加一道细亮线
-          float edge = hit ? 0.0 : smoothstep(Rp * 1.03, Rp, sqrt(b2)) * smoothstep(-0.2, 0.7, dot(normalize(ro + rd * tca), sunDir));
-          gl_FragColor = vec4(mix(col, vec3(1.0), edge * 0.6), clamp(a + edge * 0.25, 0.0, 1.0) * fade);
+          float edge = smoothstep(Rp * 1.06, Rp, sqrt(b2)) * smoothstep(Rp * 0.96, Rp, sqrt(b2)) * smoothstep(-0.2, 0.7, dot(normalize(ro + rd * tca), sunDir));
+          float dither = (jit - 0.5) / 255.0;   // 8 位颜色的色带打散
+          gl_FragColor = vec4(mix(col, vec3(1.0), edge * 0.35) + dither, clamp(a + edge * 0.12 + dither, 0.0, 1.0) * fade);
         }`,
     });
     const atmo = new THREE.Mesh(new THREE.SphereGeometry(R * 1.085, 128, 96), this.atmoMat); atmo.renderOrder = 2; this.root.add(atmo);
@@ -125,8 +133,9 @@ export class GlobeView {
       fragmentShader: "uniform vec3 c; uniform float k; varying vec3 vN; varying vec3 vV; void main(){ float f = pow(1.0 - max(0.0, dot(vN, vV)), 4.0); gl_FragColor = vec4(c, f * 0.35 * k); }" });
     this.rimMat = rimM; this.root.add(new THREE.Mesh(new THREE.SphereGeometry(R * 1.003, 96, 64), rimM));
     // 背后一团柔光：让地球「浮」在插画天空里
-    const gc = document.createElement("canvas"); gc.width = gc.height = 256; const gx = gc.getContext("2d")!; const gg = gx.createRadialGradient(128, 128, 0, 128, 128, 128);
-    gg.addColorStop(0, "rgba(200,212,255,0.55)"); gg.addColorStop(0.32, "rgba(150,170,250,0.42)"); gg.addColorStop(0.46, "rgba(120,140,230,0.22)"); gg.addColorStop(0.7, "rgba(90,110,210,0.08)"); gg.addColorStop(1, "rgba(90,110,210,0)"); gx.fillStyle = gg; gx.fillRect(0, 0, 256, 256);
+    const gc = document.createElement("canvas"); gc.width = gc.height = 512; const gx = gc.getContext("2d", { willReadFrequently: true })!; const gg = gx.createRadialGradient(256, 256, 0, 256, 256, 256);
+    gg.addColorStop(0, "rgba(200,212,255,0.55)"); gg.addColorStop(0.32, "rgba(150,170,250,0.42)"); gg.addColorStop(0.46, "rgba(120,140,230,0.22)"); gg.addColorStop(0.7, "rgba(90,110,210,0.08)"); gg.addColorStop(1, "rgba(90,110,210,0)"); gx.fillStyle = gg; gx.fillRect(0, 0, 512, 512);
+    { const im = gx.getImageData(0, 0, 512, 512); const d = im.data; for (let i = 0; i < d.length; i += 4) { const n = Math.random() * 2 - 1; d[i] += n; d[i + 1] += n; d[i + 2] += n; d[i + 3] = Math.max(0, d[i + 3] + n * 1.5); } gx.putImageData(im, 0, 0); }   // 抖一点，柔光不出一圈圈的色带（D103）
     const gt = new THREE.CanvasTexture(gc); gt.colorSpace = THREE.SRGBColorSpace;
     this.backGlow = new THREE.Sprite(new THREE.SpriteMaterial({ map: gt, transparent: true, depthWrite: false })); this.backGlow.scale.setScalar(3.4); this.backGlow.renderOrder = -1; this.root.add(this.backGlow);
   }
@@ -171,7 +180,24 @@ export class GlobeView {
 
   // ---------------- 数据
   setBooks(books: GlobeBook[]) { this.books = books; this.rebuildOverlay(); }
-  setAvatar(a: Avatar, outfit?: Outfit) { this.hero.setAvatar(a, outfit); }
+  /** 地图贴图：手机先画 2048（快），第一次拉近时再画 4096（清楚）；电脑上直接 4096 */
+  private paintEarthTex(big: boolean) {
+    const g = this.earthGeo; if (!g) return; const mat = this.earth.material as THREE.MeshStandardMaterial;
+    const { color, rough, bump } = paintEarth(g.land50!, { width: big ? 4096 : 2048, height: big ? 2048 : 1024, borders: g.borders50, shelf: 0.5 });
+    const tex = new THREE.CanvasTexture(color); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = this.renderer.capabilities.getMaxAnisotropy();
+    const old = [mat.map, mat.roughnessMap, mat.bumpMap];
+    mat.map = tex; mat.roughnessMap = new THREE.CanvasTexture(rough); mat.bumpMap = new THREE.CanvasTexture(bump); mat.bumpScale = 0.8; mat.color.set(0xffffff); mat.roughness = 1; mat.needsUpdate = true;
+    for (const t of old) t?.dispose(); this.earthBig = big;
+  }
+  /** 小人或 Q 版形态（D103：地球上也按捏人面板的形态，福贵是长毛猫就站一只猫） */
+  private makeHero(a: Avatar): Character {
+    const c = makeCharacter(a, this.base + "assets/hero_face.png", 1); c.beforeShow = (o) => this.renderer.compileAsync(o, this.camera, this.scene);
+    c.group.visible = false; this.root.add(c.group); this.heroForm = formOf(a); return c;
+  }
+  setAvatar(a: Avatar, outfit?: Outfit) {
+    if (formOf(a) !== this.heroForm) { const vis = this.hero.group.visible; this.root.remove(this.hero.group); this.hero = this.makeHero(a); this.hero.group.visible = vis; }
+    this.hero.setAvatar(a, outfit);
+  }
   /** 足迹：fresh 里的是还没「插」过的，出现时播插旗动画，播完回调 planted 记下来 */
   setFootprints(list: GlobeFlag[], fresh: Iterable<string> = []) { this.fpData = list; this.fpFresh = new Set(fresh); this.flagBucket = NaN; }
   setHome(h: HomePlace | null) { this.home = h; this.rebuildOverlay(); }
@@ -193,7 +219,7 @@ export class GlobeView {
   /** 现在是不是「整颗地球」的取景（转屏、折叠屏展开收起时据此重算高度，D102） */
   private homeFit = false;
   focusBook(id: string, animate = true, done?: () => void) {
-    this.homeFit = false;
+    this.homeFit = false; this.openFlag = null;
     const b = this.books.find((x) => x.id === id); if (!b) return; this.focus = { book: id }; this.rebuildOverlay(); this.detailPatch(b);
     this.flyTo({ lat: b.center[0] - 1, lng: b.center[1], alt: altFor(b.radiusKm, this.fitFov()) * 1.05, tilt: 18, heading: 0 }, animate ? 2400 : 0, done);
   }
@@ -250,11 +276,14 @@ export class GlobeView {
       const focused = b === focusBook;
       if (!focusBook) {
         // 首页：每本书一个标记 + 卡片
-        const p = ll2v(b.center[0], b.center[1], R * 1.002);
-        const pin = new THREE.Mesh(stopGeo, new THREE.MeshStandardMaterial({ color: new THREE.Color(b.color), emissive: new THREE.Color(b.color), emissiveIntensity: 0.35, roughness: 0.3 }));
-        pin.position.copy(p); pin.userData = { book: b.id, px: 7 }; this.overlay.add(pin); this.stopMeshes.push(pin);
+        // D103：首页不再常驻书名标签，每本书一面小旗——已结束红、要出发 / 计划中蓝、旅行中金色（带一圈呼吸）；
+        // 点旗弹一张小卡（书名、状态、日期），再点旗或点卡片翻开这本书。旗与卡片都是屏幕上固定大小的 HTML，拉近不会变大
         for (const d of b.days) for (const leg of d.legs) this.line(this.legPoints(leg), b.color, 2, leg.mode === "flight" || leg.mode === "ship", 0.75);
-        this.addLabel(`book-${b.id}`, `<b>${esc(b.title)}</b>${b.badge ? `<em class="${b.badgeKind ?? ""}">${esc(b.badge)}</em>` : ""}`, ll2v(b.center[0], b.center[1], R * 1.01), "book", 0, () => this.ev.pickBook?.(b.id));
+        const kind = b.badgeKind === "done" ? "f-done" : b.badgeKind === "live" ? "f-live" : "f-soon";   // 不叫 done / live：全局已有同名样式
+        const at = ll2v(b.center[0], b.center[1], R * 1.003); const open = this.openFlag === b.id;
+        this.addLabel(`flag-${b.id}`, FLAG_SVG, at, `bookflag ${kind}`, 0, () => { if (this.openFlag === b.id) this.ev.pickBook?.(b.id); else { this.openFlag = b.id; this.rebuildOverlay(); } });
+        const flagLabel = this.labels[this.labels.length - 1]; flagLabel.el.setAttribute("aria-label", `${b.title}${b.badge ? `，${b.badge}` : ""}`);
+        if (open) this.addLabel(`card-${b.id}`, `<b>${esc(b.title)}</b>${b.badge ? `<em class="${b.badgeKind ?? ""}">${esc(b.badge)}</em>` : ""}${b.dates ? `<small>${esc(b.dates)}</small>` : ""}`, at, "bookcard", -2, () => this.ev.pickBook?.(b.id));
         continue;
       }
       if (!focused) continue;
@@ -290,7 +319,10 @@ export class GlobeView {
     }
     this.marks.visible = this.focus.day === undefined; this.flagEl.hidden = this.focus.day !== undefined;
     // 小人：站在「今天」或这一天的起点
-    const here = focusBook ? (this.focus.day !== undefined ? [focusBook.days[this.focus.day].stops[0]?.lat, focusBook.days[this.focus.day].stops[0]?.lng] as LatLng : focusBook.heroAt ?? focusBook.center) : this.books.find((b) => b.heroAt)?.heroAt ?? null;
+    // 首页：旅行中站在这趟的「今天」；不在旅行里、放了家，就站在家门口（D103：放好家默认就看得到自己）
+    const live = this.books.find((b) => b.badgeKind === "live" && b.heroAt);
+    const here = focusBook ? (this.focus.day !== undefined ? [focusBook.days[this.focus.day].stops[0]?.lat, focusBook.days[this.focus.day].stops[0]?.lng] as LatLng : focusBook.heroAt ?? focusBook.center) : live?.heroAt ?? (this.home ? [this.home.lat, this.home.lng] as LatLng : null);
+    this.heroAtHome = !focusBook && !live && !!this.home;
     this.heroAt = here && Number.isFinite(here[0]) ? here : null; this.hero.group.visible = !!this.heroAt;
 
   }
@@ -335,7 +367,8 @@ export class GlobeView {
     const r = this.renderer.domElement.getBoundingClientRect(); const v = new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
     const rc = new THREE.Raycaster(); rc.setFromCamera(v, this.camera); rc.params.Mesh = {};
     if (this.pickCb) { const h = rc.intersectObject(this.earth, false)[0]; if (h) { const n = h.point.clone().normalize(); const lat = 90 - Math.acos(Math.max(-1, Math.min(1, n.y))) / D2R; const lng = wrap(Math.atan2(n.z, -n.x) / D2R - 180); const cb = this.pickCb; this.pickPoint(null); cb(lat, lng); } return; }
-    const hit = rc.intersectObjects(this.stopMeshes, false)[0]; if (hit?.object.userData.book) this.ev.pickBook?.(hit.object.userData.book as string);
+    const hit = rc.intersectObjects(this.stopMeshes, false)[0]; if (hit?.object.userData.book) { this.ev.pickBook?.(hit.object.userData.book as string); return; }
+    if (this.openFlag) { this.openFlag = null; this.rebuildOverlay(); }   // 点地球空白处收起小卡
   }
   setActive(on: boolean) { this.active = on; if (on) { this.last = performance.now(); this.resize(); } }
   /** 被界面挡住的部分（底部抽屉的高度 / 左页的宽度）：把投影中心挪到露出来的那块的中间 */
@@ -397,16 +430,23 @@ export class GlobeView {
     // 站点小球：保持屏幕上的像素大小
     const pxWorld = (p: THREE.Vector3) => (this.camera.position.distanceTo(p) * Math.tan((this.camera.fov * D2R) / 2) * 2) / this.h;
     for (const m of this.stopMeshes) m.scale.setScalar(pxWorld(m.position) * (m.userData.px as number));
+    if (!this.earthBig && this.earthGeo && !this.upgrading && this.cam.alt < 1.2) { this.upgrading = true; setTimeout(() => this.paintEarthTex(true), 50); }   // 拉近了：换高清地图（只换一次）
     this.updateMarks(now / 1000, pxWorld); this.viewPatch();
     // 小人：站在地面上，脸朝镜头，屏幕上约 110 像素高
     if (this.heroAt) {
-      const P = ll2v(this.heroAt[0], this.heroAt[1], R); const N = P.clone().normalize();
-      const size = Math.min(pxWorld(P) * Math.min(150, this.h * 0.16), 0.2); this.hero.group.scale.setScalar(size / 5.1);
+      const P = ll2v(this.heroAt[0], this.heroAt[1], R); let N = P.clone().normalize();
+      if (this.heroAtHome) {   // 站在小房子右边一点，不挡房子
+        const right = new THREE.Vector3().setFromMatrixColumn(this.camera.matrixWorld, 0); right.sub(N.clone().multiplyScalar(right.dot(N))).normalize();
+        P.addScaledVector(right, pxWorld(P) * 30).normalize().multiplyScalar(R); N = P.clone().normalize();
+      }
+      const size = Math.min(pxWorld(P) * Math.min(this.heroAtHome ? 70 : 150, this.h * (this.heroAtHome ? 0.09 : 0.16)), 0.2); this.hero.group.scale.setScalar(size / 5.1);
       this.hero.group.position.copy(P);
       const qUp = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), N);
       const toCam = this.camera.position.clone().sub(P); toCam.sub(N.clone().multiplyScalar(toCam.dot(N))); const local = toCam.applyQuaternion(qUp.clone().invert());
       const qYaw = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.atan2(local.x, local.z));
-      this.hero.group.quaternion.copy(qUp).multiply(qYaw); this.hero.update(dt, 0);
+      this.hero.group.quaternion.copy(qUp).multiply(qYaw);
+      if (this.heroAtHome) this.hero.group.quaternion.copy(this.camera.quaternion);   // 家门口的自己：像立着的小摆件，正脸朝镜头（远看地球时不至于只看到头顶）
+      this.hero.update(dt, 0);
       const vis = N.dot(this.camera.position.clone().normalize()) > 0.15; this.hero.group.visible = vis;
     }
     this.renderer.render(this.scene, this.camera);
@@ -424,6 +464,8 @@ export class GlobeView {
       if (!facing || v.z > 1 || x < -60 || x > this.w + 60 || y < -40 || y > this.h + 40) { l.el.style.display = "none"; continue; }
       if (!l.w) { l.el.style.display = ""; l.w = l.el.offsetWidth; l.h = l.el.offsetHeight; }
       const w = l.w, h = l.h; let lx = x - w / 2, ly = y - h - 8;
+      if (l.kind.startsWith("bookflag")) { lx = x - 3; ly = y - h + 2; l.el.style.display = ""; l.el.style.transform = `translate(${Math.round(lx)}px, ${Math.round(ly)}px)`; placed.push({ x: lx, y: ly, w, h }); continue; }   // 旗杆脚踩在点上，旗永远显示
+      if (l.kind === "bookcard") { ly = y - h - 36; lx = Math.max(8, Math.min(this.w - w - 8, lx)); ly = Math.max(8, ly); l.el.style.display = ""; l.el.style.transform = `translate(${Math.round(lx)}px, ${Math.round(ly)}px)`; placed.push({ x: lx, y: ly, w, h }); continue; }
       const hit = placed.find((r) => lx < r.x + r.w + 4 && lx + w + 4 > r.x && ly < r.y + r.h + 3 && ly + h + 3 > r.y);
       if (hit) { if (l.kind === "leg" || l.kind.startsWith("stop")) { ly = hit.y - h - 4; if (placed.some((r) => lx < r.x + r.w && lx + w > r.x && ly < r.y + r.h && ly + h > r.y)) { l.el.style.display = "none"; continue; } } else if (l.kind === "book") {
         // 书签：先试着往下挪，再试往上；都不行就让它压着（书签必须看得见）

@@ -3,7 +3,7 @@ import type { Trip, PlaceEntry, TransportEntry } from "../../shared/spec/types.t
 import type { GlobeBook, GlobeDay, GlobeLeg, GlobeStop } from "../../shared/world/globe.ts";
 import { locate } from "../../shared/geo/gazetteer.ts";
 import { haversineKm, geoFrameOfDay, type LatLng } from "../../shared/algo/geo.ts";
-import { t, duration, km as fmtKm, list, plain, days as nDays } from "../../shared/i18n/index.ts";
+import { t, duration, km as fmtKm, list, plain, days as nDays, dateRange } from "../../shared/i18n/index.ts";
 import { tripStats } from "../../shared/algo/stats.ts";
 
 /** 界面只用一个强调色（靛蓝）+ 一个高亮色（金：今天 / 去过）；路线不再按天换颜色，靠「D2」这样的标签区分 */
@@ -56,5 +56,5 @@ export function tripToGlobe(trip: Trip): GlobeBook {
   const st = tripStats(trip);
   const badgeKind: GlobeBook["badgeKind"] = trip.status === "closed" ? "done" : ti >= 0 ? "live" : trip.startDate > today() ? "soon" : "plan";
   const badge = trip.status === "closed" ? t("globe.badgeDone") : ti >= 0 ? t("globe.badgeLive", { n: trip.days[ti].index }) : trip.startDate > today() ? t("globe.badgeSoon", { n: Math.ceil((+new Date(trip.startDate) - +new Date(today())) / 864e5) }) : t("globe.badgePlan");
-  return { id: trip.id, title: plain(trip.title), subtitle: nDays(st.days), badge, center, radiusKm, color: accent(), badgeKind, days, heroAt };
+  return { id: trip.id, title: plain(trip.title), subtitle: nDays(st.days), dates: dateRange(trip.startDate, trip.endDate), badge, center, radiusKm, color: accent(), badgeKind, days, heroAt };
 }

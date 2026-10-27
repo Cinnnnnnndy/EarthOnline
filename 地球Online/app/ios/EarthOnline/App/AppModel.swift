@@ -132,6 +132,12 @@ final class AppModel: ObservableObject {
         }
         guard !store.samplesInstalled else { return }
         store.installSamples(trips)
+        // D103：第一次打开、还没捏过人时，默认形象是「小王」（放好家后她就站在家门口）
+        if store.avatar == Avatar(), let p = AvatarPreset.all.first {
+            let a = p.applied(to: store.avatar)
+            store.setAvatar(a)
+            world.send(WorldMsg.SetAvatar(avatar: a))
+        }
         pushWorldState(animate: true)
     }
 
