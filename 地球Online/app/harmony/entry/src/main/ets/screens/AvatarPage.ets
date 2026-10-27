@@ -1,4 +1,5 @@
 import { Avatar } from '../model/Spec';
+import { AVATAR_PRESETS, AvatarPreset, applyPreset } from '../model/AvatarPresets';
 import { AppModel } from '../model/AppModel';
 import { TripStore } from '../model/TripStore';
 import { SafeArea } from '../layout/LayoutState';
@@ -15,7 +16,7 @@ const DRESS: string[] = DRESS_COLORS;
 const HAT: string[] = HAT_COLORS;
 const SHOES: string[] = SHOES_COLORS;
 
-/** 捏人（网页 avatar-sheet.ts / iOS AvatarView 同一套）：名字、形态（AVATAR_FORMS）、发型、帽子、五排色块、箱子的样式。
+/** 捏人（网页 avatar-sheet.ts / iOS AvatarView 同一套）：名字、默认形象（D101）、形态（AVATAR_FORMS）、发型、帽子、五排色块、眼镜、箱子的样式。
  *  改一样就存，并发 set-avatar（世界里的小人实时变；形态由嵌入页按 form 建角色，原生不画）。 */
 @Component
 export struct AvatarPage {
@@ -45,6 +46,26 @@ export struct AvatarPage {
               onChange: (v: string) => this.apply((a: Avatar) => { a.name = v.substring(0, 12); })
             })
               .margin({ top: 8, bottom: 8 })
+          }
+          // 默认形象（D101）：点一下整套换上，下面的选项还能再细调
+          ListSection({ header: I18n.t('avatar.presets') }) {
+            Row({ space: 6 }) {
+              ForEach(AVATAR_PRESETS, (p: AvatarPreset) => {
+                Column({ space: 4 }) {
+                  Image(iconRes(p.icon)).width(22).height(22).fillColor(Theme.p().ink)
+                  Text(p.avatar.name).fontSize(FONT_SUB).maxLines(1).fontColor(Theme.p().ink)
+                }
+                .layoutWeight(1)
+                .height(TOUCH + 20)
+                .justifyContent(FlexAlign.Center)
+                .borderRadius(12)
+                .backgroundColor(Theme.p().fill)
+                .accessibilityText(p.avatar.name)
+                .onClick(() => TripStore.shared.setAvatar(applyPreset(this.avatar, p)))
+              }, (p: AvatarPreset) => p.id)
+            }
+            .width('100%')
+            .margin({ top: 8, bottom: 8 })
           }
           ListSection({ header: I18n.t('avatar.form') }) {
             Grid() {
@@ -95,6 +116,15 @@ export struct AvatarPage {
           ListSection({ header: I18n.t('avatar.dress') }) { this.Swatches(DRESS, 'dress', I18n.t('avatar.dress')) }
           ListSection({ header: I18n.t('avatar.hatColor') }) { this.Swatches(HAT, 'hatColor', I18n.t('avatar.hatColor')) }
           ListSection({ header: I18n.t('avatar.shoes') }) { this.Swatches(SHOES, 'shoes', I18n.t('avatar.shoes')) }
+          ListSection({ header: I18n.t('avatar.glasses') }) {
+            Segmented({
+              options: ['off', 'on'],
+              labels: [I18n.t('avatar.hatNone'), I18n.t('avatar.glassesOn')],
+              selected: this.avatar.glasses === true ? 'on' : 'off',
+              onPick: (v: string) => this.apply((a: Avatar) => { a.glasses = v === 'on' ? true : undefined; })
+            })
+              .margin({ top: 8, bottom: 8 })
+          }
           ListSection({ header: I18n.t('case.styleLabel') }) {
             Segmented({
               options: SUITCASE_STYLES,

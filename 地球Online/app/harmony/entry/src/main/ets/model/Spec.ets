@@ -83,6 +83,7 @@ export interface Avatar {
   name: string;
   suitcase?: string;          // SUITCASE_STYLES
   form?: string;              // AVATAR_FORMS
+  glasses?: boolean;          // 小人戴细框眼镜（D101）；没写 = 不戴
 }
 
 /** 本机偏好（不进行程数据）：theme 是「地球外的天色 / 界面深浅」，lang 缺省 = auto（跟随手机） */
