@@ -49,7 +49,7 @@ export class GlobeView {
   private books: GlobeBook[] = []; private focus: { book?: string; day?: number } = {};
   private hero: Character; private heroForm = "human"; private heroAt: LatLng | null = null; private heroAtHome = false;
   /** 首页点开了哪本书的旗（D103）：再点一次旗或点卡片就翻开 */
-  private openFlag: string | null = null;
+  private openFlag: string | null = null; private showHomeLabel = false;
   /** 手机上先用 2048 的地图，第一次拉近时换成 4096（D103） */
   private earthBig = false; private earthGeo: Awaited<ReturnType<typeof loadGlobeGeo>> | null = null; private upgrading = false;
   cam: CamState = { lat: 30, lng: 60, alt: 2.4, tilt: 0, heading: 0 };
@@ -288,7 +288,8 @@ export class GlobeView {
         // 首页：每本书一个标记 + 卡片
         // D103：首页不再常驻书名标签，每本书一面小旗——已结束红、要出发 / 计划中蓝、旅行中金色（带一圈呼吸）；
         // 点旗弹一张小卡（书名、状态、日期），再点旗或点卡片翻开这本书。旗与卡片都是屏幕上固定大小的 HTML，拉近不会变大
-        for (const d of b.days) for (const leg of d.legs) this.line(this.legPoints(leg), b.color, 2, leg.mode === "flight" || leg.mode === "ship", 0.75);
+        // D107：首页总览不画路线，一趟旅行就一面旗；点开旗的那一趟才把它的路线描出来
+        if (this.openFlag === b.id) for (const d of b.days) for (const leg of d.legs) this.line(this.legPoints(leg), b.color, 2, leg.mode === "flight" || leg.mode === "ship", 0.75);
         const kind = b.badgeKind === "done" ? "f-done" : b.badgeKind === "live" ? "f-live" : "f-soon";   // 不叫 done / live：全局已有同名样式
         const at = ll2v(b.center[0], b.center[1], R * 1.003); const open = this.openFlag === b.id;
         this.addLabel(`flag-${b.id}`, FLAG_SVG, at, `bookflag ${kind}`, 0, () => { if (this.openFlag === b.id) this.ev.pickBook?.(b.id); else { this.openFlag = b.id; this.rebuildOverlay(); } });
@@ -316,18 +317,13 @@ export class GlobeView {
     }
     // 家：小房子 + 标牌；首页再从家往每本书拉一条淡虚线弧（同一片目的地只拉一条）
     this.house.visible = !!this.home; this.homeLabel = null;
-    if (this.home) {
+    if (this.home && (focusBook || this.showHomeLabel)) {   // D107：首页不常驻「家」的牌子，点小房子才显示
       this.addLabel("home", `${icon("home", 14)}<b>${esc(t("globe.home"))}</b>${esc(this.home.name)}`, ll2v(this.home.lat, this.home.lng, R * 1.006), "home", -1);
       this.homeLabel = this.labels[this.labels.length - 1];
-      if (!focusBook) {
-        const done: LatLng[] = [];
-        for (const b of this.books) {
-          if (done.some((c) => haversineKm(c, b.center) < 400) || haversineKm([this.home.lat, this.home.lng], b.center) < 150) continue; done.push(b.center);
-          this.line(this.legPoints({ mode: "flight", coords: [[this.home.lat, this.home.lng], b.center] }), "#ffffff", 1.6, true, 0.85);
-        }
-      }
+      // D107：首页不再从家往每本书拉虚线
     }
-    this.marks.visible = this.focus.day === undefined; this.flagEl.hidden = this.focus.day !== undefined;
+    // D107：足迹小旗与「12」「3」这样的数字气泡在首页总览不显示（一趟旅行一面旗），翻开书时照旧
+    const showMarks = this.focus.day === undefined && this.focus.book !== undefined; this.marks.visible = showMarks; this.flagEl.hidden = !showMarks;
     // 小人：站在「今天」或这一天的起点
     // 首页：旅行中站在这趟的「今天」；不在旅行里、放了家，就站在家门口（D103：放好家默认就看得到自己）
     const live = this.books.find((b) => b.badgeKind === "live" && b.heroAt);
@@ -378,7 +374,8 @@ export class GlobeView {
     const rc = new THREE.Raycaster(); rc.setFromCamera(v, this.camera); rc.params.Mesh = {};
     if (this.pickCb) { const h = rc.intersectObject(this.earth, false)[0]; if (h) { const n = h.point.clone().normalize(); const lat = 90 - Math.acos(Math.max(-1, Math.min(1, n.y))) / D2R; const lng = wrap(Math.atan2(n.z, -n.x) / D2R - 180); const cb = this.pickCb; this.pickPoint(null); cb(lat, lng); } return; }
     const hit = rc.intersectObjects(this.stopMeshes, false)[0]; if (hit?.object.userData.book) { this.ev.pickBook?.(hit.object.userData.book as string); return; }
-    if (this.openFlag) { this.openFlag = null; this.rebuildOverlay(); }   // 点地球空白处收起小卡
+    if (this.home && this.house.visible && rc.intersectObject(this.house, true).length) { this.showHomeLabel = !this.showHomeLabel; this.openFlag = null; this.rebuildOverlay(); return; }   // 点小房子：显示 / 收起「家」
+    if (this.openFlag || this.showHomeLabel) { this.openFlag = null; this.showHomeLabel = false; this.rebuildOverlay(); }   // 点地球空白处收起小卡
   }
   setActive(on: boolean) { this.active = on; if (on) { this.last = performance.now(); this.resize(); } }
   /** 被界面挡住的部分（底部抽屉的高度 / 左页的宽度）：把投影中心挪到露出来的那块的中间 */
