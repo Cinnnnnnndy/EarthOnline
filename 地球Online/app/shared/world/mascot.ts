@@ -27,7 +27,7 @@ interface AnimalSpec {
   ears?: { kind: "point" | "round" | "long" | "flap"; dx: number; y: number; z?: number; s: number; tilt?: number; inner?: RGB; c?: RGB };
   muzzle?: { r: number; y: number; z: number; c: RGB; nose?: RGB; sx?: number };
   beak?: { w: number; y: number; z: number; c: RGB; flat?: boolean };
-  eyes: { dx: number; y: number; z: number; r: number; patch?: RGB };
+  eyes: { dx: number; y: number; z: number; r: number; patch?: RGB; iris?: RGB };
   cheeks?: RGB;
   legs: { n: 4 | 2; r: number; h: number; dx: number; dz: number; c?: RGB; foot?: RGB };
   arms?: { c?: RGB; flipper?: boolean };
@@ -39,6 +39,8 @@ interface AnimalSpec {
   whiskers?: RGB;
   /** 抱着 / 顶着的东西：clam 胸前一只蛤蜊（海獭），yuzu 头顶一颗柚子（水豚泡温泉的那个样子） */
   held?: "clam" | "yuzu";
+  /** 长毛（D101，长毛猫）：脖子一圈蓬松的毛领、腮帮两团绒 */
+  fluff?: { c: RGB };
 }
 const ANIMALS: Record<Exclude<MascotForm, "bean" | "cloud" | "pebble">, AnimalSpec> = {
   fox: { fur: [236, 126, 54], belly: CREAM, body: { r: 0.42, sy: 1.05, y: 0.62 }, head: { r: 0.46, y: 1.2, sy: 0.9 }, ears: { kind: "point", dx: 0.3, y: 0.3, s: 1, inner: CREAM },
@@ -47,6 +49,10 @@ const ANIMALS: Record<Exclude<MascotForm, "bean" | "cloud" | "pebble">, AnimalSp
   cat: { fur: [238, 168, 92], belly: WHITE, body: { r: 0.4, sy: 1.0, y: 0.58 }, head: { r: 0.46, y: 1.14, sx: 1.05, sy: 0.88 }, ears: { kind: "point", dx: 0.28, y: 0.3, s: 0.8, inner: PINK },
     muzzle: { r: 0.16, y: -0.12, z: 0.36, c: WHITE, nose: PINK, sx: 1.4 }, eyes: { dx: 0.17, y: 0.05, z: 0.4, r: 0.055 }, cheeks: PINK,
     legs: { n: 4, r: 0.09, h: 0.3, dx: 0.2, dz: 0.15 }, tail: { kind: "curl" } },
+  // D101：长毛猫（福贵那样的银白长毛、扁圆脸、绿眼睛）
+  persian: { fur: [236, 232, 230], belly: WHITE, body: { r: 0.44, sy: 0.92, y: 0.56 }, head: { r: 0.48, y: 1.1, sx: 1.16, sy: 0.84 }, ears: { kind: "point", dx: 0.3, y: 0.26, s: 0.58, inner: PINK },
+    muzzle: { r: 0.11, y: -0.12, z: 0.4, c: WHITE, nose: PINK, sx: 1.5 }, eyes: { dx: 0.18, y: 0.04, z: 0.4, r: 0.07, iris: [116, 196, 150] }, cheeks: PINK,
+    legs: { n: 4, r: 0.1, h: 0.22, dx: 0.21, dz: 0.15 }, tail: { kind: "bushy", tip: WHITE }, fluff: { c: [246, 244, 242] } },
   shiba: { fur: [226, 164, 92], belly: WHITE, body: { r: 0.42, sy: 1.0, y: 0.6 }, head: { r: 0.46, y: 1.16, sy: 0.9 }, ears: { kind: "point", dx: 0.27, y: 0.32, s: 0.75, inner: PINK },
     muzzle: { r: 0.2, y: -0.1, z: 0.34, c: WHITE, nose: INK, sx: 1.25 }, eyes: { dx: 0.17, y: 0.07, z: 0.4, r: 0.055 }, cheeks: [240, 170, 130],
     legs: { n: 4, r: 0.1, h: 0.32, dx: 0.22, dz: 0.16, c: WHITE }, tail: { kind: "curl", tip: WHITE } },
@@ -82,7 +88,8 @@ interface Parts { root: THREE.Group; body: THREE.Group; head: THREE.Group; legs:
 function eyesOn(head: THREE.Group, e: AnimalSpec["eyes"], out: THREE.Mesh[]) {
   for (const s of [-1, 1]) {
     if (e.patch) add(head, ball(e.r * 2.2), mat(e.patch, 0.8), s * e.dx, e.y, e.z - 0.02).scale.set(1, 1.25, 0.6);
-    const eye = add(head, ball(e.r), mat(INK, 0.25), s * e.dx, e.y, e.z); eye.userData.base = 1; out.push(eye);
+    const eye = add(head, ball(e.r), mat(e.iris ?? INK, 0.25), s * e.dx, e.y, e.z); eye.userData.base = 1; out.push(eye);
+    if (e.iris) { const pupil = new THREE.Mesh(ball(e.r * 0.55), mat(INK, 0.2)); pupil.position.set(0, 0, e.r * 0.62); pupil.scale.set(0.75, 1.05, 0.6); eye.add(pupil); }   // 有颜色的眼睛：虹膜 + 黑瞳孔
     const hl = new THREE.Mesh(ball(e.r * 0.38), mat(WHITE, 0.3)); hl.position.set(-s * e.r * 0.35, e.r * 0.35, e.r * 0.75); eye.add(hl);   // 高光
   }
 }
@@ -109,6 +116,11 @@ function animal(sp: AnimalSpec): Parts {
   if (sp.beak) { const b = sp.beak; if (b.flat) add(head, box(b.w * 2, 0.07, b.w * 1.2, 0.03), mat(b.c, 0.5), 0, b.y, b.z + b.w * 0.4); else add(head, cone(b.w, b.w * 2.2, 10), mat(b.c, 0.5), 0, b.y, b.z + b.w * 0.8).rotation.x = PI / 2; }
   eyesOn(head, sp.eyes, eyes);
   if (sp.cheeks) for (const s of [-1, 1]) add(head, ball(0.07), mat(sp.cheeks, 0.9), s * 0.3, -0.06, 0.32).scale.set(1, 0.7, 0.5);
+  if (sp.fluff) {
+    const f = mat(sp.fluff.c, 0.95);
+    for (let i = 0; i < 12; i++) { const a = (i / 12) * PI * 2; add(body, ball(0.13), f, Math.sin(a) * sp.body.r * 0.82, sp.head.y - sp.head.r * 0.78, Math.cos(a) * sp.body.r * 0.72 + 0.04).scale.set(1, 0.85, 1); }   // 毛领
+    for (const s of [-1, 1]) add(head, ball(0.16), fur, s * sp.head.r * 0.78, -sp.head.r * 0.32, 0.1).scale.set(0.9, 0.8, 0.9);   // 腮帮的绒
+  }
   if (sp.patches) for (const s of [-1, 1]) add(body, ball(0.18), mat(INK, 0.85), s * 0.36, sp.body.y + 0.12, 0.16).scale.set(0.7, 1.2, 0.7);   // 熊猫：肩上两块黑
   if (sp.whiskers && sp.muzzle) { const m = sp.muzzle, wm = mat(sp.whiskers, 0.6); for (const s of [-1, 1]) for (let k = 0; k < 2; k++) { const w = add(head, cyl(0.006, 0.006, 0.2, 4), wm, s * (m.r * (m.sx ?? 1) + 0.08), m.y + 0.03 - k * 0.05, m.z + 0.02); w.rotation.z = PI / 2 + s * (0.12 + k * 0.22); w.castShadow = false; } }   // 胡须：每边两根，一根平一根垂
   if (sp.spots) {   // 斑点：贴在身子后半与头顶，扁圆片，法线朝外

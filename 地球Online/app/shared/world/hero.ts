@@ -17,8 +17,8 @@ import { patchFabric, type FabricOpts } from "./fabric.ts";
 
 export const SKIN_COLORS: RGB[] = [[248, 210, 186], [236, 190, 160], [206, 156, 120], [150, 104, 76]];
 export const HAIR_COLORS: RGB[] = [[66, 42, 34], [30, 26, 30], [140, 92, 58], [206, 160, 98], [104, 58, 82]];
-/** 外套（羽绒服）/ 连衣裙：金、靛蓝、奶油、灰绿、玫瑰、墨 */
-export const DRESS_COLORS: RGB[] = [[218, 168, 86], [74, 95, 176], [238, 232, 220], [134, 160, 138], [212, 132, 144], [58, 66, 96]];
+/** 外套（羽绒服）/ 连衣裙：金、靛蓝、奶油、灰绿、玫瑰、墨、驼（D101，毛衣的驼色；只往后加，旧存档的序号不变） */
+export const DRESS_COLORS: RGB[] = [[218, 168, 86], [74, 95, 176], [238, 232, 220], [134, 160, 138], [212, 132, 144], [58, 66, 96], [204, 156, 112]];
 /** 毛线三件套（帽 / 围巾 / 手套）与草帽 */
 export const HAT_COLORS: RGB[] = [[242, 236, 224], [74, 95, 176], [226, 172, 70], [58, 66, 96]];
 export const SHOE_COLORS: RGB[] = [[112, 80, 62], [48, 50, 64], [236, 230, 218], [136, 62, 72]];
@@ -53,7 +53,7 @@ const EMPTY = new THREE.BufferGeometry();
 export class Hero {
   readonly group = new THREE.Group();
   readonly S: number;
-  private rig = new THREE.Group(); private body = new THREE.Group(); private head = new THREE.Group(); private eyes: THREE.Mesh[] = [];
+  private rig = new THREE.Group(); private body = new THREE.Group(); private head = new THREE.Group(); private eyes: THREE.Mesh[] = []; private glasses = new THREE.Group();
   private arms: THREE.Group[] = []; private legs: THREE.Group[] = []; private vehicleRoot = new THREE.Group();
   /** 材质按「颜色组」分：同一组共用一个颜色，但每个部件可以有自己的布料参数 */
   private m = {
@@ -131,6 +131,25 @@ export class Hero {
     });
     const eg = eyeGeometry();
     for (const s of [-1, 1]) { const e = new THREE.Mesh(eg, this.m.eye); e.position.set(s * EYE.x, EYE.y, EYE.z); e.scale.set(...EYE.r); e.userData.base = e.scale.y; this.head.add(e); this.eyes.push(e); }
+    this.buildGlasses();
+  }
+
+  /** 眼镜（D101）：细金属圆框 + 鼻梁 + 两条镜腿，挂在头上，按 avatar.glasses 显示 */
+  private buildGlasses() {
+    const g = this.glasses; g.visible = false; this.head.add(g);
+    const metal = new THREE.MeshStandardMaterial({ color: 0x5a5d68, metalness: 0.6, roughness: 0.35 });
+    const lens = new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.12, roughness: 0.05, metalness: 0, depthWrite: false });
+    const R = 0.19, T = 0.016, z = EYE.z + 0.1;
+    const bar = (a: THREE.Vector3, b: THREE.Vector3) => {
+      const m = new THREE.Mesh(new THREE.CylinderGeometry(T, T, a.distanceTo(b), 6), metal);
+      m.position.copy(a).add(b).multiplyScalar(0.5); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), b.clone().sub(a).normalize()); g.add(m);
+    };
+    for (const s of [-1, 1]) {
+      const rim = new THREE.Mesh(new THREE.TorusGeometry(R, T, 8, 40), metal); rim.position.set(s * EYE.x, EYE.y, z); rim.scale.set(1.08, 0.92, 1); g.add(rim);
+      const glass = new THREE.Mesh(new THREE.CircleGeometry(R, 32), lens); glass.position.set(s * EYE.x, EYE.y, z); glass.scale.set(1.08, 0.92, 1); glass.renderOrder = 3; g.add(glass);
+      bar(new THREE.Vector3(s * (EYE.x + R * 1.08), EYE.y + 0.02, z), new THREE.Vector3(s * 0.98, EYE.y + 0.08, 0.05));   // 镜腿：从外框搭到耳朵上方
+    }
+    bar(new THREE.Vector3(-(EYE.x - R * 1.08), EYE.y + 0.04, z + 0.01), new THREE.Vector3(EYE.x - R * 1.08, EYE.y + 0.04, z + 0.01));   // 鼻梁
   }
 
   private clearOutfit() {
@@ -205,6 +224,7 @@ export class Hero {
     m.pom.color = hc.clone().lerp(white, 0.35);
     m.straw.color = vcol(av.hat === "straw" && av.hatColor === 0 ? [236, 208, 140] : HAT_COLORS[av.hatColor % HAT_COLORS.length]);
     m.boot.color = vcol(SHOE_COLORS[av.shoes % SHOE_COLORS.length]);
+    this.glasses.visible = !!av.glasses;
   }
   setOutfit(o: Outfit) { if (o !== this.outfit) this.setAvatar(this.avatar, o); }
   get currentOutfit() { return this.outfit; }

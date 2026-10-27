@@ -203,6 +203,24 @@ struct AvatarView: View {
             Section {
                 TextField("名字", text: $avatar.name)
             }
+            // 默认形象（D101）：点一下整套换上，下面的选项还能再细调
+            Section {
+                HStack(spacing: 12) {
+                    ForEach(AvatarPreset.all) { p in
+                        Button { avatar = p.applied(to: avatar) } label: {
+                            VStack(spacing: 6) {
+                                Image(systemName: p.symbol).font(.eoBody)
+                                Text(verbatim: p.avatar.name).font(.eoSub)
+                            }
+                            .frame(maxWidth: .infinity, minHeight: 64)
+                        }
+                        .buttonStyle(.glass)
+                        .accessibilityLabel(Text(verbatim: p.avatar.name))
+                    }
+                }
+            } header: {
+                Text("默认形象").font(.eoSub).textCase(nil)
+            }
             Section {
                 // 形态（D86）：小人、八只动物、三只自建 IP（嵌入页按 form 建角色）
                 Picker("形态", selection: Binding(get: { avatar.form ?? "human" }, set: { avatar.form = $0 == "human" ? nil : $0 })) {
@@ -221,6 +239,7 @@ struct AvatarView: View {
                     Text("海獭").tag("otter")
                     Text("水豚").tag("capybara")
                     Text("石头精").tag("pebble")
+                    Text("长毛猫").tag("persian")
                 }
             }
             Section {
@@ -234,6 +253,7 @@ struct AvatarView: View {
                     Text("棒球帽").tag("cap")
                     Text("不戴").tag("none")
                 }
+                Toggle("眼镜", isOn: Binding(get: { avatar.glasses ?? false }, set: { avatar.glasses = $0 ? true : nil }))
                 Stepper(value: $avatar.dress, in: 0...(purchases.entitlements.allows(.outfitPack) ? 11 : 3)) {
                     let nStyle = avatar.dress + 1
                     Text("衣服：第 \(nStyle) 款")
