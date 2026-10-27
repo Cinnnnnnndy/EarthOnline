@@ -29,3 +29,13 @@ git config --local commit.gpgsign false
 不要在 commit message 里写 `Co-Authored-By: Claude ...` 或 `Claude-Session: ...`
 尾注，也不要在 PR 描述里加 Claude Code 的署名——`.claude/settings.json` 里的
 `attribution` 已经关掉了它们。
+
+## 版本管理
+
+- **标签**：每发一批改动打一个带说明的标签 `v0.<大>.<小>`（`git tag -a v0.101 <提交> -m "…"`），标签也推上去（`git push origin --tags`）。
+  一批里有新功能就进大版本（v0.101 → v0.102），只是修补就进小版本（v0.101 → v0.101.1）。
+- **CHANGELOG.md**（仓库根目录）：每个版本一节，中文，一行一个改动，前面写提交的短哈希。打标签时一起更新。
+- **一件事一个提交**：提交信息用中文，第一行说清做了什么；只改 iPhone Duo 适配的加前缀「Duo：」。
+  不同的事分开提交，别把无关的改动混在一起（还没定下来的改动先留在工作区，不提交）。
+- **大功能先开分支**：在分支上做完、在模拟器上验过，再合并回 main。小修补直接在 main 上。
+- 提交前跑 `npm run check`（地球Online/app），动了 iOS 再跑 `python3 ios/Support/check_strings.py` 并构建一次。
