@@ -182,17 +182,23 @@ export class GlobeView {
   private fitFov() { const v = this.camera.fov; const hz = (2 * Math.atan(Math.tan((v / 2) * D2R) * this.camera.aspect)) / D2R; return Math.min(v, hz); }
   /** 回到整颗地球。at = 要对准的地方（没有行程时是家）；不给就对准第一本书那一带 */
   focusHome(animate = true, at?: [number, number]) {
-    this.focus = {}; this.rebuildOverlay(); this.detailPatch(null);
-    const alt = Math.max(2.4, 1 / Math.sin((this.fitFov() / 2) * D2R) * 1.3 - 1);   // 地球占约四分之三，四周留出宇宙
+    this.focus = {}; this.rebuildOverlay(); this.detailPatch(null); this.homeFit = true;
+    const alt = this.homeAlt();
     if (at) { this.flyTo({ lat: Math.max(-50, Math.min(60, at[0] - 4)), lng: at[1], alt, tilt: 0, heading: 0 }, animate ? 1800 : 0); return; }
     const c = this.books[0]?.center ?? [30, 60];
     this.flyTo({ lat: Math.max(-40, Math.min(50, c[0] - 8)), lng: c[1] - 15, alt, tilt: 0, heading: 0 }, animate ? 1800 : 0);
   }
+  /** 整颗地球时的高度：地球占约四分之三，四周留出宇宙（按当前窄的那个视角算，转屏 / 展开后要重算） */
+  private homeAlt() { return Math.max(2.4, 1 / Math.sin((this.fitFov() / 2) * D2R) * 1.3 - 1); }
+  /** 现在是不是「整颗地球」的取景（转屏、折叠屏展开收起时据此重算高度，D102） */
+  private homeFit = false;
   focusBook(id: string, animate = true, done?: () => void) {
+    this.homeFit = false;
     const b = this.books.find((x) => x.id === id); if (!b) return; this.focus = { book: id }; this.rebuildOverlay(); this.detailPatch(b);
     this.flyTo({ lat: b.center[0] - 1, lng: b.center[1], alt: altFor(b.radiusKm, this.fitFov()) * 1.05, tilt: 18, heading: 0 }, animate ? 2400 : 0, done);
   }
   focusDay(id: string, dayIdx: number, animate = true, done?: () => void) {
+    this.homeFit = false;
     const b = this.books.find((x) => x.id === id); const d = b?.days[dayIdx]; if (!b || !d) return; this.focus = { book: id, day: dayIdx }; this.rebuildOverlay();
     if (!this.patch) this.detailPatch(b);
     this.flyTo({ lat: d.center[0] - 0.15 * Math.min(4, d.radiusKm / 60), lng: d.center[1], alt: altFor(Math.max(18, d.radiusKm), this.fitFov()) * 1.1, tilt: 38, heading: 0 }, animate ? 1800 : 0, done);
@@ -366,6 +372,7 @@ export class GlobeView {
     // 竖屏（手机、折叠外屏）：加大纵向视角，横向才装得下地球
     this.camera.fov = asp < 1 ? Math.min(56, (2 * Math.atan((Math.tan(16 * D2R) / asp) * 0.72)) / D2R) : 32;
     this.camera.updateProjectionMatrix(); this.applyInsets(); for (const m of this.lineMats) m.resolution.set(this.w, this.h);
+    if (this.homeFit) { const alt = this.homeAlt(); if (this.anim) this.anim.to.alt = alt; else this.cam.alt = alt; }   // 转屏 / 展开：整颗地球重新装进画面（D102）
   }
 
   private frame = (now: number) => {

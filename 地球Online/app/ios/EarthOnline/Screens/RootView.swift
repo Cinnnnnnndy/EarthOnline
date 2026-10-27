@@ -86,8 +86,6 @@ struct RootView: View {
             DayEditorSheet(tripID: tripID, day: day)
         case .entry(let tripID, let day, let entryID, let type):
             EntryEditorSheet(tripID: tripID, day: day, entryID: entryID, kind: type)
-        case .welcomeHome:
-            WelcomeHomeSheet()
         }
     }
 }

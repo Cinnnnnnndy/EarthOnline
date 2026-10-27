@@ -28,8 +28,6 @@ enum AppSheet: Identifiable, Equatable {
     case stop(tripID: String, day: Int, entryID: String)
     case editDay(tripID: String, day: Int)
     case entry(tripID: String, day: Int, entryID: String?, type: EntryKind)
-    /// 第一次打开：先放家（D100）
-    case welcomeHome
 
     var id: String {
         switch self {
@@ -38,7 +36,6 @@ enum AppSheet: Identifiable, Equatable {
         case .stop(let t, let d, let e): return "stop-\(t)-\(d)-\(e)"
         case .editDay(let t, let d): return "edit-\(t)-\(d)"
         case .entry(let t, let d, let e, let k): return "entry-\(t)-\(d)-\(e ?? "new")-\(k.rawValue)"
-        case .welcomeHome: return "welcome-home"
         }
     }
 }
@@ -118,7 +115,6 @@ final class AppModel: ObservableObject {
         pushWorldState(animate: false)
         enterStage(.home, animate: false)
         if !store.isEphemeral && !store.samplesInstalled { Task { await installStarterSamples() } }
-        if !store.isEphemeral && store.home == nil && !store.homeAsked { sheet = .welcomeHome }   // 第一次打开先问家在哪（D100）
     }
 
     /// 第一次启动装两本示例，和网页第一次打开一样（D100）：「冰岛 + 北欧」（行程页的方案二，经世界层的导入器解析）与「关西七日」。

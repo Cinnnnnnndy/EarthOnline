@@ -26,7 +26,16 @@ enum DuoLayout {
             if let fold = foldFromReservedRegions(proxy) { return fold }
         }
         #endif
-        return StageLayout.fallback(size: proxy.size)
+        // D102：按整个窗口（含安全区）判形态，和 shared/spec/layout.ts 一样按屏幕尺寸算；
+        // 只用安全区里的尺寸时，Duo 内屏竖持（669×951，上下安全区很高）会被量成 669×835，宽高比刚好过 0.8，被错当成两页
+        let s = proxy.safeAreaInsets
+        let full = CGSize(width: proxy.size.width + s.leading + s.trailing, height: proxy.size.height + s.top + s.bottom)
+        switch StageLayout.fallback(size: full) {
+        case .spread(let x, let gap): return .spread(foldX: x - s.leading, gap: gap)
+        case .triple(let c, let gap): return .triple(creases: c.map { $0 - s.leading }, gap: gap)
+        case .hover(let y, let gap): return .hover(foldY: y - s.top, gap: gap)
+        case .compact: return .compact
+        }
     }
 
     #if IPHONE_DUO_SDK

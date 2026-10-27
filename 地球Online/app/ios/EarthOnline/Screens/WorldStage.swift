@@ -38,10 +38,11 @@ struct WorldStage: View {
                         .transition(.move(edge: .top).combined(with: .opacity))
                 }
             }
-            .task(id: insets(layout)) {
-                let i = insets(layout)
-                world.send(WorldMsg.SetInsets(left: i.left, bottom: i.bottom, top: i.top, right: i.right))
-                world.send(WorldMsg.SetLayout(layout: layout.bridgeName, width: Double(size.width), height: Double(size.height)))
+            // D102：原来是 .task(id: insets)，在 iPhone Duo 内屏上只在启动时（尺寸还是 0、按一页算）跑了一次，展开后不再重发，
+            // 地球一直按「一页 + 底部卡片」偏上、偏大。改成看「布局态 + 尺寸 + 让出的边」，任何一项变了都重发
+            .onChange(of: StageKey(layout: layout.bridgeName, width: Double(size.width).rounded(), height: Double(size.height).rounded(), insets: insets(layout)), initial: true) { _, k in
+                world.send(WorldMsg.SetInsets(left: k.insets.left, bottom: k.insets.bottom, top: k.insets.top, right: k.insets.right))
+                world.send(WorldMsg.SetLayout(layout: k.layout, width: k.width, height: k.height))
             }
         }
         .task(id: phase) {
@@ -65,11 +66,14 @@ struct WorldStage: View {
     }
 
     struct Insets: Hashable { var left: Double; var bottom: Double; var right: Double = 0; var top: Double = 0 }
+    struct StageKey: Equatable { var layout: String; var width: Double; var height: Double; var insets: Insets }
 
-    /// 一页：卡片顶边以下都算被挡住；两页：左页整页被挡住（地球居中在右页）；三页：左右两页都让（地球在中页）；悬停：让出下半屏
+    /// 一页：卡片顶边以下都算被挡住；两页：书和某一天的抽屉占满左页 → 地球居中在右页，首页左页只有一张小卡 → 地球在整屏居中（D102）；
+    /// 三页：左右两页都让（地球在中页）；悬停：让出下半屏
     private func insets(_ layout: StageLayout) -> Insets {
         switch layout {
         case .spread(let foldX, let gap):
+            if case .home = app.stage { return Insets(left: 0, bottom: 0) }
             return Insets(left: Double(foldX + gap / 2).rounded(), bottom: 0)
         case .triple(let creases, let gap):
             let left = Double((creases.first ?? screen.width / 3) + gap / 2).rounded()

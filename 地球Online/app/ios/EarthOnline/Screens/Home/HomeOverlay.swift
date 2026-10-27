@@ -41,6 +41,15 @@ struct HomeOverlay: View {
 
     @ViewBuilder
     private func bottomStack(_ state: JourneyState) -> some View {
+        if WelcomeHomeCard.pending(store) {
+            WelcomeHomeCard()   // 第一次打开先放家（D100 / D102）：答完之前底部只放这张卡
+        } else {
+            journeyStack(state)
+        }
+    }
+
+    @ViewBuilder
+    private func journeyStack(_ state: JourneyState) -> some View {
         VStack(spacing: 16) {
             switch state {
             case .traveling(let id, let day):
