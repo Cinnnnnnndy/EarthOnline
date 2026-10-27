@@ -8,11 +8,11 @@ import SwiftUI
 ///
 /// 用法：`StageReader { layout in ... }` 取代 GeometryReader，拿到 compact / spread 两种形态。
 struct StageReader<Content: View>: View {
-    @ViewBuilder var content: (StageLayout, CGSize) -> Content
+    @ViewBuilder var content: (StageLayout, CGSize, EdgeInsets) -> Content
 
     var body: some View {
         GeometryReader { proxy in
-            content(DuoLayout.resolve(proxy), proxy.size)
+            content(DuoLayout.resolve(proxy), proxy.size, proxy.safeAreaInsets)
         }
     }
 }

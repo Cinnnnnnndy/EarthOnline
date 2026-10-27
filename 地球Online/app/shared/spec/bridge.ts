@@ -44,7 +44,7 @@ export type ShellToEmbed =
   | { kind: "fly-to"; lat: number; lng: number; alt: number }
   | { kind: "set-home"; home: { name: string; lat: number; lng: number } | null }
   | { kind: "set-footprints"; flags: { id: string; name: string; lat: number; lng: number }[]; fresh: string[] }
-  | { kind: "set-insets"; left: number; bottom: number; top: number; right: number }
+  | { kind: "set-insets"; left: number; bottom: number; top: number; right: number; /** D105：整颗地球时填满让出来之后那块的多少（0–1）；不给 = 原来的「约四分之三」 */ fill?: number }
   | { kind: "set-sky"; phase: "day" | "dusk" | "night" }
   | { kind: "set-palette"; palette: Palette }
   | { kind: "mark-visited"; entryId: string; visited: boolean }

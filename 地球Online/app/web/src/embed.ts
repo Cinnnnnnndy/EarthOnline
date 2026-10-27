@@ -104,7 +104,7 @@ function handleShell(m: ShellToEmbed) {
     case "fly-to": ensureGlobe().flyTo({ lat: m.lat, lng: m.lng, alt: m.alt, tilt: 0, heading: 0 }, 1000, undefined, 0.6, easeOut); break;   // 新建旅程选了地方：1 秒、只减速，跟手
     case "set-home": ensureGlobe().setHome(m.home); break;
     case "set-footprints": ensureGlobe().setFootprints(m.flags, m.fresh); break;
-    case "set-insets": { const i = { left: m.left, bottom: m.bottom, right: m.right, top: m.top }; globe?.setInsets(i); world?.setInsets(i); break; }
+    case "set-insets": { const i = { left: m.left, bottom: m.bottom, right: m.right, top: m.top, fill: m.fill }; globe?.setInsets(i); world?.setInsets(i); break; }
     case "set-sky": phase = m.phase; globe?.setPhase(m.phase); globeBd?.setPhase(m.phase); world?.setPhase(m.phase); worldBd?.setPhase(m.phase); applySky(m.phase); break;   // 某一天的世界夜里也换（D85）
     case "set-palette": world?.setPalette(m.palette); worldBd?.setPalette(m.palette); break;
     case "mark-visited": world?.markVisited(m.entryId, m.visited); break;

@@ -215,7 +215,15 @@ export class GlobeView {
     this.flyTo({ lat: Math.max(-40, Math.min(50, c[0] - 8)), lng: c[1] - 15, alt, tilt: 0, heading: 0 }, animate ? 1800 : 0);
   }
   /** 整颗地球时的高度：地球占约四分之三，四周留出宇宙（按当前窄的那个视角算，转屏 / 展开后要重算） */
-  private homeAlt() { return Math.max(2.4, 1 / Math.sin((this.fitFov() / 2) * D2R) * 1.3 - 1); }
+  private homeAlt() {
+    if (this.fill > 0 && this.h > 0) {
+      // 屏幕上的半径 = 露出来那块的短边的一半 × fill；反推相机离球心的距离：tan(asin(R/d)) = (r / (h/2))·tan(fov/2)
+      const { left, right, top, bottom } = this.insets; const availH = this.h - top - bottom, availW = this.w - left - right;   // 像素是方的：横竖同一个比例
+      const rPx = (Math.min(availH, availW) / 2) * this.fill; const k = (rPx / (this.h / 2)) * Math.tan((this.camera.fov * D2R) / 2);
+      const d = 1 / Math.sin(Math.atan(Math.max(0.05, k))); return Math.max(1.15, d - 1);
+    }
+    return Math.max(2.4, 1 / Math.sin((this.fitFov() / 2) * D2R) * 1.3 - 1);
+  }
   /** 现在是不是「整颗地球」的取景（转屏、折叠屏展开收起时据此重算高度，D102） */
   private homeFit = false;
   focusBook(id: string, animate = true, done?: () => void) {
@@ -393,7 +401,12 @@ export class GlobeView {
     return { x: (c.x + 1) / 2 * this.w, y: (1 - c.y) / 2 * this.h, r };
   }
   /** 被面板挡住的四边（D90：三页时左右都让，悬停时让下半）：视觉中心挪到露出来的那块 */
-  setInsets(i: { left: number; bottom: number; right?: number; top?: number }) { this.insets = { left: i.left, bottom: i.bottom, right: i.right ?? 0, top: i.top ?? 0 }; this.applyInsets(); }
+  setInsets(i: { left: number; bottom: number; right?: number; top?: number; fill?: number }) {
+    this.insets = { left: i.left, bottom: i.bottom, right: i.right ?? 0, top: i.top ?? 0 }; this.fill = i.fill ?? 0; this.applyInsets();
+    if (this.homeFit) { const alt = this.homeAlt(); if (this.anim) this.anim.to.alt = alt; else this.cam.alt = alt; }
+  }
+  /** D105：>0 时整颗地球填满「去掉上下左右让出的边之后」那块的这么多（展开的大屏上用，地球大一点）；0 = 原来的约四分之三 */
+  private fill = 0;
   private applyInsets() {
     const { left, bottom, right, top } = this.insets; if (!left && !bottom && !right && !top) { this.camera.clearViewOffset(); return; }
     this.camera.setViewOffset(this.w, this.h, (right - left) / 2, (bottom - top) / 2, this.w, this.h);

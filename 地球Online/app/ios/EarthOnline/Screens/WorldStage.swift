@@ -17,7 +17,7 @@ struct WorldStage: View {
     }
 
     var body: some View {
-        StageReader { layout, size in
+        StageReader { layout, size, safe in
             ZStack {
                 Color.space(phase)
                     .ignoresSafeArea()
@@ -40,8 +40,8 @@ struct WorldStage: View {
             }
             // D102：原来是 .task(id: insets)，在 iPhone Duo 内屏上只在启动时（尺寸还是 0、按一页算）跑了一次，展开后不再重发，
             // 地球一直按「一页 + 底部卡片」偏上、偏大。改成看「布局态 + 尺寸 + 让出的边」，任何一项变了都重发
-            .onChange(of: StageKey(layout: layout.bridgeName, width: Double(size.width).rounded(), height: Double(size.height).rounded(), insets: insets(layout)), initial: true) { _, k in
-                world.send(WorldMsg.SetInsets(left: k.insets.left, bottom: k.insets.bottom, top: k.insets.top, right: k.insets.right))
+            .onChange(of: StageKey(layout: layout.bridgeName, width: Double(size.width).rounded(), height: Double(size.height).rounded(), insets: insets(layout, safe: safe, size: size)), initial: true) { _, k in
+                world.send(WorldMsg.SetInsets(left: k.insets.left, bottom: k.insets.bottom, top: k.insets.top, right: k.insets.right, fill: k.insets.fill))
                 world.send(WorldMsg.SetLayout(layout: k.layout, width: k.width, height: k.height))
             }
         }
@@ -65,15 +65,19 @@ struct WorldStage: View {
         }
     }
 
-    struct Insets: Hashable { var left: Double; var bottom: Double; var right: Double = 0; var top: Double = 0 }
+    struct Insets: Hashable { var left: Double; var bottom: Double; var right: Double = 0; var top: Double = 0; var fill: Double? = nil }
     struct StageKey: Equatable { var layout: String; var width: Double; var height: Double; var insets: Insets }
 
     /// 一页：卡片顶边以下都算被挡住；两页：书和某一天的抽屉占满左页 → 地球居中在右页，首页左页只有一张小卡 → 地球在整屏居中（D102）；
     /// 三页：左右两页都让（地球在中页）；悬停：让出下半屏
-    private func insets(_ layout: StageLayout) -> Insets {
+    private func insets(_ layout: StageLayout, safe: EdgeInsets = EdgeInsets(), size: CGSize = .zero) -> Insets {
+        // D105：展开的大屏首页，地球填满上下各留边之后的那一条（横持时图标在右边一列，上边只留安全区 + 边距）
+        let unfolded = size.width + safe.leading + safe.trailing >= StageLayout.phoneMax
         switch layout {
         case .spread(let foldX, let gap):
-            if case .home = app.stage { return Insets(left: 0, bottom: 0) }
+            if case .home = app.stage {
+                return Insets(left: 0, bottom: Double(safe.bottom + Metrics.globeBottomMargin).rounded(), top: Double(safe.top + Metrics.globeTopMargin).rounded(), fill: Metrics.globeFill)
+            }
             return Insets(left: Double(foldX + gap / 2).rounded(), bottom: 0)
         case .triple(let creases, let gap):
             let left = Double((creases.first ?? screen.width / 3) + gap / 2).rounded()
@@ -83,7 +87,11 @@ struct WorldStage: View {
             return Insets(left: 0, bottom: Double(screen.height - foldY + gap / 2).rounded())
         case .compact:
             guard let f = obstruction, screen.height > 0 else { return Insets(left: 0, bottom: 0) }
-            return Insets(left: 0, bottom: max(0, Double(screen.height - f.minY) + 8).rounded())
+            let bottom = max(0, Double(screen.height - f.minY) + 8).rounded()
+            if unfolded, case .home = app.stage {   // 竖持展开：上边让出图标那一排，下边让出票和新建胶囊，中间那条填满
+                return Insets(left: 0, bottom: bottom + Double(Metrics.globeBottomMargin) - 8, top: Double(safe.top + 8 + Metrics.touch + Metrics.globeTopMargin).rounded(), fill: Metrics.globeFill)
+            }
+            return Insets(left: 0, bottom: bottom)
         }
     }
 }
@@ -153,19 +161,19 @@ struct StageScaffold<Leading: View, Trailing: View, Bottom: View>: View {
                             .padding(.top, 8)
                         Spacer(minLength: 12)
                         bottom
-                            .frame(maxWidth: max(0, min(Metrics.cardMaxWidth, leftWidth - Metrics.gutter * 2)))
+                            .frame(maxWidth: max(0, min(Metrics.cardMaxWidth, leftWidth - Metrics.spreadLeading - Metrics.gutter)))
                             .reportsObstruction($obstruction)
                             .padding(.bottom, 12)
                     }
-                    .padding(.horizontal, Metrics.gutter)
-                    .frame(width: leftWidth, height: proxy.size.height, alignment: .topLeading)
-                    HStack {
-                        Spacer(minLength: 0)
-                        trailing
-                    }
-                    .padding(.top, 8)
+                    .padding(.leading, Metrics.spreadLeading)
                     .padding(.trailing, Metrics.gutter)
-                    .frame(width: proxy.size.width, alignment: .topTrailing)
+                    .frame(width: leftWidth, height: proxy.size.height, alignment: .topLeading)
+                    // D105：两页时图标竖着排在右边一列，顶上让出右上角竖放的状态栏
+                    trailing
+                        .environment(\.iconBarVertical, true)
+                        .padding(.top, Metrics.statusClearance)
+                        .padding(.trailing, Metrics.gutter)
+                        .frame(width: proxy.size.width, height: proxy.size.height, alignment: .topTrailing)
                 }
             }
     }

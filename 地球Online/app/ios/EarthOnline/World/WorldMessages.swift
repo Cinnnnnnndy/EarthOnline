@@ -153,8 +153,10 @@ enum WorldMsg {
         var bottom: Double
         var top: Double
         var right: Double
+        /// D105：整颗地球填满让出边之后那块的多少（展开的大屏首页用）；nil = 原来的大小
+        var fill: Double? = nil
         var channel: WorldChannel? { .insets }
-        private enum CodingKeys: String, CodingKey { case kind, left, bottom, top, right }
+        private enum CodingKeys: String, CodingKey { case kind, left, bottom, top, right, fill }
     }
 
     /// ★ 地球外的天色

@@ -54,4 +54,13 @@ enum Metrics {
     static let touch: CGFloat = 44
     static let capsuleHeight: CGFloat = 44
     static let foldGap: CGFloat = 24
+    /// D105：展开的大屏上，整颗地球上下留的边（在安全区之外再留这么多；上边还要让出顶上那排图标）
+    static let globeTopMargin: CGFloat = 28
+    static let globeBottomMargin: CGFloat = 28
+    /// 地球占那一条的多少：竖持时那一条受宽度限制，留一点左右的空
+    static let globeFill: Double = 0.94
+    /// D105：两页时左页内容离屏幕左边的距离（内屏四角圆得很大，16 会被切掉票的一角）
+    static let spreadLeading: CGFloat = 32
+    /// D105：横持展开时右边一列图标顶上让出状态栏（时间 + 信号那一块竖着放在右上角）
+    static let statusClearance: CGFloat = 96
 }
