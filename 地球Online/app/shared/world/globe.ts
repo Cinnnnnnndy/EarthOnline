@@ -162,11 +162,13 @@ export class GlobeView {
   private async paintPatch(box: { minLat: number; maxLat: number; minLng: number; maxLng: number }, still: () => boolean) {
     let { minLat, maxLat, minLng, maxLng } = box;
     const land: Ring[][] = await loadLand10(this.base).catch(() => []); if (!land.length || !still()) return;
+    // D106：等飞完再画（同步画一张 3072 的图，飞到一半就卡两秒）；手机上画 2048
+    while (this.anim) { await new Promise((r) => setTimeout(r, 120)); if (!still()) return; }
     if (this.patch) { this.root.remove(this.patch); (this.patch.material as THREE.MeshStandardMaterial).map?.dispose(); this.patch.geometry.dispose(); this.patch = null; }
     this.patchBox = box;
-    const W = 3072, H = Math.min(3072, Math.round((W * (maxLat - minLat)) / (maxLng - minLng) / Math.max(0.3, Math.cos(((minLat + maxLat) / 2) * D2R)) * Math.cos(((minLat + maxLat) / 2) * D2R)) || 1536);
+    const touch = typeof navigator !== "undefined" && navigator.maxTouchPoints > 0; const W = touch ? 1536 : 3072, H = Math.min(W, Math.round((W * (maxLat - minLat)) / (maxLng - minLng) / Math.max(0.3, Math.cos(((minLat + maxLat) / 2) * D2R)) * Math.cos(((minLat + maxLat) / 2) * D2R)) || 1536);
     const sub = land.filter((poly) => poly[0].some(([x, y]) => x > minLng - 5 && x < maxLng + 5 && y > minLat - 5 && y < maxLat + 5));
-    const { color, rough } = paintEarth(sub, { width: W, height: Math.max(512, H), bbox: { minLng, maxLng, minLat, maxLat }, shelf: 0.12, seed: 11 });
+    const { color, rough } = paintEarth(sub, { width: W, height: Math.max(512, H), bbox: { minLng, maxLng, minLat, maxLat }, shelf: 0.12, seed: 11, noBump: true });
     // 边缘羽化，和底图融在一起
     const cx = color.getContext("2d")!; const fx = document.createElement("canvas"); fx.width = color.width; fx.height = color.height; const f = fx.getContext("2d")!;
     const gh = f.createLinearGradient(0, 0, fx.width, 0); gh.addColorStop(0, "rgba(0,0,0,0)"); gh.addColorStop(0.08, "#000"); gh.addColorStop(0.92, "#000"); gh.addColorStop(1, "rgba(0,0,0,0)"); f.fillStyle = gh; f.fillRect(0, 0, fx.width, fx.height);
@@ -443,7 +445,8 @@ export class GlobeView {
     // 站点小球：保持屏幕上的像素大小
     const pxWorld = (p: THREE.Vector3) => (this.camera.position.distanceTo(p) * Math.tan((this.camera.fov * D2R) / 2) * 2) / this.h;
     for (const m of this.stopMeshes) m.scale.setScalar(pxWorld(m.position) * (m.userData.px as number));
-    if (!this.earthBig && this.earthGeo && !this.upgrading && this.cam.alt < 1.2) { this.upgrading = true; setTimeout(() => this.paintEarthTex(true), 50); }   // 拉近了：换高清地图（只换一次）
+    // 拉近了：换高清地图（只换一次）。D106：要等相机停稳（不在飞、没在拖、停了一秒）且在首页总览才换——飞进书的半路上换，iOS 上卡两秒
+    if (!this.earthBig && this.earthGeo && !this.upgrading && this.cam.alt < 1.2 && !this.anim && !this.dragging && this.idle > 1 && this.focus.book === undefined) { this.upgrading = true; setTimeout(() => this.paintEarthTex(true), 50); }
     this.updateMarks(now / 1000, pxWorld); this.viewPatch();
     // 小人：站在地面上，脸朝镜头，屏幕上约 110 像素高
     if (this.heroAt) {

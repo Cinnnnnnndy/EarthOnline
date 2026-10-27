@@ -63,7 +63,7 @@ export function drawBlurred(ctx: CanvasRenderingContext2D, src: HTMLCanvasElemen
 }
 function rng(seed: number) { let a = seed >>> 0; return () => { a = (a + 0x6d2b79f5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 
-export interface EarthOpts { width: number; height: number; bbox?: { minLng: number; maxLng: number; minLat: number; maxLat: number }; shelf?: number; borders?: Ring[]; seed?: number }
+export interface EarthOpts { width: number; height: number; bbox?: { minLng: number; maxLng: number; minLat: number; maxLat: number }; shelf?: number; borders?: Ring[]; seed?: number; /** 不画起伏图（高清补丁不用它，省掉两遍大图模糊） */ noBump?: boolean }
 /** 画一张地图（全球或一个范围），返回颜色图与粗糙度图 */
 export function paintEarth(land: Ring[][], o: EarthOpts): { color: HTMLCanvasElement; rough: HTMLCanvasElement; bump: HTMLCanvasElement } {
   const W = o.width, H = o.height; const b = o.bbox ?? { minLng: -180, maxLng: 180, minLat: -90, maxLat: 90 };
@@ -116,6 +116,7 @@ export function paintEarth(land: Ring[][], o: EarthOpts): { color: HTMLCanvasEle
   }
   // 起伏（bumpMap）：先在一张不透明的白描稿上画「中间粗、两头细」的山脊，再整张模糊后半透明叠上去——
   // 读起来是一片隆起的晕渲，而不是一根根等粗的管子（D100）。分段描是为了逐段收窄；描稿不透明，段与段的圆头重叠处不会叠出珠子。
+  if (!o.noBump) {
   const hill = mk(); const hl = hill.getContext("2d")!; hl.strokeStyle = "#fff"; hl.lineCap = "round"; hl.lineJoin = "round";
   for (const [w, pts] of MOUNTAINS) {
     const P = pts.map(([lng, lat]) => proj(lng, lat)); const seg: number[] = [0];
@@ -130,6 +131,7 @@ export function paintEarth(land: Ring[][], o: EarthOpts): { color: HTMLCanvasEle
   }
   bu.save(); bu.globalAlpha = 0.55; drawBlurred(bu, hill, Math.max(3, pxPerDeg * 1.1));   // 宽而软的一层
   bu.globalAlpha = 0.3; drawBlurred(bu, hill, Math.max(2, pxPerDeg * 0.45)); bu.restore();   // 脊上稍微收一点
+  }
   // 点彩：和平面插画层同一种颗粒
   for (let i = 0, n = Math.round((W * H) / 260); i < n; i++) { const x = R() * W, y = R() * H; bx.fillStyle = R() < 0.55 ? "rgba(255,255,240,0.10)" : "rgba(30,40,70,0.07)"; bx.fillRect(x, y, 1.2, 1.2); }
   bx.globalCompositeOperation = "destination-in"; bx.drawImage(maskA, 0, 0);
