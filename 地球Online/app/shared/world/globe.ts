@@ -35,6 +35,7 @@ export function ll2v(lat: number, lng: number, r = R): THREE.Vector3 {
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 /** 只减速不加速：一出手就转过去、最后轻轻停住（选目的地时的转向用它，跟手） */
 export const easeOut = (t: number) => 1 - (1 - t) ** 3;
+const reducedMotion = () => typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 const wrap = (d: number) => ((((d + 180) % 360) + 360) % 360) - 180;
 /** 让一个半径 km 的范围装进视野需要的离地高度（地球半径单位） */
 export function altFor(radiusKm: number, fovDeg = 32) { const ang = Math.min(1.2, radiusKm / 6371); return Math.max(0.018, (Math.sin(ang) / Math.tan((fovDeg * D2R) / 2)) * 1.25 - (1 - Math.cos(ang))); }
@@ -50,13 +51,15 @@ export class GlobeView {
   private hero: Character; private heroForm = "human"; private heroAt: LatLng | null = null; private heroAtHome = false;
   /** 首页点开了哪本书的旗（D103）：再点一次旗或点卡片就翻开 */
   private openFlag: string | null = null; private showHomeLabel = false;
+  /** D108：转到背面的家和旗，在地球边上放一个小指示，点了飞过去 */
+  private edgeEl!: HTMLElement; private edges: { id: string; P: THREE.Vector3; el: HTMLElement }[] = [];
   /** 手机上先用 2048 的地图，第一次拉近时换成 4096（D103） */
   private earthBig = false; private earthGeo: Awaited<ReturnType<typeof loadGlobeGeo>> | null = null; private upgrading = false;
   cam: CamState = { lat: 30, lng: 60, alt: 2.4, tilt: 0, heading: 0 };
   private anim: { from: CamState; to: CamState; t: number; dur: number; hop: number; ease: (t: number) => number; done?: () => void } | null = null;
   private vel = { lat: 0, lng: 0 }; private dragging = false; private idle = 0; private active = true; private raf = 0; private last = 0;
   private w = 1; private h = 1; private ro: ResizeObserver; private lineMats: LineMaterial[] = []; private stopMeshes: THREE.Mesh[] = [];
-  autoRotate = true;
+  autoRotate = true; private returned = true;
   // 足迹小旗 + 家
   private kit = new FlagKit(); private marks = new THREE.Group(); private flagEl: HTMLElement; private flagLabels: Label[] = [];
   private fpData: GlobeFlag[] = []; private fpFresh = new Set<string>(); private flagBucket = NaN;
@@ -70,6 +73,7 @@ export class GlobeView {
     this.renderer.domElement.className = "globe-canvas"; host.appendChild(this.renderer.domElement);
     this.labelsEl = document.createElement("div"); this.labelsEl.className = "globe-labels"; host.appendChild(this.labelsEl);
     this.flagEl = document.createElement("div"); this.flagEl.className = "globe-labels flags"; host.appendChild(this.flagEl);
+    this.edgeEl = document.createElement("div"); this.edgeEl.className = "globe-labels edges"; host.appendChild(this.edgeEl);
     const pm = new THREE.PMREMGenerator(this.renderer); this.scene.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture; this.scene.environmentIntensity = 0.5; pm.dispose();
     this.scene.add(this.root, this.camera); this.root.add(this.overlay, this.marks); this.house.visible = false; this.root.add(this.house);
     // 光：跟着相机走的主光（左上），天光，一盏暖色轮廓光从背后
@@ -216,6 +220,16 @@ export class GlobeView {
     const c = this.books[0]?.center ?? [30, 60];
     this.flyTo({ lat: Math.max(-40, Math.min(50, c[0] - 8)), lng: c[1] - 15, alt, tilt: 0, heading: 0 }, animate ? 1800 : 0);
   }
+  /** D108：回正——不给目标就回家（没放家就回默认的取景）；给书的 id 就飞到那趟旅行（仍是整颗地球的高度，不翻开书） */
+  recenter(target?: string, ms = 1100) {
+    this.openFlag = null; this.showHomeLabel = false; this.returned = true;
+    const b = target ? this.books.find((x) => x.id === target) : undefined;
+    const at: LatLng | undefined = b ? b.center : this.home ? [this.home.lat, this.home.lng] : undefined;
+    if (this.focus.book !== undefined || !this.homeFit) { this.focusHome(true, at); return; }
+    this.rebuildOverlay(); const alt = this.homeAlt();
+    if (at) this.flyTo({ lat: Math.max(-50, Math.min(60, at[0] - 4)), lng: at[1], alt, tilt: 0, heading: 0 }, ms, undefined, 0.5, easeOut);
+    else { const c = this.books[0]?.center ?? [30, 60]; this.flyTo({ lat: Math.max(-40, Math.min(50, c[0] - 8)), lng: c[1] - 15, alt, tilt: 0, heading: 0 }, ms, undefined, 0.5, easeOut); }
+  }
   /** 整颗地球时的高度：地球占约四分之三，四周留出宇宙（按当前窄的那个视角算，转屏 / 展开后要重算） */
   private homeAlt() {
     if (this.fill > 0 && this.h > 0) {
@@ -322,6 +336,16 @@ export class GlobeView {
       this.homeLabel = this.labels[this.labels.length - 1];
       // D107：首页不再从家往每本书拉虚线
     }
+    // D108：背面指示（只在首页总览）
+    this.edgeEl.replaceChildren(); this.edges = [];
+    if (!focusBook) {
+      const mk = (id: string, html: string, lat: number, lng: number, aria: string, go: () => void) => {
+        const el = document.createElement("button"); el.type = "button"; el.className = "gedge"; el.innerHTML = html; el.setAttribute("aria-label", aria); el.style.display = "none";
+        el.addEventListener("click", (e) => { e.stopPropagation(); go(); }); this.edgeEl.appendChild(el); this.edges.push({ id, P: ll2v(lat, lng, R), el });
+      };
+      if (this.home) mk("home", icon("home", 14), this.home.lat, this.home.lng, t("globe.home"), () => this.recenter());
+      for (const b of this.books) mk(b.id, `<svg width="14" height="16" viewBox="0 0 22 28" aria-hidden="true"><path d="M3 2v25" stroke="currentColor" stroke-width="3"/><path d="M4 3h14l-4 5 4 5H4z" fill="${b.badgeKind === "done" ? "#e0554d" : b.badgeKind === "live" ? "#f0b43c" : "#4a78d8"}"/></svg>`, b.center[0], b.center[1], b.title, () => this.recenter(b.id));
+    }
     // D107：足迹小旗与「12」「3」这样的数字气泡在首页总览不显示（一趟旅行一面旗），翻开书时照旧
     const showMarks = this.focus.day === undefined && this.focus.book !== undefined; this.marks.visible = showMarks; this.flagEl.hidden = !showMarks;
     // 小人：站在「今天」或这一天的起点
@@ -349,13 +373,14 @@ export class GlobeView {
   }
   private bindInput() {
     const el = this.renderer.domElement; const pts = new Map<number, { x: number; y: number }>(); let pinch = 0; let moved = 0;
-    el.addEventListener("pointerdown", (e) => { el.setPointerCapture(e.pointerId); pts.set(e.pointerId, { x: e.clientX, y: e.clientY }); this.dragging = true; this.anim = null; this.idle = 0; moved = 0; if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = Math.hypot(a.x - b.x, a.y - b.y); } });
+    el.addEventListener("pointerdown", (e) => { el.setPointerCapture(e.pointerId); pts.set(e.pointerId, { x: e.clientX, y: e.clientY }); this.dragging = true; this.anim = null; this.idle = 0; this.returned = false; moved = 0; if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = Math.hypot(a.x - b.x, a.y - b.y); } });
     el.addEventListener("pointermove", (e) => {
       const p = pts.get(e.pointerId); if (!p) return; const dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY; moved += Math.abs(dx) + Math.abs(dy);
       if (pts.size === 2) { const [a, b] = [...pts.values()]; const d = Math.hypot(a.x - b.x, a.y - b.y); if (pinch) this.zoom(pinch / d); pinch = d; return; }
       const k = (this.cam.alt * 55) / this.h; const cs = Math.cos(this.cam.heading * D2R), sn = Math.sin(this.cam.heading * D2R);
       const dLat = (dy * cs + dx * sn) * k, dLng = (-dx * cs + dy * sn) * k / Math.max(0.2, Math.cos(this.cam.lat * D2R));
-      this.cam.lat = Math.max(-80, Math.min(80, this.cam.lat + dLat)); this.cam.lng = wrap(this.cam.lng + dLng); this.vel = { lat: dLat * 60, lng: dLng * 60 };
+      this.cam.lat = Math.max(-80, Math.min(80, this.cam.lat + dLat)); this.cam.lng = wrap(this.cam.lng + dLng);
+      { const cap = 40 * Math.max(0.15, Math.min(1, this.cam.alt / 2)); this.vel = { lat: Math.max(-cap, Math.min(cap, dLat * 60)), lng: Math.max(-cap * 1.5, Math.min(cap * 1.5, dLng * 60)) }; }   // D108：甩一下最多转这么快，不至于甩成一直转
     });
     const up = (e: PointerEvent) => { pts.delete(e.pointerId); if (!pts.size) this.dragging = false; pinch = 0; if (moved < 6) this.pick(e); };
     el.addEventListener("pointerup", up); el.addEventListener("pointercancel", up);
@@ -368,7 +393,7 @@ export class GlobeView {
       else if (e.key === "+" || e.key === "=") this.zoom(0.8); else if (e.key === "-") this.zoom(1.25);
     });
   }
-  private zoom(f: number) { this.cam.alt = Math.max(0.012, Math.min(4, this.cam.alt * f)); this.cam.tilt = Math.max(0, Math.min(45, (1 - Math.min(1, this.cam.alt / 1.2)) * 45)); }
+  private zoom(f: number) { this.returned = false; this.cam.alt = Math.max(0.012, Math.min(this.focus.book === undefined ? Math.min(4, this.homeAlt() * 1.35) : 4, this.cam.alt * f)); this.cam.tilt = Math.max(0, Math.min(45, (1 - Math.min(1, this.cam.alt / 1.2)) * 45)); }
   private pick(e: PointerEvent) {
     const r = this.renderer.domElement.getBoundingClientRect(); const v = new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
     const rc = new THREE.Raycaster(); rc.setFromCamera(v, this.camera); rc.params.Mesh = {};
@@ -431,7 +456,8 @@ export class GlobeView {
     } else if (!this.dragging) {
       this.cam.lat = Math.max(-80, Math.min(80, this.cam.lat + this.vel.lat * dt)); this.cam.lng = wrap(this.cam.lng + this.vel.lng * dt);
       this.vel.lat *= Math.pow(0.12, dt); this.vel.lng *= Math.pow(0.12, dt);
-      if (this.autoRotate && this.focus.book === undefined && !this.pickCb && this.idle > 3) this.cam.lng = wrap(this.cam.lng + dt * 4 * Math.min(1, (this.idle - 3) / 2));
+      // D108：不再自己一直转（转着转着就不知道在哪了）；首页停手 7 秒后慢慢回到家（或默认的取景）。减弱动态效果、点开了小卡时不回
+      if (this.autoRotate && this.focus.book === undefined && !this.pickCb && this.idle > 7 && !this.returned && !this.openFlag && !this.showHomeLabel && !reducedMotion()) { this.returned = true; this.recenter(undefined, 2200); }
     }
     const pose = this.camPose(this.cam); this.camera.position.copy(pose.pos); this.camera.up.copy(pose.up); this.camera.lookAt(pose.look);
     this.rimMat.uniforms.k.value = Math.min(1, Math.max(0, (this.cam.alt - 0.06) / 0.5));
@@ -467,6 +493,17 @@ export class GlobeView {
   };
 
   private updateLabels() {
+    if (this.edges.length) {
+      const camN = this.camera.position.clone().normalize(); const disk = this.screenDisk();
+      const right = new THREE.Vector3().setFromMatrixColumn(this.camera.matrixWorld, 0), up = new THREE.Vector3().setFromMatrixColumn(this.camera.matrixWorld, 1);
+      const off = this.anim || this.dragging;
+      for (const e of this.edges) {
+        const n = e.P.clone().normalize(); if (off || n.dot(camN) > 0.12) { e.el.style.display = "none"; continue; }
+        const v = n.clone().sub(camN.clone().multiplyScalar(n.dot(camN))); const dx = v.dot(right), dy = -v.dot(up); const len = Math.hypot(dx, dy) || 1;
+        const x = Math.max(22, Math.min(this.w - 22, disk.x + (dx / len) * (disk.r + 22))), y = Math.max(22, Math.min(this.h - 22, disk.y + (dy / len) * (disk.r + 22)));
+        e.el.style.display = ""; e.el.style.transform = `translate(${Math.round(x - 16)}px, ${Math.round(y - 16)}px) rotate(0deg)`;
+      }
+    }
     const hr = this.host.getBoundingClientRect(); const placed: { x: number; y: number; w: number; h: number }[] = [];
     for (const el of document.querySelectorAll<HTMLElement>("[data-avoid]")) { const r = el.getBoundingClientRect(); if (r.width && r.height) placed.push({ x: r.left - hr.left, y: r.top - hr.top, w: r.width, h: r.height }); }
     const camN = this.camera.position.clone().normalize();
@@ -537,7 +574,7 @@ export class GlobeView {
   }
 
   snapshot(): string { this.renderer.render(this.scene, this.camera); return this.renderer.domElement.toDataURL("image/png"); }
-  dispose() { cancelAnimationFrame(this.raf); this.ro.disconnect(); this.clearOverlay(); this.kit.dispose(); this.flagEl.remove(); this.renderer.dispose(); this.renderer.domElement.remove(); this.labelsEl.remove(); this.hero.dispose(); }
+  dispose() { cancelAnimationFrame(this.raf); this.ro.disconnect(); this.clearOverlay(); this.kit.dispose(); this.flagEl.remove(); this.edgeEl.remove(); this.renderer.dispose(); this.renderer.domElement.remove(); this.labelsEl.remove(); this.hero.dispose(); }
 }
 function esc(s: string) { return s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c] as string)); }
 export { DEFAULT_AVATAR };

@@ -101,6 +101,7 @@ function handleShell(m: ShellToEmbed) {
     case "focus-home": ensureGlobe().focusHome(m.animate, [m.lat, m.lng]); break;
     case "focus-book": ensureGlobe().focusBook(m.id, m.animate); break;
     case "focus-day": ensureGlobe().focusDay(m.id, m.dayIndex, m.animate); break;
+    case "recenter": ensureGlobe().recenter(m.target); break;
     case "fly-to": ensureGlobe().flyTo({ lat: m.lat, lng: m.lng, alt: m.alt, tilt: 0, heading: 0 }, 1000, undefined, 0.6, easeOut); break;   // 新建旅程选了地方：1 秒、只减速，跟手
     case "set-home": ensureGlobe().setHome(m.home); break;
     case "set-footprints": ensureGlobe().setFootprints(m.flags, m.fresh); break;

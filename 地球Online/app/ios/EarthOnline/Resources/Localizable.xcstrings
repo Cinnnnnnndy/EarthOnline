@@ -7559,6 +7559,23 @@
           }
         }
       }
+    },
+    "回到家": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back home"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "家に戻る"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

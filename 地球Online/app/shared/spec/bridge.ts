@@ -42,6 +42,8 @@ export type ShellToEmbed =
   | { kind: "focus-book"; id: string; animate: boolean }
   | { kind: "focus-day"; id: string; dayIndex: number; animate: boolean }
   | { kind: "fly-to"; lat: number; lng: number; alt: number }
+  /** D108：回正——不给 target 回家（没家回默认取景），给书的 id 飞到那趟旅行 */
+  | { kind: "recenter"; target?: string }
   | { kind: "set-home"; home: { name: string; lat: number; lng: number } | null }
   | { kind: "set-footprints"; flags: { id: string; name: string; lat: number; lng: number }[]; fresh: string[] }
   | { kind: "set-insets"; left: number; bottom: number; top: number; right: number; /** D105：整颗地球时填满让出来之后那块的多少（0–1）；不给 = 原来的「约四分之三」 */ fill?: number }
@@ -83,6 +85,6 @@ export type EmbedToShell =
   /** 做好的卡：kind 是 cutout（抠出了主体，PNG 带透明）/ polaroid（背景太复杂，整张 JPEG）；原生把图存下、把 { id, kind, w, h } 记进书里 */
   | { kind: "card-made"; requestId: string; card?: { kind: "cutout" | "polaroid"; w: number; h: number }; dataUrl?: string; error?: string };
 
-const SHELL_KINDS = new Set(["show-globe", "show-day", "set-trips", "focus-home", "focus-book", "focus-day", "fly-to", "set-home", "set-footprints", "set-insets", "set-sky", "set-palette", "mark-visited", "pick-point", "import-page", "show-suitcase", "export-suitcase", "case-search", "case-toggle", "core-call", "export-long-image", "make-card"]);
+const SHELL_KINDS = new Set(["show-globe", "show-day", "set-trips", "focus-home", "focus-book", "focus-day", "fly-to", "recenter", "set-home", "set-footprints", "set-insets", "set-sky", "set-palette", "mark-visited", "pick-point", "import-page", "show-suitcase", "export-suitcase", "case-search", "case-toggle", "core-call", "export-long-image", "make-card"]);
 /** 这条消息是给嵌入页的（否则原样交给世界层） */
 export const isShellMessage = (m: { kind: string }): m is ShellToEmbed => SHELL_KINDS.has(m.kind);

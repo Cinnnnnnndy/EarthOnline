@@ -403,3 +403,7 @@ html[data-shape="spread"] .tk-dock,html[data-shape="triple"] .tk-dock{right:auto
 .case-group{margin-top:4px} .cg-title{margin:6px 2px 2px} .case-empty{margin:16px 4px}
 .case-actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;position:relative} .case-actions input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 .case-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 4px 0} .case-tools{display:flex;gap:4px} .ibtn.on{background:var(--s-fill,rgba(29,30,35,.08))}
+
+/* D108：转到背面的家和旗——地球边上的小圆钮，点了飞过去 */
+.globe-labels.edges{pointer-events:none}
+.gedge{position:absolute;left:0;top:0;width:32px;height:32px;border-radius:50%;border:none;display:grid;place-items:center;pointer-events:auto;cursor:pointer;color:#1d2842;background:rgba(255,255,255,.82);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 4px 12px rgba(20,40,70,.18);opacity:.9}

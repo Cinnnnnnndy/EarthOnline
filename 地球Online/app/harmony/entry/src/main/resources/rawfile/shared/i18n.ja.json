@@ -62,6 +62,7 @@
   "home.allTrips": "すべての旅行",
   "home.importTrip": "旅行を読み込む",
   "home.footprints": "足あとと自宅",
+  "home.recenter": "家に戻る",
   "home.planted": "行った場所が{n}か所増えた",
   "home.nextTrip": "次の旅：{title}、{n}日後",
   "home.seeFirstDay": "1日目を見る",

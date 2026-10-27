@@ -74,6 +74,7 @@ export const EN: Record<keyof typeof ZH, string> = {
   "home.allTrips": "All trips",
   "home.importTrip": "Import trip",
   "home.footprints": "Footprints and home",
+  "home.recenter": "Back home",
   "home.planted": "{n} new {n:place|places} visited",
   "home.nextTrip": "Next: {title}, in {n} {n:day|days}",
   "home.seeFirstDay": "See day 1",

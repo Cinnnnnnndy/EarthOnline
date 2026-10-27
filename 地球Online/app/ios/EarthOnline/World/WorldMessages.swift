@@ -114,6 +114,14 @@ enum WorldMsg {
     }
 
     /// ★ 相机飞到某处（新建旅程时预览目的地）
+    /// D108：回正——target 为 nil 时回家（没家回默认取景），给书的 id 飞到那趟旅行
+    struct Recenter: WorldCommand {
+        var kind = "recenter"
+        var target: String?
+        var channel: WorldChannel? { nil }   // 一次性：不重放
+        private enum CodingKeys: String, CodingKey { case kind, target }
+    }
+
     struct FlyTo: WorldCommand {
         var kind = "fly-to"
         var lat: Double

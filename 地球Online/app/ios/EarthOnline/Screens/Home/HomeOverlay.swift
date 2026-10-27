@@ -30,6 +30,14 @@ struct HomeOverlay: View {
             if case .traveling = state {
                 GlassIconButton("plus", label: "新建旅程") { app.sheet = .newTrip(.voice) }
             }
+            // D108：回正——点一下回家；长按选去哪（家、旅行中 / 下一趟、任意一趟）
+            GlassIconButton("scope", label: "回到家") { app.world.send(WorldMsg.Recenter(target: nil)) }
+                .contextMenu {
+                    Button { app.world.send(WorldMsg.Recenter(target: nil)) } label: { Label("回到家", systemImage: "house") }
+                    ForEach(store.trips) { t in
+                        Button { app.world.send(WorldMsg.Recenter(target: t.id)) } label: { Label { Text(verbatim: t.title) } icon: { Image(systemName: "flag") } }
+                    }
+                }
             GlassIconButton("books.vertical", label: "全部旅程") { app.show(.shelf) }
             GlassIconButton("square.and.arrow.down", label: "导入") { app.sheet = .newTrip(.importFile) }
             GlassIconButton("flag", label: "足迹与家") { app.show(.footprints) }

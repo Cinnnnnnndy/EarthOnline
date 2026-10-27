@@ -49,6 +49,7 @@
     "focus-book": "camera",
     "focus-day": "camera",
     "fly-to": "camera",
+    "recenter": null,
     "set-home": "home",
     "set-footprints": "footprints",
     "set-insets": "insets",

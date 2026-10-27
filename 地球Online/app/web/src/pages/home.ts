@@ -69,6 +69,7 @@ export function HomePage(p: Record<string, string>, root: HTMLElement) {
     bar.replaceChildren(h("span", { class: "wordmark" }, t("app.name")), h("span", { class: "grow" }),
       h("div", { class: "fab-group lg" },
         j.kind === "traveling" ? fab("plus", t("home.newTrip"), () => openNew("dest")) : null,
+        fab("locate", t("home.recenter"), () => G.recenter()),   // D108：回正
         fab("list", t("home.allTrips"), openTrips), fab("import", t("home.importTrip"), () => openNew("import")),
         fab("flag", t("home.footprints"), () => openFootprints(() => renderHome(false))), fab("gear", t("common.settings"), () => go("/settings"))));
     const items: (HTMLElement | null)[] = [];

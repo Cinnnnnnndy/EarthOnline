@@ -18,7 +18,7 @@ export const CHANNEL_OF: Record<MessageKind, Channel | null> = {
   "set-avatar": "avatar", "set-view": "view", "set-post": "post", "set-layout": "layout", snapshot: null,
   // 嵌入页（ShellToEmbed）
   "show-globe": "mode", "show-day": "mode", "set-trips": "trips",
-  "focus-home": "camera", "focus-book": "camera", "focus-day": "camera", "fly-to": "camera",
+  "focus-home": "camera", "focus-book": "camera", "focus-day": "camera", "fly-to": "camera", "recenter": null,
   "set-home": "home", "set-footprints": "footprints", "set-insets": "insets", "set-sky": "sky", "set-palette": "palette",
   "mark-visited": null, "pick-point": "pick", "import-page": null,
   "show-suitcase": null, "export-suitcase": null, "case-search": null, "case-toggle": null,
