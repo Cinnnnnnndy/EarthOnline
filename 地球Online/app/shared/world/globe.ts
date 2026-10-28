@@ -493,13 +493,16 @@ export class GlobeView {
         const right = new THREE.Vector3().setFromMatrixColumn(this.camera.matrixWorld, 0); right.sub(N.clone().multiplyScalar(right.dot(N))).normalize();
         P.addScaledVector(right, pxWorld(P) * 30).normalize().multiplyScalar(R); N = P.clone().normalize();
       }
-      const size = Math.min(pxWorld(P) * Math.min(this.heroAtHome ? 70 : 150, this.h * (this.heroAtHome ? 0.09 : 0.16)), 0.2); this.hero.group.scale.setScalar(size / 5.1);
+      // D109：书里露出来的只有按钮和抽屉之间那一条，小人最多占它的四分之一，不再顶出画面被裁掉
+      const strip = Math.max(80, this.h - this.insets.top - this.insets.bottom);
+      const size = Math.min(pxWorld(P) * Math.min(this.heroAtHome ? 70 : 150, this.heroAtHome ? this.h * 0.09 : Math.min(this.h * 0.16, strip * 0.25)), 0.2); this.hero.group.scale.setScalar(size / 5.1);
       this.hero.group.position.copy(P);
       const qUp = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), N);
       const toCam = this.camera.position.clone().sub(P); toCam.sub(N.clone().multiplyScalar(toCam.dot(N))); const local = toCam.applyQuaternion(qUp.clone().invert());
       const qYaw = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.atan2(local.x, local.z));
       this.hero.group.quaternion.copy(qUp).multiply(qYaw);
       if (this.heroAtHome) this.hero.group.quaternion.copy(this.camera.quaternion);   // 家门口的自己：像立着的小摆件，正脸朝镜头（远看地球时不至于只看到头顶）
+      else this.hero.group.quaternion.slerp(this.camera.quaternion, this.faceCam());   // D109：翻开书时镜头几乎垂直往下看，立在地上的小人只剩一个白帽顶，也立起来朝镜头
       this.hero.update(dt, 0);
       const vis = N.dot(this.camera.position.clone().normalize()) > 0.15; this.hero.group.visible = vis;
     }
@@ -541,6 +544,8 @@ export class GlobeView {
     }
   }
 
+  /** D109：镜头越接近垂直往下看（倾角小于 30°），地上的小人、小房子越要转过来正对镜头；某一天斜着看（38°）时就真的立在地上 */
+  private faceCam() { return Math.min(1, Math.max(0, (30 - this.cam.tilt) / 18)); }
   /** 立在地面上、朝着镜头一侧的姿态 */
   private standQuat(N: THREE.Vector3, P: THREE.Vector3): THREE.Quaternion {
     const qUp = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), N);
