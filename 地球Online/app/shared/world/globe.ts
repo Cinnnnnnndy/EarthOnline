@@ -589,12 +589,20 @@ export class GlobeView {
     // 家
     if (this.home) {
       const P = ll2v(this.home.lat, this.home.lng, R * 1.0004); const N = P.clone().normalize(); const vis = N.dot(camN) > 0.05; this.house.visible = vis;
-      if (vis) { const size = Math.min(pxWorld(P) * 34, 0.1); this.house.position.copy(P); this.house.quaternion.copy(this.standQuat(N, P)); this.house.scale.setScalar(size); }
+      if (vis) {
+        const size = Math.min(pxWorld(P) * 34, 0.1); this.house.position.copy(P); this.house.scale.setScalar(size);
+        // D109：远看地球时镜头几乎正对地面，贴地立着的房子只露出一块深色屋顶。像家门口的小人一样立起来正对镜头，
+        // 再侧过来一点、往镜头低一点头，墙、门、窗和屋顶都看得见；拉近、镜头斜下来以后慢慢回到真的立在地上
+        const k = Math.max(this.faceCam(), Math.min(1, Math.max(0, (this.cam.alt - 0.15) / 0.35)));
+        const card = this.camera.quaternion.clone().multiply(HOUSE_TURN); this.house.quaternion.copy(this.standQuat(N, P)).slerp(card, k);
+      }
     }
   }
 
   snapshot(): string { this.renderer.render(this.scene, this.camera); return this.renderer.domElement.toDataURL("image/png"); }
   dispose() { cancelAnimationFrame(this.raf); this.ro.disconnect(); this.clearOverlay(); this.kit.dispose(); this.flagEl.remove(); this.edgeEl.remove(); this.renderer.dispose(); this.renderer.domElement.remove(); this.labelsEl.remove(); this.hero.dispose(); }
 }
+/** 立着正对镜头的小房子：往左侧过 25°、朝镜头低头 14°，看得到正面、一侧的墙和屋顶 */
+const HOUSE_TURN = new THREE.Quaternion().setFromEuler(new THREE.Euler(0.24, -0.44, 0, "YXZ"));
 function esc(s: string) { return s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c] as string)); }
 export { DEFAULT_AVATAR };
