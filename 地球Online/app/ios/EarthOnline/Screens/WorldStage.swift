@@ -57,9 +57,11 @@ struct WorldStage: View {
     }
 
     /// D109：卡片报新位置时直接重发让出的边。翻开书时抽屉一帧里量两次（先 228 高、再 494 高），
-    /// 第二次只触发了一遍不更新修饰符的布局，上面的 onChange 收不到，地球按半截抽屉留白，路线落在抽屉后面
-    private var obstructionReport: Binding<CGRect?> {
+    /// 第二次只触发了一遍不更新修饰符的布局，上面的 onChange 收不到，地球按半截抽屉留白，路线落在抽屉后面。
+    /// 只认当前这一页的卡片：从书回到首页时，正在淡出的书的抽屉还会再报几次位置，不能让首页的地球按它留白
+    private func obstructionReport(_ stage: Stage) -> Binding<CGRect?> {
         Binding(get: { obstruction }, set: { v in
+            guard app.stage == stage else { return }
             obstruction = v
             DispatchQueue.main.async {
                 let g = geo
@@ -72,13 +74,13 @@ struct WorldStage: View {
     private func overlay(_ layout: StageLayout) -> some View {
         switch app.stage {
         case .home:
-            HomeOverlay(layout: layout, obstruction: obstructionReport)
+            HomeOverlay(layout: layout, obstruction: obstructionReport(app.stage))
                 .transition(.opacity)
         case .book(let id):
-            BookOverlay(tripID: id, layout: layout, obstruction: obstructionReport)
+            BookOverlay(tripID: id, layout: layout, obstruction: obstructionReport(app.stage))
                 .transition(.opacity)
         case .day(let id, let i):
-            DayOverlay(tripID: id, dayIndex: i, layout: layout, obstruction: obstructionReport)
+            DayOverlay(tripID: id, dayIndex: i, layout: layout, obstruction: obstructionReport(app.stage))
                 .transition(.opacity)
         }
     }
