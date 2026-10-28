@@ -212,7 +212,7 @@ export class GlobeView {
   private fitFov() { const v = this.camera.fov; const hz = (2 * Math.atan(Math.tan((v / 2) * D2R) * this.camera.aspect)) / D2R; return Math.min(v, hz); }
   /** 回到整颗地球。at = 要对准的地方（没有行程时是家）；不给就对准第一本书那一带 */
   focusHome(animate = true, at?: [number, number]) {
-    this.focus = {}; this.rebuildOverlay(); this.detailPatch(null); this.homeFit = true;
+    this.focus = {}; this.rebuildOverlay(); this.detailPatch(null); this.homeFit = true; this.bookFit = false;
     const alt = this.homeAlt();
     if (at) { this.flyTo({ lat: Math.max(-50, Math.min(60, at[0] - 4)), lng: at[1], alt, tilt: 0, heading: 0 }, animate ? 1800 : 0); return; }
     const c = this.books[0]?.center ?? [30, 60];
@@ -243,10 +243,25 @@ export class GlobeView {
   focusBook(id: string, animate = true, done?: () => void) {
     this.homeFit = false; this.openFlag = null;
     const b = this.books.find((x) => x.id === id); if (!b) return; this.focus = { book: id }; this.rebuildOverlay(); this.detailPatch(b);
-    this.flyTo({ lat: b.center[0] - 1, lng: b.center[1], alt: altFor(b.radiusKm, this.fitFov()) * 1.05, tilt: 18, heading: 0 }, animate ? 2400 : 0, done);
+    this.bookFit = true; this.flyTo(this.bookCam(b), animate ? 2400 : 0, done);
+  }
+  /** D109：翻开一本书时的取景——整条路线装进露出来的那块（去掉底部的票和日程、顶上那排按钮），四周留出边。
+   *  原来对准「中心往南 1 度」、按整屏算高度：关西这样半径几十公里的书，镜头落在路线南边一百多公里的海岸上，路线、站点、小人都不在画面里 */
+  private bookCam(b: GlobeBook): CamState {
+    const { left, right, top, bottom } = this.insets; const availH = Math.max(80, this.h - top - bottom), availW = Math.max(80, this.w - left - right);
+    const rPx = (Math.min(availH, availW) / 2) * 0.7; const k = (rPx / (this.h / 2)) * Math.tan((this.camera.fov * D2R) / 2);
+    const a = Math.min(1.2, b.radiusKm / 6371); const alt = Math.max(0.018, Math.sin(a) / Math.max(0.02, k) - (1 - Math.cos(a)));
+    return { lat: b.center[0], lng: b.center[1], alt, tilt: 12, heading: 0 };
+  }
+  /** 正以「整本书」取景（没拖动、没缩放、没进某一天）：让出的边变了（抽屉长出来、转屏）就重新装 */
+  private bookFit = false;
+  private refitBook() {
+    if (!this.bookFit || this.focus.day !== undefined) return; const b = this.books.find((x) => x.id === this.focus.book); if (!b) return;
+    const c = this.bookCam(b); if (this.anim) { this.anim.to.alt = c.alt; return; }
+    if (Math.abs(Math.log(c.alt / this.cam.alt)) > 0.05) this.flyTo({ ...this.cam, alt: c.alt }, 450, undefined, 0, easeOut);
   }
   focusDay(id: string, dayIdx: number, animate = true, done?: () => void) {
-    this.homeFit = false;
+    this.homeFit = false; this.bookFit = false;
     const b = this.books.find((x) => x.id === id); const d = b?.days[dayIdx]; if (!b || !d) return; this.focus = { book: id, day: dayIdx }; this.rebuildOverlay();
     if (!this.patch) this.detailPatch(b);
     this.flyTo({ lat: d.center[0] - 0.15 * Math.min(4, d.radiusKm / 60), lng: d.center[1], alt: altFor(Math.max(18, d.radiusKm), this.fitFov()) * 1.1, tilt: 38, heading: 0 }, animate ? 1800 : 0, done);
@@ -371,7 +386,7 @@ export class GlobeView {
   }
   private bindInput() {
     const el = this.renderer.domElement; const pts = new Map<number, { x: number; y: number }>(); let pinch = 0; let moved = 0;
-    el.addEventListener("pointerdown", (e) => { el.setPointerCapture(e.pointerId); pts.set(e.pointerId, { x: e.clientX, y: e.clientY }); this.dragging = true; this.anim = null; this.idle = 0; this.returned = false; moved = 0; if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = Math.hypot(a.x - b.x, a.y - b.y); } });
+    el.addEventListener("pointerdown", (e) => { el.setPointerCapture(e.pointerId); pts.set(e.pointerId, { x: e.clientX, y: e.clientY }); this.dragging = true; this.anim = null; this.idle = 0; this.returned = false; this.bookFit = false; moved = 0; if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = Math.hypot(a.x - b.x, a.y - b.y); } });
     el.addEventListener("pointermove", (e) => {
       const p = pts.get(e.pointerId); if (!p) return; const dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY; moved += Math.abs(dx) + Math.abs(dy);
       if (pts.size === 2) { const [a, b] = [...pts.values()]; const d = Math.hypot(a.x - b.x, a.y - b.y); if (pinch) this.zoom(pinch / d); pinch = d; return; }
@@ -391,7 +406,7 @@ export class GlobeView {
       else if (e.key === "+" || e.key === "=") this.zoom(0.8); else if (e.key === "-") this.zoom(1.25);
     });
   }
-  private zoom(f: number) { this.returned = false; this.cam.alt = Math.max(0.012, Math.min(this.focus.book === undefined ? Math.min(4, this.homeAlt() * 1.35) : 4, this.cam.alt * f)); this.cam.tilt = Math.max(0, Math.min(45, (1 - Math.min(1, this.cam.alt / 1.2)) * 45)); }
+  private zoom(f: number) { this.returned = false; this.bookFit = false; this.cam.alt = Math.max(0.012, Math.min(this.focus.book === undefined ? Math.min(4, this.homeAlt() * 1.35) : 4, this.cam.alt * f)); this.cam.tilt = Math.max(0, Math.min(45, (1 - Math.min(1, this.cam.alt / 1.2)) * 45)); }
   private pick(e: PointerEvent) {
     const r = this.renderer.domElement.getBoundingClientRect(); const v = new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
     const rc = new THREE.Raycaster(); rc.setFromCamera(v, this.camera); rc.params.Mesh = {};
@@ -426,6 +441,7 @@ export class GlobeView {
   setInsets(i: { left: number; bottom: number; right?: number; top?: number; fill?: number }) {
     this.insets = { left: i.left, bottom: i.bottom, right: i.right ?? 0, top: i.top ?? 0 }; this.fill = i.fill ?? 0; this.applyInsets();
     if (this.homeFit) { const alt = this.homeAlt(); if (this.anim) this.anim.to.alt = alt; else this.cam.alt = alt; }
+    this.refitBook();
   }
   /** D105：>0 时整颗地球填满「去掉上下左右让出的边之后」那块的这么多（展开的大屏上用，地球大一点）；0 = 原来的约四分之三 */
   private fill = 0;
@@ -441,6 +457,7 @@ export class GlobeView {
     this.camera.fov = asp < 1 ? Math.min(56, (2 * Math.atan((Math.tan(16 * D2R) / asp) * 0.72)) / D2R) : 32;
     this.camera.updateProjectionMatrix(); this.applyInsets(); for (const m of this.lineMats) m.resolution.set(this.w, this.h);
     if (this.homeFit) { const alt = this.homeAlt(); if (this.anim) this.anim.to.alt = alt; else this.cam.alt = alt; }   // 转屏 / 展开：整颗地球重新装进画面（D102）
+    this.refitBook();
   }
 
   private frame = (now: number) => {

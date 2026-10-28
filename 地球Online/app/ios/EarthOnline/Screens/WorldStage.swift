@@ -10,6 +10,8 @@ struct WorldStage: View {
 
     @State private var obstruction: CGRect?
     @State private var screen: CGSize = .zero
+    /// D109：最近一次的布局态 / 尺寸 / 安全区（卡片报新位置时拿它重算让出的边）
+    @State private var geo = StageGeometry()
 
     private var phase: SkyPhase {
         Daylight.resolvePhase(appearance: store.settings.appearance, systemDark: colorScheme == .dark,
@@ -18,6 +20,8 @@ struct WorldStage: View {
 
     var body: some View {
         StageReader { layout, size, safe in
+            let key = StageKey(layout: layout.bridgeName, width: Double(size.width).rounded(), height: Double(size.height).rounded(), insets: insets(layout, safe: safe, size: size))
+            let _ = geo.remember(layout, size, safe)
             ZStack {
                 Color.space(phase)
                     .ignoresSafeArea()
@@ -40,33 +44,47 @@ struct WorldStage: View {
             }
             // D102：原来是 .task(id: insets)，在 iPhone Duo 内屏上只在启动时（尺寸还是 0、按一页算）跑了一次，展开后不再重发，
             // 地球一直按「一页 + 底部卡片」偏上、偏大。改成看「布局态 + 尺寸 + 让出的边」，任何一项变了都重发
-            .onChange(of: StageKey(layout: layout.bridgeName, width: Double(size.width).rounded(), height: Double(size.height).rounded(), insets: insets(layout, safe: safe, size: size)), initial: true) { _, k in
-                world.send(WorldMsg.SetInsets(left: k.insets.left, bottom: k.insets.bottom, top: k.insets.top, right: k.insets.right, fill: k.insets.fill))
-                world.send(WorldMsg.SetLayout(layout: k.layout, width: k.width, height: k.height))
-            }
+            .onChange(of: key, initial: true) { _, k in push(k) }
         }
         .task(id: phase) {
             world.send(WorldMsg.SetSky(phase: phase))
         }
     }
 
+    private func push(_ k: StageKey) {
+        world.send(WorldMsg.SetInsets(left: k.insets.left, bottom: k.insets.bottom, top: k.insets.top, right: k.insets.right, fill: k.insets.fill))
+        world.send(WorldMsg.SetLayout(layout: k.layout, width: k.width, height: k.height))
+    }
+
+    /// D109：卡片报新位置时直接重发让出的边。翻开书时抽屉一帧里量两次（先 228 高、再 494 高），
+    /// 第二次只触发了一遍不更新修饰符的布局，上面的 onChange 收不到，地球按半截抽屉留白，路线落在抽屉后面
+    private var obstructionReport: Binding<CGRect?> {
+        Binding(get: { obstruction }, set: { v in
+            obstruction = v
+            DispatchQueue.main.async {
+                let g = geo
+                push(StageKey(layout: g.layout.bridgeName, width: Double(g.size.width).rounded(), height: Double(g.size.height).rounded(), insets: insets(g.layout, safe: g.safe, size: g.size)))
+            }
+        })
+    }
+
     @ViewBuilder
     private func overlay(_ layout: StageLayout) -> some View {
         switch app.stage {
         case .home:
-            HomeOverlay(layout: layout, obstruction: $obstruction)
+            HomeOverlay(layout: layout, obstruction: obstructionReport)
                 .transition(.opacity)
         case .book(let id):
-            BookOverlay(tripID: id, layout: layout, obstruction: $obstruction)
+            BookOverlay(tripID: id, layout: layout, obstruction: obstructionReport)
                 .transition(.opacity)
         case .day(let id, let i):
-            DayOverlay(tripID: id, dayIndex: i, layout: layout, obstruction: $obstruction)
+            DayOverlay(tripID: id, dayIndex: i, layout: layout, obstruction: obstructionReport)
                 .transition(.opacity)
         }
     }
 
     struct Insets: Hashable { var left: Double; var bottom: Double; var right: Double = 0; var top: Double = 0; var fill: Double? = nil }
-    struct StageKey: Equatable { var layout: String; var width: Double; var height: Double; var insets: Insets }
+    struct StageKey: Hashable { var layout: String; var width: Double; var height: Double; var insets: Insets }
 
     /// 一页：卡片顶边以下都算被挡住；两页：书和某一天的抽屉占满左页 → 地球居中在右页，首页左页只有一张小卡 → 地球在整屏居中（D102）；
     /// 三页：左右两页都让（地球在中页）；悬停：让出下半屏
@@ -88,14 +106,27 @@ struct WorldStage: View {
         case .hover(let foldY, let gap):
             return Insets(left: 0, bottom: Double(screen.height - foldY + gap / 2).rounded())
         case .compact:
-            guard let f = obstruction, screen.height > 0 else { return Insets(left: 0, bottom: 0) }
-            let bottom = max(0, Double(screen.height - f.minY) + 8).rounded()
+            // D109：卡片的位置是整屏坐标（.global），屏幕高也要按整屏算——原来用的是安全区里的高（iPhone 18 Pro 上 778，不是 874），
+            // 让出的底边少了上下安全区那 96pt：首页地球偏下，翻开书时路线落在抽屉后面
+            let fullH = size.height + safe.top + safe.bottom
+            guard let f = obstruction, fullH > 0 else { return Insets(left: 0, bottom: 0) }
+            let bottom = max(0, Double(fullH - f.minY) + 8).rounded()
             if duoOpen, case .home = app.stage {   // 竖持展开：上边让出图标那一排，下边让出票和新建胶囊，中间那条填满
                 return Insets(left: 0, bottom: bottom + Double(Metrics.globeBottomMargin) - 8, top: Double(safe.top + 8 + Metrics.touch + Metrics.globeTopMargin).rounded(), fill: Metrics.globeFill)
             }
-            return Insets(left: 0, bottom: bottom)
+            if case .home = app.stage { return Insets(left: 0, bottom: bottom) }
+            // D109：书和某一天顶上有返回那排按钮：上边也让出来，路线装在按钮和抽屉之间
+            return Insets(left: 0, bottom: bottom, top: Double(safe.top + 8 + Metrics.touch).rounded())
         }
     }
+}
+
+/// 舞台最近一次的几何（引用类型：在 body 里记下，不触发重绘）
+final class StageGeometry {
+    var layout: StageLayout = .compact
+    var size: CGSize = .zero
+    var safe = EdgeInsets()
+    func remember(_ l: StageLayout, _ s: CGSize, _ e: EdgeInsets) { layout = l; size = s; safe = e }
 }
 
 /// 在地球上点选时顶部的提示条
