@@ -71,11 +71,13 @@ struct WorldStage: View {
     /// 一页：卡片顶边以下都算被挡住；两页：书和某一天的抽屉占满左页 → 地球居中在右页，首页左页只有一张小卡 → 地球在整屏居中（D102）；
     /// 三页：左右两页都让（地球在中页）；悬停：让出下半屏
     private func insets(_ layout: StageLayout, safe: EdgeInsets = EdgeInsets(), size: CGSize = .zero) -> Insets {
-        // D105：展开的大屏首页，地球填满上下各留边之后的那一条（横持时图标在右边一列，上边只留安全区 + 边距）
-        let unfolded = size.width + safe.leading + safe.trailing >= StageLayout.phoneMax
+        // D105：Duo 展开的首页，地球填满上下各留边之后的那一条（横持时图标在右边一列，上边只留安全区 + 边距）；
+        // D109：只认 Duo 展开（机型 + 姿态），别的大屏还是原来的大小
+        let duoOpen = DuoDevice.isOpen(fullWidth: size.width + safe.leading + safe.trailing)
         switch layout {
         case .spread(let foldX, let gap):
             if case .home = app.stage {
+                guard duoOpen else { return Insets(left: 0, bottom: 0) }
                 return Insets(left: 0, bottom: Double(safe.bottom + Metrics.globeBottomMargin).rounded(), top: Double(safe.top + Metrics.globeTopMargin).rounded(), fill: Metrics.globeFill)
             }
             return Insets(left: Double(foldX + gap / 2).rounded(), bottom: 0)
@@ -88,7 +90,7 @@ struct WorldStage: View {
         case .compact:
             guard let f = obstruction, screen.height > 0 else { return Insets(left: 0, bottom: 0) }
             let bottom = max(0, Double(screen.height - f.minY) + 8).rounded()
-            if unfolded, case .home = app.stage {   // 竖持展开：上边让出图标那一排，下边让出票和新建胶囊，中间那条填满
+            if duoOpen, case .home = app.stage {   // 竖持展开：上边让出图标那一排，下边让出票和新建胶囊，中间那条填满
                 return Insets(left: 0, bottom: bottom + Double(Metrics.globeBottomMargin) - 8, top: Double(safe.top + 8 + Metrics.touch + Metrics.globeTopMargin).rounded(), fill: Metrics.globeFill)
             }
             return Insets(left: 0, bottom: bottom)
@@ -123,6 +125,8 @@ private struct PickBar: View {
 /// 舞台两侧的布局骨架：紧凑时「右上图标 + 底部内容」，展开时「左页内容 + 右页图标」
 struct StageScaffold<Leading: View, Trailing: View, Bottom: View>: View {
     let layout: StageLayout
+    /// D109：Duo 展开时左页离边 32pt、图标右边一列；别的两页设备照旧
+    @Environment(\.duoOpen) private var duoOpen
     @Binding var obstruction: CGRect?
     @ViewBuilder var leading: Leading
     @ViewBuilder var trailing: Trailing
@@ -155,23 +159,24 @@ struct StageScaffold<Leading: View, Trailing: View, Bottom: View>: View {
     private func spreadBody(foldX: CGFloat, gap: CGFloat) -> some View {
             GeometryReader { proxy in
                 let leftWidth = max(0, foldX - gap / 2)
+                let inset = duoOpen ? Metrics.spreadLeading : Metrics.gutter
                 ZStack(alignment: .topLeading) {
                     VStack(alignment: .leading, spacing: 0) {
                         leading
                             .padding(.top, 8)
                         Spacer(minLength: 12)
                         bottom
-                            .frame(maxWidth: max(0, min(Metrics.cardMaxWidth, leftWidth - Metrics.spreadLeading - Metrics.gutter)))
+                            .frame(maxWidth: max(0, min(Metrics.cardMaxWidth, leftWidth - inset - Metrics.gutter)))
                             .reportsObstruction($obstruction)
                             .padding(.bottom, 12)
                     }
-                    .padding(.leading, Metrics.spreadLeading)
+                    .padding(.leading, inset)
                     .padding(.trailing, Metrics.gutter)
                     .frame(width: leftWidth, height: proxy.size.height, alignment: .topLeading)
-                    // D105：两页时图标竖着排在右边一列，顶上让出右上角竖放的状态栏
+                    // D105：Duo 横持展开时图标竖着排在右边一列，顶上让出右上角竖放的状态栏；别的两页设备还是右上一排
                     trailing
-                        .environment(\.iconBarVertical, true)
-                        .padding(.top, Metrics.statusClearance)
+                        .environment(\.iconBarVertical, duoOpen)
+                        .padding(.top, duoOpen ? Metrics.statusClearance : 8)
                         .padding(.trailing, Metrics.gutter)
                         .frame(width: proxy.size.width, height: proxy.size.height, alignment: .topTrailing)
                 }

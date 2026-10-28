@@ -13,7 +13,44 @@ struct StageReader<Content: View>: View {
     var body: some View {
         GeometryReader { proxy in
             content(DuoLayout.resolve(proxy), proxy.size, proxy.safeAreaInsets)
+                .environment(\.duoOpen, DuoDevice.isOpen(proxy))
         }
+    }
+}
+
+/// D109：只给 iPhone Duo 展开时用的那套布局（D105 的地球放大、上下留边、横持图标右边一列、左页离边 32pt）。
+/// 原来按「整屏宽 ≥ 600」判，会把 iPad 上跑的 iPhone 版、以后别的大屏也当成 Duo；现在按机型 + 展开姿态判：
+/// 机型是 iPhone Duo（iPhone19,4；模拟器读 SIMULATOR_MODEL_IDENTIFIER），并且现在用的是内屏（外屏 ≈421 宽，内屏展开 ≥ 600）。
+/// 有 Duo SDK 以后，姿态改读系统给的铰链状态。
+enum DuoDevice {
+    static let modelIdentifiers: Set<String> = ["iPhone19,4"]
+
+    static let isDuo: Bool = {
+        if let sim = ProcessInfo.processInfo.environment["SIMULATOR_MODEL_IDENTIFIER"] { return modelIdentifiers.contains(sim) }
+        var info = utsname()
+        uname(&info)
+        let machine = withUnsafeBytes(of: &info.machine) { raw in
+            String(decoding: raw.prefix(while: { $0 != 0 }), as: UTF8.self)
+        }
+        return modelIdentifiers.contains(machine)
+    }()
+
+    /// 是 Duo、并且展开着（内屏）
+    @MainActor
+    static func isOpen(_ proxy: GeometryProxy) -> Bool {
+        let s = proxy.safeAreaInsets
+        return isOpen(fullWidth: proxy.size.width + s.leading + s.trailing)
+    }
+
+    static func isOpen(fullWidth: CGFloat) -> Bool { isDuo && fullWidth >= StageLayout.phoneMax }
+}
+
+private struct DuoOpenKey: EnvironmentKey { static let defaultValue = false }
+extension EnvironmentValues {
+    /// D109：iPhone Duo 展开着（StageReader 设）
+    var duoOpen: Bool {
+        get { self[DuoOpenKey.self] }
+        set { self[DuoOpenKey.self] = newValue }
     }
 }
 
