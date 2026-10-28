@@ -13,6 +13,7 @@ import type { Avatar } from "../spec/types.ts";
 import { greatCircle, haversineKm, type LatLng } from "../algo/geo.ts";
 import { clusterFlags, type FlagCluster, type HomePlace } from "../algo/footprints.ts";
 import { FlagKit, makeHouse } from "./globe-marks.ts";
+import { paintPatchAsync } from "./patch-paint.ts";
 import { icon } from "./icons.ts";
 import { t } from "../i18n/index.ts";
 
@@ -168,16 +169,13 @@ export class GlobeView {
     const land: Ring[][] = await loadLand10(this.base).catch(() => []); if (!land.length || !still()) return;
     // D106：等飞完再画（同步画一张 3072 的图，飞到一半就卡两秒）；手机上画 2048
     while (this.anim) { await new Promise((r) => setTimeout(r, 120)); if (!still()) return; }
-    if (this.patch) { this.root.remove(this.patch); (this.patch.material as THREE.MeshStandardMaterial).map?.dispose(); this.patch.geometry.dispose(); this.patch = null; }
     this.patchBox = box;
     const touch = typeof navigator !== "undefined" && navigator.maxTouchPoints > 0; const W = touch ? 1536 : 3072, H = Math.min(W, Math.round((W * (maxLat - minLat)) / (maxLng - minLng) / Math.max(0.3, Math.cos(((minLat + maxLat) / 2) * D2R)) * Math.cos(((minLat + maxLat) / 2) * D2R)) || 1536);
     const sub = land.filter((poly) => poly[0].some(([x, y]) => x > minLng - 5 && x < maxLng + 5 && y > minLat - 5 && y < maxLat + 5));
-    const { color, rough } = paintEarth(sub, { width: W, height: Math.max(512, H), bbox: { minLng, maxLng, minLat, maxLat }, shelf: 0.12, seed: 11, noBump: true });
-    // 边缘羽化，和底图融在一起
-    const cx = color.getContext("2d")!; const fx = document.createElement("canvas"); fx.width = color.width; fx.height = color.height; const f = fx.getContext("2d")!;
-    const gh = f.createLinearGradient(0, 0, fx.width, 0); gh.addColorStop(0, "rgba(0,0,0,0)"); gh.addColorStop(0.08, "#000"); gh.addColorStop(0.92, "#000"); gh.addColorStop(1, "rgba(0,0,0,0)"); f.fillStyle = gh; f.fillRect(0, 0, fx.width, fx.height);
-    f.globalCompositeOperation = "destination-in"; const gv = f.createLinearGradient(0, 0, 0, fx.height); gv.addColorStop(0, "rgba(0,0,0,0)"); gv.addColorStop(0.1, "#000"); gv.addColorStop(0.9, "#000"); gv.addColorStop(1, "rgba(0,0,0,0)"); f.fillStyle = gv; f.fillRect(0, 0, fx.width, fx.height);
-    cx.globalCompositeOperation = "destination-in"; cx.drawImage(fx, 0, 0);
+    // D109：在 Web Worker 里画（原来同步画，落地后还要顿一下）；画的时候镜头又飞走了 / 书合上了，就不铺
+    const { color, rough } = await paintPatchAsync(sub, { width: W, height: Math.max(512, H), bbox: { minLng, maxLng, minLat, maxLat }, shelf: 0.12, seed: 11 });
+    if (!still()) return;
+    if (this.patch) { this.root.remove(this.patch); (this.patch.material as THREE.MeshStandardMaterial).map?.dispose(); this.patch.geometry.dispose(); this.patch = null; }
     const tex = new THREE.CanvasTexture(color); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
     const geo = new THREE.SphereGeometry(R * 1.0006, 96, 64, (minLng + 180) * D2R, (maxLng - minLng) * D2R, (90 - maxLat) * D2R, (maxLat - minLat) * D2R);
     this.patch = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: tex, roughnessMap: new THREE.CanvasTexture(rough), roughness: 1, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1 }));

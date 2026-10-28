@@ -43,11 +43,15 @@ export function drawRings(ctx: CanvasRenderingContext2D, polys: Ring[][], proj: 
   const trace = (ring: Ring, shift: number) => { ring.forEach(([lng, lat], i) => { const [x, y] = proj(lng + shift, lat); if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y); }); if (closed) ctx.closePath(); };
   for (const poly of polys) for (const r of poly) { const u = unwrap(r); if (!u.crosses) trace(r, 0); else { trace(u.ring, 0); trace(u.ring, 360); trace(u.ring, -360); } }
 }
+/** D109：在页面里是普通画布，在 Web Worker 里（高清补丁在后台画）是 OffscreenCanvas——2D 接口一样，这里只当画布用 */
+export function newCanvas(): HTMLCanvasElement {
+  return typeof document !== "undefined" ? document.createElement("canvas") : (new OffscreenCanvas(1, 1) as unknown as HTMLCanvasElement);
+}
 let blurOK: boolean | null = null;
 /** WebKit（iOS 的 WKWebView、Safari）认得 ctx.filter = "blur(…)"，但画出来不模糊：探一次，不灵就改用「缩小再平滑放大」 */
 function canvasBlurWorks(): boolean {
   if (blurOK !== null) return blurOK;
-  const c = document.createElement("canvas"); c.width = c.height = 16; const x = c.getContext("2d", { willReadFrequently: true })!;
+  const c = newCanvas(); c.width = c.height = 16; const x = c.getContext("2d", { willReadFrequently: true })!;
   x.filter = "blur(3px)"; x.fillStyle = "#000"; x.fillRect(7, 0, 2, 16);
   return (blurOK = x.getImageData(3, 8, 1, 1).data[3] > 0);
 }
@@ -56,8 +60,8 @@ export function drawBlurred(ctx: CanvasRenderingContext2D, src: HTMLCanvasElemen
   ctx.save();
   if (canvasBlurWorks()) { ctx.filter = `blur(${px}px)`; ctx.drawImage(src, dx, dy); ctx.restore(); return; }
   const f = Math.max(1, px / 3); const w = Math.max(2, Math.round(src.width / f)), h = Math.max(2, Math.round(src.height / f));
-  const a = document.createElement("canvas"); a.width = w; a.height = h; const ax = a.getContext("2d")!; ax.imageSmoothingQuality = "high"; ax.drawImage(src, 0, 0, w, h);
-  const b = document.createElement("canvas"); b.width = Math.max(1, w >> 1); b.height = Math.max(1, h >> 1); const bx = b.getContext("2d")!; bx.imageSmoothingQuality = "high"; bx.drawImage(a, 0, 0, b.width, b.height);
+  const a = newCanvas(); a.width = w; a.height = h; const ax = a.getContext("2d")!; ax.imageSmoothingQuality = "high"; ax.drawImage(src, 0, 0, w, h);
+  const b = newCanvas(); b.width = Math.max(1, w >> 1); b.height = Math.max(1, h >> 1); const bx = b.getContext("2d")!; bx.imageSmoothingQuality = "high"; bx.drawImage(a, 0, 0, b.width, b.height);
   ax.clearRect(0, 0, w, h); ax.drawImage(b, 0, 0, w, h);
   ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high"; ctx.drawImage(a, dx, dy, src.width, src.height); ctx.restore();
 }
@@ -70,7 +74,7 @@ export function paintEarth(land: Ring[][], o: EarthOpts): { color: HTMLCanvasEle
   const proj = (lng: number, lat: number): [number, number] => [((lng - b.minLng) / (b.maxLng - b.minLng)) * W, ((b.maxLat - lat) / (b.maxLat - b.minLat)) * H];
   const latAt = (y: number) => b.maxLat - (y / H) * (b.maxLat - b.minLat);
   const pxPerDeg = W / (b.maxLng - b.minLng);
-  const mk = () => { const c = document.createElement("canvas"); c.width = W; c.height = H; return c; };
+  const mk = () => { const c = newCanvas(); c.width = W; c.height = H; return c; };
   // 陆地遮罩
   const mask = mk(); const mx = mask.getContext("2d")!; mx.fillStyle = "#000"; mx.fillRect(0, 0, W, H); mx.fillStyle = "#fff"; drawRings(mx, land, proj); mx.fill("evenodd");
   // 同一块陆地的 alpha 版（透明底上画陆地）：给 destination-in / source-in 用，免得逐像素读回（手机上读回大画布很慢）
@@ -103,7 +107,7 @@ export function paintEarth(land: Ring[][], o: EarthOpts): { color: HTMLCanvasEle
     const P = pts.map(([lng, lat]) => proj(lng, lat)); const pad = width + blurPx * 3;
     const x0 = Math.floor(Math.min(...P.map((p) => p[0])) + shift[0] - pad), y0 = Math.floor(Math.min(...P.map((p) => p[1])) + shift[1] - pad);
     const x1 = Math.ceil(Math.max(...P.map((p) => p[0])) + shift[0] + pad), y1 = Math.ceil(Math.max(...P.map((p) => p[1])) + shift[1] + pad);
-    const t = document.createElement("canvas"); t.width = Math.max(1, x1 - x0); t.height = Math.max(1, y1 - y0); const tx = t.getContext("2d")!;
+    const t = newCanvas(); t.width = Math.max(1, x1 - x0); t.height = Math.max(1, y1 - y0); const tx = t.getContext("2d")!;
     tx.strokeStyle = style; tx.lineWidth = width; tx.lineCap = "round"; tx.lineJoin = "round"; tx.beginPath();
     P.forEach(([x, y], i) => { if (i) tx.lineTo(x + shift[0] - x0, y + shift[1] - y0); else tx.moveTo(x + shift[0] - x0, y + shift[1] - y0); }); tx.stroke();
     drawBlurred(ctx, t, blurPx, x0, y0);
@@ -151,14 +155,14 @@ export function paintEarth(land: Ring[][], o: EarthOpts): { color: HTMLCanvasEle
 let grainCache: HTMLCanvasElement | null = null;
 function grainTile(seed: number): HTMLCanvasElement {
   if (grainCache) return grainCache;
-  const c = document.createElement("canvas"); c.width = c.height = 256; const x = c.getContext("2d")!; const id = x.createImageData(256, 256); const d = id.data; const R = rng(seed);
+  const c = newCanvas(); c.width = c.height = 256; const x = c.getContext("2d")!; const id = x.createImageData(256, 256); const d = id.data; const R = rng(seed);
   for (let i = 0; i < d.length; i += 4) { const n = R() - 0.5; const v = n > 0 ? 255 : 0; d[i] = d[i + 1] = d[i + 2] = v; d[i + 3] = Math.round(Math.abs(n) * 2 * 10); }
   x.putImageData(id, 0, 0); return (grainCache = c);
 }
 
 /** 云：分形值噪声阈值化 */
 export function paintClouds(W = 1024, H = 512, seed = 3): HTMLCanvasElement {
-  const c = document.createElement("canvas"); c.width = W; c.height = H; const x = c.getContext("2d")!; const id = x.createImageData(W, H); const d = id.data;
+  const c = newCanvas(); c.width = W; c.height = H; const x = c.getContext("2d")!; const id = x.createImageData(W, H); const d = id.data;
   const R = rng(seed); const G = 64; const grid = new Float32Array((G + 1) * (G / 2 + 1)); for (let i = 0; i < grid.length; i++) grid[i] = R();
   const val = (u: number, v: number, f: number) => { const gu = (u * f) % G, gv = Math.min(G / 2 - 0.001, v * f * 0.5); const i = Math.floor(gu), j = Math.floor(gv), a = gu - i, b = gv - j; const s = (t: number) => t * t * (3 - 2 * t); const g = (ii: number, jj: number) => grid[(jj * (G + 1)) + ((ii % G) + G) % G]; return (g(i, j) * (1 - s(a)) + g(i + 1, j) * s(a)) * (1 - s(b)) + (g(i, j + 1) * (1 - s(a)) + g(i + 1, j + 1) * s(a)) * s(b); };
   for (let y = 0; y < H; y++) for (let xx = 0; xx < W; xx++) {
@@ -171,4 +175,14 @@ export function paintClouds(W = 1024, H = 512, seed = 3): HTMLCanvasElement {
     const k = (y * W + xx) * 4; d[k] = d[k + 1] = d[k + 2] = 255; d[k + 3] = Math.max(0, Math.min(255, a * 235 + (R() - 0.5) * 3));
   }
   x.putImageData(id, 0, 0); return c;
+}
+
+/** 聚焦一块地方时铺的高清补丁：画好颜色图与粗糙度图，四边羽化，好和底图融在一起（D109：主线程和 patch-worker.ts 共用） */
+export function paintPatchTex(land: Ring[][], o: EarthOpts): { color: HTMLCanvasElement; rough: HTMLCanvasElement } {
+  const { color, rough } = paintEarth(land, { ...o, noBump: true });
+  const cx = color.getContext("2d")!; const fx = newCanvas(); fx.width = color.width; fx.height = color.height; const f = fx.getContext("2d")!;
+  const gh = f.createLinearGradient(0, 0, fx.width, 0); gh.addColorStop(0, "rgba(0,0,0,0)"); gh.addColorStop(0.08, "#000"); gh.addColorStop(0.92, "#000"); gh.addColorStop(1, "rgba(0,0,0,0)"); f.fillStyle = gh; f.fillRect(0, 0, fx.width, fx.height);
+  f.globalCompositeOperation = "destination-in"; const gv = f.createLinearGradient(0, 0, 0, fx.height); gv.addColorStop(0, "rgba(0,0,0,0)"); gv.addColorStop(0.1, "#000"); gv.addColorStop(0.9, "#000"); gv.addColorStop(1, "rgba(0,0,0,0)"); f.fillStyle = gv; f.fillRect(0, 0, fx.width, fx.height);
+  cx.globalCompositeOperation = "destination-in"; cx.drawImage(fx, 0, 0);
+  return { color, rough };
 }
