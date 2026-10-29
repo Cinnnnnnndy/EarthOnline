@@ -521,7 +521,9 @@ export class GlobeView {
       if (this.heroAtHome) this.hero.group.quaternion.copy(this.camera.quaternion);   // 家门口的自己：像立着的小摆件，正脸朝镜头（远看地球时不至于只看到头顶）
       else this.hero.group.quaternion.slerp(this.camera.quaternion, this.faceCam());   // D109：翻开书时镜头几乎垂直往下看，立在地上的小人只剩一个白帽顶，也立起来朝镜头
       this.hero.update(dt, 0);
-      const vis = N.dot(this.camera.position.clone().normalize()) > 0.15; this.hero.group.visible = vis;
+      // D112：快转到地球边上时缩小着消失（原来一直立到边上，立着朝镜头的身子整个探出地球外面，像飘在天上）；家门口的那个和背面的「家」指示同一个阈值
+      const fade = this.heroAtHome ? edgeFade(N.dot(this.camera.position.clone().normalize())) : (N.dot(this.camera.position.clone().normalize()) > 0.15 ? 1 : 0);
+      this.hero.group.scale.multiplyScalar(Math.max(0.001, fade)); this.hero.group.visible = fade > 0.02;
     }
     this.renderFrame();
     this.updateLabels(); this.ev.moved?.(this.cam);
@@ -533,7 +535,7 @@ export class GlobeView {
       const right = new THREE.Vector3().setFromMatrixColumn(this.camera.matrixWorld, 0), up = new THREE.Vector3().setFromMatrixColumn(this.camera.matrixWorld, 1);
       const off = this.anim || this.dragging;
       for (const e of this.edges) {
-        const n = e.P.clone().normalize(); if (off || n.dot(camN) > 0.12) { e.el.style.display = "none"; continue; }
+        const n = e.P.clone().normalize(); if (off || n.dot(camN) > (e.id === "home" ? EDGE_GONE : 0.12)) { e.el.style.display = "none"; continue; }
         const v = n.clone().sub(camN.clone().multiplyScalar(n.dot(camN))); const dx = v.dot(right), dy = -v.dot(up); const len = Math.hypot(dx, dy) || 1;
         const x = Math.max(22, Math.min(this.w - 22, disk.x + (dx / len) * (disk.r + 22))), y = Math.max(22, Math.min(this.h - 22, disk.y + (dy / len) * (disk.r + 22)));
         e.el.style.display = ""; e.el.style.transform = `translate(${Math.round(x - 16)}px, ${Math.round(y - 16)}px) rotate(0deg)`;
@@ -606,9 +608,9 @@ export class GlobeView {
     this.kit.wave(t);
     // 家
     if (this.home) {
-      const P = ll2v(this.home.lat, this.home.lng, R * 1.0004); const N = P.clone().normalize(); const vis = N.dot(camN) > 0.05; this.house.visible = vis;
+      const P = ll2v(this.home.lat, this.home.lng, R * 1.0004); const N = P.clone().normalize(); const fade = edgeFade(N.dot(camN)); const vis = fade > 0.02; this.house.visible = vis;
       if (vis) {
-        const size = Math.min(pxWorld(P) * 34, 0.1); this.house.position.copy(P); this.house.scale.setScalar(size);
+        const size = Math.min(pxWorld(P) * 34, 0.1) * fade; this.house.position.copy(P); this.house.scale.setScalar(size);
         // D109：远看地球时镜头几乎正对地面，贴地立着的房子只露出一块深色屋顶。像家门口的小人一样立起来正对镜头，
         // 再侧过来一点、往镜头低一点头，墙、门、窗和屋顶都看得见；拉近、镜头斜下来以后慢慢回到真的立在地上
         const k = Math.max(this.faceCam(), Math.min(1, Math.max(0, (this.cam.alt - 0.15) / 0.35)));
@@ -633,5 +635,8 @@ export class GlobeView {
 }
 /** 立着正对镜头的小房子：往左侧过 25°、朝镜头低头 14°，看得到正面、一侧的墙和屋顶 */
 const HOUSE_TURN = new THREE.Quaternion().setFromEuler(new THREE.Euler(0.24, -0.44, 0, "YXZ"));
+/** D112：家门口的小人和小房子离地球边多近开始缩小、多近完全不见（N·镜头方向）；完全不见时背面的「家」指示接上 */
+const EDGE_GONE = 0.3, EDGE_FULL = 0.5;
+function edgeFade(d: number) { const t = Math.min(1, Math.max(0, (d - EDGE_GONE) / (EDGE_FULL - EDGE_GONE))); return t * t * (3 - 2 * t); }
 function esc(s: string) { return s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c] as string)); }
 export { DEFAULT_AVATAR };
