@@ -98,7 +98,8 @@ struct WorldStage: View {
         case .spread(let foldX, let gap):
             if case .home = app.stage {
                 guard duoOpen else { return Insets(left: 0, bottom: 0) }
-                return Insets(left: 0, bottom: Double(safe.bottom + Metrics.globeBottomMargin).rounded(), top: Double(safe.top + Metrics.globeTopMargin).rounded(), fill: Metrics.globeFill)
+                // D110：图标回到顶上一排，上边也让出那一排
+                return Insets(left: 0, bottom: Double(safe.bottom + Metrics.globeBottomMargin).rounded(), top: Double(safe.top + 8 + Metrics.touch + Metrics.globeTopMargin).rounded(), fill: Metrics.globeFill)
             }
             return Insets(left: Double(foldX + gap / 2).rounded(), bottom: 0)
         case .triple(let creases, let gap):
@@ -206,11 +207,10 @@ struct StageScaffold<Leading: View, Trailing: View, Bottom: View>: View {
                     .padding(.leading, inset)
                     .padding(.trailing, Metrics.gutter)
                     .frame(width: leftWidth, height: proxy.size.height, alignment: .topLeading)
-                    // D105：Duo 横持展开时图标竖着排在右边一列，顶上让出右上角竖放的状态栏；别的两页设备还是右上一排
+                    // D110：所有机型图标都在顶上一排（D105 的 Duo 横持右边一列撤掉）；Duo 横持时让开右上角竖放的状态栏
                     trailing
-                        .environment(\.iconBarVertical, duoOpen)
-                        .padding(.top, duoOpen ? Metrics.statusClearance : 8)
-                        .padding(.trailing, Metrics.gutter)
+                        .padding(.top, 8)
+                        .padding(.trailing, Metrics.gutter + (duoOpen ? Metrics.statusSideWidth : 0))
                         .frame(width: proxy.size.width, height: proxy.size.height, alignment: .topTrailing)
                 }
             }

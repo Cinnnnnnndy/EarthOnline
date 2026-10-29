@@ -61,6 +61,6 @@ enum Metrics {
     static let globeFill: Double = 0.94
     /// D105：两页时左页内容离屏幕左边的距离（内屏四角圆得很大，16 会被切掉票的一角）
     static let spreadLeading: CGFloat = 32
-    /// D105：横持展开时右边一列图标顶上让出状态栏（时间 + 信号那一块竖着放在右上角）
-    static let statusClearance: CGFloat = 96
+    /// D110：Duo 横持展开时状态栏（时间 + 信号）竖着放在右上角，顶上那排图标要让开它这么宽
+    static let statusSideWidth: CGFloat = 64
 }

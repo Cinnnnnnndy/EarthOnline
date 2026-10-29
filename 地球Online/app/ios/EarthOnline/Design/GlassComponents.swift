@@ -81,21 +81,11 @@ struct GlassIconButton: View {
 /// 一组浮动图标按钮（右上角），放在同一个 GlassEffectContainer 里让玻璃彼此融合
 struct GlassIconBar<Content: View>: View {
     @ViewBuilder var content: Content
-    /// D105：横持展开时竖着排在右边（StageScaffold 两页时设）
-    @Environment(\.iconBarVertical) private var vertical
 
     var body: some View {
         GlassEffectContainer(spacing: 10) {
-            if vertical { VStack(spacing: 10) { content } } else { HStack(spacing: 10) { content } }
+            HStack(spacing: 10) { content }
         }
-    }
-}
-
-private struct IconBarVerticalKey: EnvironmentKey { static let defaultValue = false }
-extension EnvironmentValues {
-    var iconBarVertical: Bool {
-        get { self[IconBarVerticalKey.self] }
-        set { self[IconBarVerticalKey.self] = newValue }
     }
 }
 
