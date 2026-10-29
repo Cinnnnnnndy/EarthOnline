@@ -529,10 +529,10 @@ export class GlobeView {
       if (l.kind.startsWith("bookflag")) { lx = x - 3; ly = y - h + 2; l.el.style.display = ""; l.el.style.transform = `translate(${Math.round(lx)}px, ${Math.round(ly)}px)`; placed.push({ x: lx, y: ly, w, h }); continue; }   // 旗杆脚踩在点上，旗永远显示
       if (l.kind === "bookcard") { ly = y - h - 36; lx = Math.max(8, Math.min(this.w - w - 8, lx)); ly = Math.max(8, ly); l.el.style.display = ""; l.el.style.transform = `translate(${Math.round(lx)}px, ${Math.round(ly)}px)`; placed.push({ x: lx, y: ly, w, h }); continue; }
       const hit = placed.find((r) => lx < r.x + r.w + 4 && lx + w + 4 > r.x && ly < r.y + r.h + 3 && ly + h + 3 > r.y);
-      if (hit) { if (l.kind === "leg" || l.kind.startsWith("stop")) { ly = hit.y - h - 4; if (placed.some((r) => lx < r.x + r.w && lx + w > r.x && ly < r.y + r.h && ly + h > r.y)) { l.el.style.display = "none"; continue; } } else if (l.kind === "book") {
-        // 书签：先试着往下挪，再试往上；都不行就让它压着（书签必须看得见）
-        const free = (yy: number) => !placed.some((r) => lx < r.x + r.w + 4 && lx + w + 4 > r.x && yy < r.y + r.h + 3 && yy + h + 3 > r.y) && yy > 4 && yy + h < this.h - 4;
-        let y2 = ly; for (let k = 1; k < 8 && !free(y2); k++) { const d = (h + 6) * Math.ceil(k / 2) * (k % 2 ? 1 : -1); y2 = ly + d; } if (free(y2)) ly = y2;
+      if (hit) { if (l.kind === "leg" || l.kind.startsWith("stop")) { ly = hit.y - h - 4; if (placed.some((r) => lx < r.x + r.w && lx + w > r.x && ly < r.y + r.h && ly + h > r.y)) { l.el.style.display = "none"; continue; } } else if (l.kind === "book" || l.kind === "day") {   // D110：「D5 奈良」这样的天也挪一挪，不被挤掉
+        // 书签：先试着往下挪，再试往上；都不行就让它压着（书签必须看得见）。D110：天的标签最多挪开两个身位，再远就和它标的地方对不上了，宁可不显示
+        const free = (yy: number) => !placed.some((r) => lx < r.x + r.w + 4 && lx + w + 4 > r.x && yy < r.y + r.h + 3 && yy + h + 3 > r.y) && yy > Math.max(4, l.kind === "day" ? this.insets.top : 0) && yy + h < this.h - Math.max(4, l.kind === "day" ? this.insets.bottom : 0);
+        let y2 = ly; for (let k = 1; k < (l.kind === "day" ? 5 : 8) && !free(y2); k++) { const d = (h + 6) * Math.ceil(k / 2) * (k % 2 ? 1 : -1); y2 = ly + d; } if (free(y2)) ly = y2; else if (l.kind === "day") { l.el.style.display = "none"; continue; }
       } else { l.el.style.display = "none"; continue; } }
       l.el.style.display = ""; l.el.style.transform = `translate(${Math.round(lx)}px, ${Math.round(ly)}px)`; placed.push({ x: lx, y: ly, w, h });
     }
