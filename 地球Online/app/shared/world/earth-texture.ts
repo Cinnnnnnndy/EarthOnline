@@ -79,6 +79,8 @@ export function paintEarth(land: Ring[][], o: EarthOpts): { color: HTMLCanvasEle
   const mask = mk(); const mx = mask.getContext("2d")!; mx.fillStyle = "#000"; mx.fillRect(0, 0, W, H); mx.fillStyle = "#fff"; drawRings(mx, land, proj); mx.fill("evenodd");
   // 同一块陆地的 alpha 版（透明底上画陆地）：给 destination-in / source-in 用，免得逐像素读回（手机上读回大画布很慢）
   const maskA = mk(); const ma = maskA.getContext("2d")!; ma.fillStyle = "#fff"; drawRings(ma, land, proj); ma.fill("evenodd");
+  // D111：南极洲的轮廓在极点附近合不上，evenodd 填完极点留一个海色的圆洞：南纬 82° 往南一律算陆地（再往南是罗斯冰架，本来就是白的）
+  if (b.minLat < -82) { const y = proj(0, -82)[1]; mx.fillRect(0, y, W, H - y); ma.fillRect(0, y, W, H - y); }
   const color = mk(); const c = color.getContext("2d")!;
   // 海：高纬偏深青，赤道偏亮蓝
   const og = c.createLinearGradient(0, 0, 0, H);
@@ -142,7 +144,8 @@ export function paintEarth(land: Ring[][], o: EarthOpts): { color: HTMLCanvasEle
   bu.globalCompositeOperation = "destination-in"; bu.drawImage(maskA, 0, 0);
   c.drawImage(biome, 0, 0);
   // 沙色海岸线
-  c.strokeStyle = "rgba(250,236,196,0.75)"; c.lineWidth = Math.max(1, pxPerDeg * 0.05); c.lineJoin = "round"; drawRings(c, land, proj); c.stroke();
+  c.save(); if (b.minLat < -82) { c.beginPath(); c.rect(0, 0, W, proj(0, -82)[1]); c.clip(); }   // D111：极点那圈合不上的边不描
+  c.strokeStyle = "rgba(250,236,196,0.75)"; c.lineWidth = Math.max(1, pxPerDeg * 0.05); c.lineJoin = "round"; drawRings(c, land, proj); c.stroke(); c.restore();
   // 国界
   if (o.borders) { c.strokeStyle = "rgba(255,255,255,0.38)"; c.lineWidth = Math.max(0.8, pxPerDeg * 0.03); drawRings(c, o.borders.map((l) => [l]), proj, false); c.stroke(); }
   // 颗粒
