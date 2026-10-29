@@ -27,7 +27,8 @@ export interface GlobeEvents { pickBook?: (id: string) => void; pickDay?: (bookI
 export interface GlobeFlag { id: string; name: string; lat: number; lng: number }
 
 const R = 1; const D2R = Math.PI / 180;
-/** 路线和站点小球离地的高度（约 2 公里：比地图贴片 1.0006 高一点，不打架，拉近也不飘） */
+/** 路线、站点小球和它们的牌子离地的高度（约 2 公里，拉近也不飘）。D110：牌子原来挂在 1.004（约 25 公里高），
+ *  看某一天时镜头比它还低，牌子就投到屏幕顶上、钻进状态栏 */
 const ROUTE_LIFT = 1.0003;
 /** 地球上书的小旗（D103）：一根旗杆 + 三角旗面，颜色由 CSS（.gl-bookflag.f-done / f-soon / f-live）给 */
 const FLAG_SVG = `<svg width="22" height="28" viewBox="0 0 22 28" aria-hidden="true"><path d="M3 2v25" stroke="#1d2842" stroke-width="2" stroke-linecap="round"/><path class="fl" d="M4 3h14l-4 5 4 5H4z"/><circle cx="3" cy="26.5" r="1.8" fill="#1d2842"/></svg>`;
@@ -249,11 +250,12 @@ export class GlobeView {
   }
   /** D109：翻开一本书时的取景——整条路线装进露出来的那块（去掉底部的票和日程、顶上那排按钮），四周留出边。
    *  原来对准「中心往南 1 度」、按整屏算高度：关西这样半径几十公里的书，镜头落在路线南边一百多公里的海岸上，路线、站点、小人都不在画面里 */
-  private bookCam(b: GlobeBook): CamState {
+  private bookCam(b: GlobeBook): CamState { return this.fitCam(b.center, b.radiusKm, 12); }
+  private fitCam(center: LatLng, radiusKm: number, tilt: number): CamState {
     const { left, right, top, bottom } = this.insets; const availH = Math.max(80, this.h - top - bottom), availW = Math.max(80, this.w - left - right);
     const rPx = (Math.min(availH, availW) / 2) * 0.7; const k = (rPx / (this.h / 2)) * Math.tan((this.camera.fov * D2R) / 2);
-    const a = Math.min(1.2, b.radiusKm / 6371); const alt = Math.max(0.018, Math.sin(a) / Math.max(0.02, k) - (1 - Math.cos(a)));
-    return { lat: b.center[0], lng: b.center[1], alt, tilt: 12, heading: 0 };
+    const a = Math.min(1.2, radiusKm / 6371); const alt = Math.max(0.0015, Math.sin(a) / Math.max(0.02, k) - (1 - Math.cos(a)));
+    return { lat: center[0], lng: center[1], alt, tilt, heading: 0 };
   }
   /** 正以「整本书」取景（没拖动、没缩放、没进某一天）：让出的边变了（抽屉长出来、转屏）就重新装 */
   private bookFit = false;
@@ -266,7 +268,8 @@ export class GlobeView {
     this.homeFit = false; this.bookFit = false;
     const b = this.books.find((x) => x.id === id); const d = b?.days[dayIdx]; if (!b || !d) return; this.focus = { book: id, day: dayIdx }; this.rebuildOverlay();
     if (!this.patch) this.detailPatch(b);
-    this.flyTo({ lat: d.center[0] - 0.15 * Math.min(4, d.radiusKm / 60), lng: d.center[1], alt: altFor(Math.max(18, d.radiusKm), this.fitFov()) * 1.1, tilt: 38, heading: 0 }, animate ? 1800 : 0, done);
+    // D110：按露出来的那块装（顶上按钮和底下这一天的抽屉之间）：原来按整屏算、再往南挪一点，站点挤在顶上，第一站的牌子钻到状态栏底下
+    this.flyTo(this.fitCam(d.center, Math.max(6, d.radiusKm * 1.3), 30), animate ? 1800 : 0, done);
   }
   /** 潜入：从当前视角往这一天的中心俯冲 */
   dive(done: () => void) {
@@ -343,7 +346,7 @@ export class GlobeView {
           const m = new THREE.Mesh(stopGeo, new THREE.MeshStandardMaterial({ color: new THREE.Color(KIND[s.kind] || d.color), roughness: 0.4 }));
           m.position.copy(ll2v(s.lat, s.lng, R * ROUTE_LIFT)); m.userData = { px: 5 }; this.overlay.add(m); this.stopMeshes.push(m);
         }
-        if (this.focus.day === undefined) this.addLabel(`day-${di}`, `<b>${esc(d.label)}</b>${esc(d.title)}`, ll2v(d.center[0], d.center[1], R * 1.004), "day", 1 + di * 0.01, () => this.ev.pickDay?.(b.id, di));
+        if (this.focus.day === undefined) this.addLabel(`day-${di}`, `<b>${esc(d.label)}</b>${esc(d.title)}`, ll2v(d.center[0], d.center[1], R * ROUTE_LIFT), "day", 1 + di * 0.01, () => this.ev.pickDay?.(b.id, di));
         if (this.focus.day === di) {
           d.stops.forEach((s, si) => {
             const col = KIND[s.kind] || d.color; const p = ll2v(s.lat, s.lng, R * ROUTE_LIFT);
@@ -351,7 +354,7 @@ export class GlobeView {
             m.position.copy(p); m.userData = { px: 5 }; this.overlay.add(m); this.stopMeshes.push(m);
             const ic = s.kind === "hotel" ? icon("hotel", 13) : s.kind === "airport" ? icon("plane", 13) : s.kind === "port" ? icon("anchor", 13) : `<span class="n" style="background:${col}">${esc(String(s.n))}</span>`;
             if (d.stops.slice(0, si).some((x) => x.name === s.name)) return;
-            this.addLabel(`stop-${si}`, `${ic}<b>${esc(s.name)}</b>`, ll2v(s.lat, s.lng, R * 1.004), `stop ${s.kind}`, 2 + si * 0.01);
+            this.addLabel(`stop-${si}`, `${ic}<b>${esc(s.name)}</b>`, ll2v(s.lat, s.lng, R * ROUTE_LIFT), `stop ${s.kind}`, 2 + si * 0.01);
           });
           // 路段标签不在地球上显示了：底部抽屉里逐段列着交通方式、公里和时长
         }
@@ -549,7 +552,8 @@ export class GlobeView {
       if (l.kind.startsWith("bookflag")) { lx = x - 3; ly = y - h + 2; l.el.style.display = ""; l.el.style.transform = `translate(${Math.round(lx)}px, ${Math.round(ly)}px)`; placed.push({ x: lx, y: ly, w, h }); continue; }   // 旗杆脚踩在点上，旗永远显示
       if (l.kind === "bookcard") { ly = y - h - 36; lx = Math.max(8, Math.min(this.w - w - 8, lx)); ly = Math.max(8, ly); l.el.style.display = ""; l.el.style.transform = `translate(${Math.round(lx)}px, ${Math.round(ly)}px)`; placed.push({ x: lx, y: ly, w, h }); continue; }
       const hit = placed.find((r) => lx < r.x + r.w + 4 && lx + w + 4 > r.x && ly < r.y + r.h + 3 && ly + h + 3 > r.y);
-      if (hit) { if (l.kind === "leg" || l.kind.startsWith("stop")) { ly = hit.y - h - 4; if (placed.some((r) => lx < r.x + r.w && lx + w > r.x && ly < r.y + r.h && ly + h > r.y)) { l.el.style.display = "none"; continue; } } else if (l.kind === "book" || l.kind === "day") {   // D110：「D5 奈良」这样的天也挪一挪，不被挤掉
+      if (hit) { if (l.kind === "leg" || l.kind.startsWith("stop")) { ly = hit.y - h - 4; if (ly < this.insets.top || placed.some((r) => lx < r.x + r.w && lx + w > r.x && ly < r.y + r.h && ly + h > r.y)) { l.el.style.display = "none"; continue; } } else if (l.kind === "book" || l.kind === "day") {   // D110：「D5 奈良」这样的天也挪一挪，不被挤掉
+        // 站点的牌子被挤到顶上那排按钮里就不显示（D110）。
         // 书签：先试着往下挪，再试往上；都不行就让它压着（书签必须看得见）。D110：天的标签最多挪开两个身位，再远就和它标的地方对不上了，宁可不显示
         const free = (yy: number) => !placed.some((r) => lx < r.x + r.w + 4 && lx + w + 4 > r.x && yy < r.y + r.h + 3 && yy + h + 3 > r.y) && yy > Math.max(4, l.kind === "day" ? this.insets.top : 0) && yy + h < this.h - Math.max(4, l.kind === "day" ? this.insets.bottom : 0);
         let y2 = ly; for (let k = 1; k < (l.kind === "day" ? 5 : 8) && !free(y2); k++) { const d = (h + 6) * Math.ceil(k / 2) * (k % 2 ? 1 : -1); y2 = ly + d; } if (free(y2)) ly = y2; else if (l.kind === "day") { l.el.style.display = "none"; continue; }
