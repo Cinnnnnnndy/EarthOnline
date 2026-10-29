@@ -523,7 +523,7 @@ export class GlobeView {
       this.hero.update(dt, 0);
       const vis = N.dot(this.camera.position.clone().normalize()) > 0.15; this.hero.group.visible = vis;
     }
-    this.renderer.render(this.scene, this.camera);
+    this.renderFrame();
     this.updateLabels(); this.ev.moved?.(this.cam);
   };
 
@@ -617,7 +617,18 @@ export class GlobeView {
     }
   }
 
-  snapshot(): string { this.renderer.render(this.scene, this.camera); return this.renderer.domElement.toDataURL("image/png"); }
+  /** D111：小人和小房子另画一遍，叠在大气光晕上面。原来它们在地球边上时，透明的大气壳（半径 1.085）画在它们前面，
+   *  转动地球时小人上半身被罩上一层蓝白的雾。第二遍清掉深度：它们是立着朝镜头的，在地球下沿时身子会「插」进球里只剩一双脚；
+   *  转到背面时本来就藏起来了（N·镜头 的判断），所以不用地球来挡 */
+  private renderFrame() {
+    const fg = [this.hero.group, this.house]; for (const o of fg) o.traverse((c) => c.layers.set(1));
+    this.scene.traverse((c) => { if ((c as THREE.Light).isLight) c.layers.enable(1); });
+    const r = this.renderer; const auto = r.autoClear;
+    this.camera.layers.set(0); r.render(this.scene, this.camera);
+    r.autoClear = false; r.clearDepth(); this.camera.layers.set(1); r.render(this.scene, this.camera);
+    r.autoClear = auto; this.camera.layers.set(0);
+  }
+  snapshot(): string { this.renderFrame(); return this.renderer.domElement.toDataURL("image/png"); }
   dispose() { cancelAnimationFrame(this.raf); this.ro.disconnect(); this.clearOverlay(); this.kit.dispose(); this.flagEl.remove(); this.edgeEl.remove(); this.renderer.dispose(); this.renderer.domElement.remove(); this.labelsEl.remove(); this.hero.dispose(); }
 }
 /** 立着正对镜头的小房子：往左侧过 25°、朝镜头低头 14°，看得到正面、一侧的墙和屋顶 */
