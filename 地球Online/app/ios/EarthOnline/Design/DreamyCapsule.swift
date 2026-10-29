@@ -3,7 +3,7 @@ import UIKit
 
 /// 「新建旅程」：浮在地球上、不属于任何卡片的胶囊（第七轮起高 44）。
 /// 平涂的「沙画」渐变 + 细颗粒噪点 + 5 颗小星光 + 一道白色渐变的玻璃边。
-/// 第八轮续：全应用唯一带颜色的按钮——蜜 → 晨 → 琥珀，只有晨色一个色相（珊瑚那一端和天空打架，去掉了），白星，墨色字保证对比；深色外观下底深一档。
+/// 全应用唯一带颜色的按钮。D110：从蜜 → 琥珀换成糖果色的靛紫 → 兰紫 → 樱粉，白字白星；深色外观下底深一档。
 struct DreamyCapsuleButton: View {
     let title: LocalizedStringKey
     var systemImage: String = "sparkles"
@@ -20,7 +20,7 @@ struct DreamyCapsuleButton: View {
                 Text(title)
             }
             .font(.eoSubStrong)
-            .foregroundStyle(Color.dreamInk)
+            .foregroundStyle(Color.white)
             .padding(.horizontal, 22)
             .frame(height: Metrics.capsuleHeight)
             .background { DreamySand(night: night, reduceTransparency: reduceTransparency).clipShape(Capsule()) }
@@ -33,7 +33,7 @@ struct DreamyCapsuleButton: View {
             .contentShape(Capsule())
         }
         .buttonStyle(DreamyPressStyle())
-        .shadow(color: (night ? Color.black : Color.dreamAmber).opacity(night ? 0.3 : 0.35), radius: 18, x: 0, y: 8)
+        .shadow(color: (night ? Color.black : Color.dreamOrchid).opacity(night ? 0.3 : 0.4), radius: 18, x: 0, y: 8)
     }
 }
 
@@ -54,7 +54,7 @@ struct DreamySand: View {
     var body: some View {
         let glint = Color.white
         ZStack {
-            LinearGradient(colors: night ? [.dreamHoneyNight, .dreamDawnNight, .dreamAmberNight] : [.dreamHoney, .dreamDawn, .dreamAmber], startPoint: .leading, endPoint: .trailing)
+            LinearGradient(colors: night ? [.dreamVioletNight, .dreamOrchidNight, .dreamPinkNight] : [.dreamViolet, .dreamOrchid, .dreamPink], startPoint: .leading, endPoint: .trailing)
             // 沙画的「笔触」：两团很淡的横向晕染，仍然是平的
             LinearGradient(colors: [glint.opacity(0.0), glint.opacity(0.10), glint.opacity(0.0)],
                            startPoint: .topLeading, endPoint: .bottomTrailing)

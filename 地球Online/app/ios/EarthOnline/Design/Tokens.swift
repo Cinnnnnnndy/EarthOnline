@@ -24,14 +24,14 @@ extension Color {
         }
     }
 
-    /// 新建旅程胶囊的三段色（第八轮续）：全应用唯一带颜色的按钮——蜜 → 晨 → 琥珀，只有晨色一个色相（珊瑚那一端和天空打架，去掉了）；深色外观下底深一档，字一直是墨
-    static let dreamInk = Color(red: 0x1E / 255, green: 0x26 / 255, blue: 0x40 / 255)
-    static let dreamHoney = Color(red: 0xF6 / 255, green: 0xD5 / 255, blue: 0x8C / 255)
-    static let dreamDawn = Color(red: 0xF0 / 255, green: 0xB8 / 255, blue: 0x4A / 255)
-    static let dreamAmber = Color(red: 0xE6 / 255, green: 0xA0 / 255, blue: 0x32 / 255)
-    static let dreamHoneyNight = Color(red: 0xEB / 255, green: 0xC2 / 255, blue: 0x5E / 255)
-    static let dreamDawnNight = Color(red: 0xDF / 255, green: 0xA5 / 255, blue: 0x3C / 255)
-    static let dreamAmberNight = Color(red: 0xCF / 255, green: 0x8E / 255, blue: 0x2C / 255)
+    /// 新建旅程胶囊的三段色（D110）：全应用唯一带颜色的按钮。原来的蜜 → 琥珀在淡紫的天上像一块旧黄铜，
+    /// 改成糖果色的靛紫 → 兰紫 → 樱粉：和天空同一族（紫、粉），但深两档、更饱和，一眼就是能按的那个；字和星光是白的。深色外观下底深一档
+    static let dreamViolet = Color(red: 0x6A / 255, green: 0x5C / 255, blue: 0xF0 / 255)
+    static let dreamOrchid = Color(red: 0xA8 / 255, green: 0x62 / 255, blue: 0xF2 / 255)
+    static let dreamPink = Color(red: 0xF2 / 255, green: 0x6E / 255, blue: 0xB4 / 255)
+    static let dreamVioletNight = Color(red: 0x55 / 255, green: 0x48 / 255, blue: 0xD8 / 255)
+    static let dreamOrchidNight = Color(red: 0x8E / 255, green: 0x4E / 255, blue: 0xDA / 255)
+    static let dreamPinkNight = Color(red: 0xD8 / 255, green: 0x58 / 255, blue: 0x9C / 255)
 }
 
 /// 字阶（第八轮末，判断 D69）：只有两档字号——17（.body）与 13（.footnote），两种字重；不用字间距、不用全大写。
