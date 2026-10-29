@@ -23,6 +23,12 @@ struct AvatarPreset: Identifiable {
         return a
     }
 
+    /// 现在穿的是不是这一套（名字可以改，不算；行李箱不算）
+    func matches(_ a: Avatar) -> Bool {
+        var x = a; x.suitcase = nil; x.name = avatar.name
+        return x == avatar
+    }
+
     /// 换上：保留自己的行李箱
     func applied(to cur: Avatar) -> Avatar {
         var a = avatar

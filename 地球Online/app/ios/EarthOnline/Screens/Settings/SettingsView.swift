@@ -207,15 +207,23 @@ struct AvatarView: View {
             Section {
                 HStack(spacing: 12) {
                     ForEach(AvatarPreset.all) { p in
+                        // D112：每个默认形象一个小头像（按它自己的发色、毛衣色画），选中的那个描边 + 对勾
+                        let on = p.matches(avatar)
                         Button { avatar = p.applied(to: avatar) } label: {
                             VStack(spacing: 6) {
-                                Image(systemName: p.symbol).font(.eoBody)
+                                AvatarPresetToken(avatar: p.avatar)
+                                    .frame(width: 48, height: 48)
                                 Text(verbatim: p.avatar.name).font(.eoSub)
                             }
-                            .frame(maxWidth: .infinity, minHeight: 64)
+                            .frame(maxWidth: .infinity, minHeight: 84)
+                            .overlay(alignment: .topTrailing) {
+                                if on { Image(systemName: "checkmark.circle.fill").font(.eoSub).foregroundStyle(Color.eoLake).offset(x: 4, y: -4) }
+                            }
                         }
                         .buttonStyle(.glass)
+                        .overlay { Capsule().strokeBorder(Color.eoLake, lineWidth: on ? 2 : 0) }
                         .accessibilityLabel(Text(verbatim: p.avatar.name))
+                        .accessibilityAddTraits(on ? .isSelected : [])
                     }
                 }
             } header: {
@@ -223,7 +231,8 @@ struct AvatarView: View {
             }
             Section {
                 // 形态（D86）：小人、八只动物、三只自建 IP（嵌入页按 form 建角色）
-                Picker("形态", selection: Binding(get: { avatar.form ?? "human" }, set: { avatar.form = $0 == "human" ? nil : $0 })) {
+                // D112：换成动物时把帽子摘掉（下面帽子那一行会藏起来，留着就没法再摘）
+                Picker("形态", selection: Binding(get: { avatar.form ?? "human" }, set: { avatar.form = $0 == "human" ? nil : $0; if $0 != "human" { avatar.hat = "none" } })) {
                     Text("小人").tag("human")
                     Text("狐狸").tag("fox")
                     Text("猫").tag("cat")
@@ -242,6 +251,8 @@ struct AvatarView: View {
                     Text("长毛猫").tag("persian")
                 }
             }
+            // D112：发型、帽子、眼镜、衣服、肤色只对小人有用；选了动物（比如福贵）就不显示这几行
+            if avatar.form == nil {
             Section {
                 Picker("发型", selection: $avatar.hair) {
                     Text("丸子头").tag("bun")
@@ -268,6 +279,7 @@ struct AvatarView: View {
                         .font(.eoSub)
                         .buttonStyle(.borderless)
                 }
+            }
             }
         }
         .font(.eoBody)
