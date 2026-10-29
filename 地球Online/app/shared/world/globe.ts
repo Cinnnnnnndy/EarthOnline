@@ -27,6 +27,8 @@ export interface GlobeEvents { pickBook?: (id: string) => void; pickDay?: (bookI
 export interface GlobeFlag { id: string; name: string; lat: number; lng: number }
 
 const R = 1; const D2R = Math.PI / 180;
+/** 路线和站点小球离地的高度（约 2 公里：比地图贴片 1.0006 高一点，不打架，拉近也不飘） */
+const ROUTE_LIFT = 1.0003;
 /** 地球上书的小旗（D103）：一根旗杆 + 三角旗面，颜色由 CSS（.gl-bookflag.f-done / f-soon / f-live）给 */
 const FLAG_SVG = `<svg width="22" height="28" viewBox="0 0 22 28" aria-hidden="true"><path d="M3 2v25" stroke="#1d2842" stroke-width="2" stroke-linecap="round"/><path class="fl" d="M4 3h14l-4 5 4 5H4z"/><circle cx="3" cy="26.5" r="1.8" fill="#1d2842"/></svg>`;
 export function ll2v(lat: number, lng: number, r = R): THREE.Vector3 {
@@ -292,17 +294,26 @@ export class GlobeView {
   private line(points: THREE.Vector3[], color: string, width: number, dashed: boolean, opacity: number) {
     if (points.length < 2) return;
     const g = new LineGeometry(); g.setPositions(points.flatMap((p) => [p.x, p.y, p.z]));
+    if (!dashed) { // D110：实线底下垫一道白边（像地图上的路线），在绿地、海面上都看得清；虚线不垫（垫了像梯子）
+      const cm = new LineMaterial({ color: new THREE.Color("#ffffff"), linewidth: width + 3, transparent: true, opacity: opacity * 0.85, worldUnits: false, depthTest: true });
+      cm.resolution.set(this.w, this.h); this.lineMats.push(cm); const cl = new Line2(g, cm); cl.renderOrder = 2; this.overlay.add(cl);
+    }
     const m = new LineMaterial({ color: new THREE.Color(color), linewidth: width, dashed, dashSize: 0.006, gapSize: 0.004, transparent: true, opacity, worldUnits: false, depthTest: true });
     m.resolution.set(this.w, this.h); this.lineMats.push(m);
     const l = new Line2(g, m); if (dashed) l.computeLineDistances(); l.renderOrder = 3; this.overlay.add(l);
   }
+  /** D110：路线贴着地面画。原来航班是拱起的弧（最高 0.12 个地球半径），地面路段抬高 1.0018（约 11 公里）、点之间拉直线——
+   *  拉近了看，拱弧成了两根从小人身边斜出去的长直线，直线段的中间钻进地面只剩一截一截。现在每段都沿大圆每约 2 公里取一个点，
+   *  只抬高 ROUTE_LIFT（约 2 公里，刚好不和地面打架）；航班也贴地，用虚线区分 */
   private legPoints(leg: GlobeLeg): THREE.Vector3[] {
-    if (leg.mode === "flight") {
-      const a = leg.coords[0], b = leg.coords[leg.coords.length - 1]; const gc = greatCircle(a, b, 64); const ang = haversineKm(a, b) / 6371;
-      return gc.map(([la, ln], i) => ll2v(la, ln, R * (1.004 + Math.sin((Math.PI * i) / (gc.length - 1)) * Math.min(0.12, ang * 0.35))));
+    const src = leg.mode === "flight" ? [leg.coords[0], leg.coords[leg.coords.length - 1]] : leg.coords.filter((_, i, a) => i % Math.max(1, Math.floor(a.length / 400)) === 0 || i === a.length - 1);
+    const out: THREE.Vector3[] = [];
+    for (let i = 1; i < src.length; i++) {
+      const km = haversineKm(src[i - 1], src[i]); const n = Math.max(1, Math.min(160, Math.ceil(km / 2)));
+      const gc = n > 1 ? greatCircle(src[i - 1], src[i], n) : [src[i - 1], src[i]];
+      for (let k = i > 1 ? 1 : 0; k < gc.length; k++) out.push(ll2v(gc[k][0], gc[k][1], R * ROUTE_LIFT));
     }
-    const step = Math.max(1, Math.floor(leg.coords.length / 400));
-    return leg.coords.filter((_, i) => i % step === 0 || i === leg.coords.length - 1).map(([la, ln]) => ll2v(la, ln, R * 1.0018));
+    return out;
   }
   private rebuildOverlay() {
     this.clearOverlay();
@@ -328,10 +339,14 @@ export class GlobeView {
       b.days.forEach((d, di) => {
         const on = this.focus.day === undefined || this.focus.day === di;
         for (const leg of d.legs) this.line(this.legPoints(leg), d.color, on ? (this.focus.day === di ? 4 : 3) : 2, leg.mode === "flight" || leg.mode === "ship", on ? 1 : 0.3);
+        if (this.focus.day === undefined) for (const s of d.stops) {   // D110：整本书时每一站一个小点，一天的路线有头有尾
+          const m = new THREE.Mesh(stopGeo, new THREE.MeshStandardMaterial({ color: new THREE.Color(KIND[s.kind] || d.color), roughness: 0.4 }));
+          m.position.copy(ll2v(s.lat, s.lng, R * ROUTE_LIFT)); m.userData = { px: 5 }; this.overlay.add(m); this.stopMeshes.push(m);
+        }
         if (this.focus.day === undefined) this.addLabel(`day-${di}`, `<b>${esc(d.label)}</b>${esc(d.title)}`, ll2v(d.center[0], d.center[1], R * 1.004), "day", 1 + di * 0.01, () => this.ev.pickDay?.(b.id, di));
         if (this.focus.day === di) {
           d.stops.forEach((s, si) => {
-            const col = KIND[s.kind] || d.color; const p = ll2v(s.lat, s.lng, R * 1.002);
+            const col = KIND[s.kind] || d.color; const p = ll2v(s.lat, s.lng, R * ROUTE_LIFT);
             const m = new THREE.Mesh(stopGeo, new THREE.MeshStandardMaterial({ color: new THREE.Color(col), emissive: new THREE.Color(col), emissiveIntensity: 0.3, roughness: 0.35 }));
             m.position.copy(p); m.userData = { px: 5 }; this.overlay.add(m); this.stopMeshes.push(m);
             const ic = s.kind === "hotel" ? icon("hotel", 13) : s.kind === "airport" ? icon("plane", 13) : s.kind === "port" ? icon("anchor", 13) : `<span class="n" style="background:${col}">${esc(String(s.n))}</span>`;
@@ -477,6 +492,8 @@ export class GlobeView {
     // 站点小球：保持屏幕上的像素大小
     const pxWorld = (p: THREE.Vector3) => (this.camera.position.distanceTo(p) * Math.tan((this.camera.fov * D2R) / 2) * 2) / this.h;
     for (const m of this.stopMeshes) m.scale.setScalar(pxWorld(m.position) * (m.userData.px as number));
+    // D110：虚线的长短跟着镜头高度走（原来固定 0.006，约 38 公里：拉近了一段虚线就是一根长棍或几个小钩）——屏幕上大约 9 像素一段
+    { const dash = pxWorld(this.camera.position.clone().setLength(R)) * 9; for (const m of this.lineMats) if (m.dashed) { m.dashSize = dash; m.gapSize = dash * 0.7; } }
     // 拉近了：换高清地图（只换一次）。D106：要等相机停稳（不在飞、没在拖、停了一秒）且在首页总览才换——飞进书的半路上换，iOS 上卡两秒
     if (!this.earthBig && this.earthGeo && !this.upgrading && this.cam.alt < 1.2 && !this.anim && !this.dragging && this.idle > 1 && this.focus.book === undefined) { this.upgrading = true; setTimeout(() => this.paintEarthTex(true), 50); }
     this.updateMarks(now / 1000, pxWorld); this.viewPatch();
