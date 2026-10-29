@@ -51,7 +51,7 @@ export class GlobeView {
   private books: GlobeBook[] = []; private focus: { book?: string; day?: number } = {};
   private hero: Character; private heroForm = "human"; private heroAt: LatLng | null = null; private heroAtHome = false;
   /** 首页点开了哪本书的旗（D103）：再点一次旗或点卡片就翻开 */
-  private openFlag: string | null = null; private showHomeLabel = false;
+  private openFlag: string | null = null;
   /** D108：转到背面的家和旗，在地球边上放一个小指示，点了飞过去 */
   private edgeEl!: HTMLElement; private edges: { id: string; P: THREE.Vector3; el: HTMLElement }[] = [];
   /** 手机上先用 2048 的地图，第一次拉近时换成 4096（D103） */
@@ -65,7 +65,7 @@ export class GlobeView {
   private kit = new FlagKit(); private marks = new THREE.Group(); private flagEl: HTMLElement; private flagLabels: Label[] = [];
   private fpData: GlobeFlag[] = []; private fpFresh = new Set<string>(); private flagBucket = NaN;
   private flags: { c: FlagCluster; g: THREE.Group; P: THREE.Vector3; t0: number; fresh: boolean }[] = []; private rings: { m: THREE.Mesh; P: THREE.Vector3; t0: number }[] = [];
-  private plantPending: string[] = []; private home: HomePlace | null = null; private house = makeHouse(); private homeLabel: Label | null = null;
+  private plantPending: string[] = []; private home: HomePlace | null = null; private house = makeHouse();
   private pickCb: ((lat: number, lng: number) => void) | null = null;
 
   constructor(readonly host: HTMLElement, readonly base: string, readonly ev: GlobeEvents = {}) {
@@ -220,7 +220,7 @@ export class GlobeView {
   }
   /** D108：回正——不给目标就回家（没放家就回默认的取景）；给书的 id 就飞到那趟旅行（仍是整颗地球的高度，不翻开书） */
   recenter(target?: string, ms = 1100) {
-    this.openFlag = null; this.showHomeLabel = false; this.returned = true;
+    this.openFlag = null; this.returned = true;
     const b = target ? this.books.find((x) => x.id === target) : undefined;
     const at: LatLng | undefined = b ? b.center : this.home ? [this.home.lat, this.home.lng] : undefined;
     if (this.focus.book !== undefined || !this.homeFit) { this.focusHome(true, at); return; }
@@ -342,13 +342,8 @@ export class GlobeView {
         }
       });
     }
-    // 家：小房子 + 标牌；首页再从家往每本书拉一条淡虚线弧（同一片目的地只拉一条）
-    this.house.visible = !!this.home; this.homeLabel = null;
-    if (this.home && (focusBook || this.showHomeLabel)) {   // D107：首页不常驻「家」的牌子，点小房子才显示
-      this.addLabel("home", `${icon("home", 14)}<b>${esc(t("globe.home"))}</b>${esc(this.home.name)}`, ll2v(this.home.lat, this.home.lng, R * 1.006), "home", -1);
-      this.homeLabel = this.labels[this.labels.length - 1];
-      // D107：首页不再从家往每本书拉虚线
-    }
+    // 家：只有小房子（D110：「家 上海」的牌子哪儿都不显示了——点小房子、翻开书时也不显示）
+    this.house.visible = !!this.home;
     // D108：背面指示（只在首页总览）
     this.edgeEl.replaceChildren(); this.edges = [];
     if (!focusBook) {
@@ -412,8 +407,7 @@ export class GlobeView {
     const rc = new THREE.Raycaster(); rc.setFromCamera(v, this.camera); rc.params.Mesh = {};
     if (this.pickCb) { const h = rc.intersectObject(this.earth, false)[0]; if (h) { const n = h.point.clone().normalize(); const lat = 90 - Math.acos(Math.max(-1, Math.min(1, n.y))) / D2R; const lng = wrap(Math.atan2(n.z, -n.x) / D2R - 180); const cb = this.pickCb; this.pickPoint(null); cb(lat, lng); } return; }
     const hit = rc.intersectObjects(this.stopMeshes, false)[0]; if (hit?.object.userData.book) { this.ev.pickBook?.(hit.object.userData.book as string); return; }
-    if (this.home && this.house.visible && rc.intersectObject(this.house, true).length) { this.showHomeLabel = !this.showHomeLabel; this.openFlag = null; this.rebuildOverlay(); return; }   // 点小房子：显示 / 收起「家」
-    if (this.openFlag || this.showHomeLabel) { this.openFlag = null; this.showHomeLabel = false; this.rebuildOverlay(); }   // 点地球空白处收起小卡
+    if (this.openFlag) { this.openFlag = null; this.rebuildOverlay(); }   // 点地球空白处收起小卡
   }
   setActive(on: boolean) { this.active = on; if (on) { this.last = performance.now(); this.resize(); } }
   /** 被界面挡住的部分（底部抽屉的高度 / 左页的宽度）：把投影中心挪到露出来的那块的中间 */
@@ -472,7 +466,7 @@ export class GlobeView {
       this.cam.lat = Math.max(-80, Math.min(80, this.cam.lat + this.vel.lat * dt)); this.cam.lng = wrap(this.cam.lng + this.vel.lng * dt);
       this.vel.lat *= Math.pow(0.12, dt); this.vel.lng *= Math.pow(0.12, dt);
       // D108：不再自己一直转（转着转着就不知道在哪了）；首页停手 7 秒后慢慢回到家（或默认的取景）。减弱动态效果、点开了小卡时不回
-      if (this.autoRotate && this.focus.book === undefined && !this.pickCb && this.idle > 7 && !this.returned && !this.openFlag && !this.showHomeLabel && !reducedMotion()) { this.returned = true; this.recenter(undefined, 2200); }
+      if (this.autoRotate && this.focus.book === undefined && !this.pickCb && this.idle > 7 && !this.returned && !this.openFlag && !reducedMotion()) { this.returned = true; this.recenter(undefined, 2200); }
     }
     const pose = this.camPose(this.cam); this.camera.position.copy(pose.pos); this.camera.up.copy(pose.up); this.camera.lookAt(pose.look);
     this.rimMat.uniforms.k.value = Math.min(1, Math.max(0, (this.cam.alt - 0.06) / 0.5));
