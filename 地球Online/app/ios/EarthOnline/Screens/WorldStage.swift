@@ -98,10 +98,13 @@ struct WorldStage: View {
         case .spread(let foldX, let gap):
             if case .home = app.stage {
                 guard duoOpen else { return Insets(left: 0, bottom: 0) }
-                // D110：图标回到顶上一排，上边也让出那一排
-                return Insets(left: 0, bottom: Double(safe.bottom + Metrics.globeBottomMargin).rounded(), top: Double(safe.top + 8 + Metrics.touch + Metrics.globeTopMargin).rounded(), fill: Metrics.globeFill)
+                // D110：图标回到顶上一排，上边也让出那一排。
+                // D112：左下角那张票压着地球的左下：左边让出票宽的三分之二，地球往右挪（大小由高度定，不变小）
+                let left = obstruction.map { Double($0.maxX * 0.65).rounded() } ?? 0
+                return Insets(left: left, bottom: Double(safe.bottom + Metrics.globeBottomMargin).rounded(), top: Double(safe.top + 8 + Metrics.touch + Metrics.globeTopMargin).rounded(), fill: Metrics.globeFill)
             }
-            return Insets(left: Double(foldX + gap / 2).rounded(), bottom: 0)
+            // D112：书和某一天时上边也让出顶上那排按钮，路线不顶到按钮里
+            return Insets(left: Double(foldX + gap / 2).rounded(), bottom: 0, top: Double(safe.top + 8 + Metrics.touch).rounded())
         case .triple(let creases, let gap):
             let left = Double((creases.first ?? screen.width / 3) + gap / 2).rounded()
             let right = Double(screen.width - ((creases.count > 1 ? creases[1] : screen.width * 2 / 3) - gap / 2)).rounded()
