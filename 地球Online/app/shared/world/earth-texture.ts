@@ -164,7 +164,8 @@ function grainTile(seed: number): HTMLCanvasElement {
 export function paintClouds(W = 1024, H = 512, seed = 3): HTMLCanvasElement {
   const c = newCanvas(); c.width = W; c.height = H; const x = c.getContext("2d")!; const id = x.createImageData(W, H); const d = id.data;
   const R = rng(seed); const G = 64; const grid = new Float32Array((G + 1) * (G / 2 + 1)); for (let i = 0; i < grid.length; i++) grid[i] = R();
-  const val = (u: number, v: number, f: number) => { const gu = (u * f) % G, gv = Math.min(G / 2 - 0.001, v * f * 0.5); const i = Math.floor(gu), j = Math.floor(gv), a = gu - i, b = gv - j; const s = (t: number) => t * t * (3 - 2 * t); const g = (ii: number, jj: number) => grid[(jj * (G + 1)) + ((ii % G) + G) % G]; return (g(i, j) * (1 - s(a)) + g(i + 1, j) * s(a)) * (1 - s(b)) + (g(i, j + 1) * (1 - s(a)) + g(i + 1, j + 1) * s(a)) * s(b); };
+  // D111：横向按每一层自己的格数 f 绕回（原来按 G = 64 绕，u 走到 1 时 u·f 才到 f < 64，左右两边对不上，180° 经线上一道硬边）
+  const val = (u: number, v: number, f: number) => { const gu = (u * f) % G, gv = Math.min(G / 2 - 0.001, v * f * 0.5); const i = Math.floor(gu), j = Math.floor(gv), a = gu - i, b = gv - j; const s = (t: number) => t * t * (3 - 2 * t); const g = (ii: number, jj: number) => grid[(jj * (G + 1)) + ((ii % f) + f) % f]; return (g(i, j) * (1 - s(a)) + g(i + 1, j) * s(a)) * (1 - s(b)) + (g(i, j + 1) * (1 - s(a)) + g(i + 1, j + 1) * s(a)) * s(b); };
   for (let y = 0; y < H; y++) for (let xx = 0; xx < W; xx++) {
     const u = xx / W, v = y / H; let n = 0, amp = 0.55, f = 6;
     for (let o = 0; o < 4; o++) { n += val(u, v, f) * amp; amp *= 0.5; f *= 2; }
