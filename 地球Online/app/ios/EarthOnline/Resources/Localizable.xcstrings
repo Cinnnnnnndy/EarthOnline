@@ -3672,6 +3672,23 @@
         }
       }
     },
+    "旅程与足迹": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trips and footprints"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "旅と足あと"
+          }
+        }
+      }
+    },
     "旅程和足迹只存在这台手机上。": {
       "extractionState": "manual",
       "localizations": {

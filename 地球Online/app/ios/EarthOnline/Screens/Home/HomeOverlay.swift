@@ -38,9 +38,8 @@ struct HomeOverlay: View {
                         Button { app.world.send(WorldMsg.Recenter(target: t.id)) } label: { Label { Text(verbatim: t.title) } icon: { Image(systemName: "flag") } }
                     }
                 }
-            GlassIconButton("books.vertical", label: "全部旅程") { app.show(.shelf) }
-            GlassIconButton("square.and.arrow.down", label: "导入") { app.sheet = .newTrip(.importFile) }
-            GlassIconButton("flag", label: "足迹与家") { app.show(.footprints) }
+            // D112：书架和足迹合成一颗（进去是全部旅程，顶上一行进足迹与家）；导入不单独放，在「新建旅程」的「导入」页签里
+            GlassIconButton("books.vertical", label: "旅程与足迹") { app.show(.shelf) }
             GlassIconButton("gearshape", label: "设置") { app.show(.settings) }
         }
     }

@@ -10,6 +10,18 @@ struct ShelfView: View {
 
     var body: some View {
         List {
+            // D112：首页的书架和足迹合成了一颗按钮，足迹与家从这里进
+            Section {
+                Button { app.show(.footprints) } label: {
+                    HStack {
+                        Label("足迹与家", systemImage: "flag")
+                        Spacer()
+                        if let home = store.home { Text(verbatim: home.name).foregroundStyle(.secondary) }
+                        Image(systemName: "chevron.right").font(.eoSub).foregroundStyle(.tertiary)
+                    }
+                }
+                .foregroundStyle(.primary)
+            }
             if store.trips.isEmpty {
                 Section {
                     Text("还没有旅程。回到地球，点「新建旅程」开始第一本。")
@@ -44,7 +56,7 @@ struct ShelfView: View {
         }
         .listStyle(.insetGrouped)
         .font(.eoBody)
-        .navigationTitle(Text("全部旅程"))
+        .navigationTitle(Text("旅程与足迹"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
