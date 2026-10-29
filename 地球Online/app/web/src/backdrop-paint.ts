@@ -273,14 +273,11 @@ export function paintOrbit(phase: SpacePhase, seed = 5): HTMLCanvasElement {
       const p = at(B, B.th0 / TAU, 0.2, ph); const rr = r0 * 0.7; const cg = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, rr); cg.addColorStop(0, O.core); cg.addColorStop(1, "rgba(0,0,0,0)");
       ctx.save(); ctx.globalCompositeOperation = "screen"; ctx.fillStyle = cg; ctx.fillRect(p.x - rr, p.y - rr, rr * 2, rr * 2); ctx.restore();
     }
-    if (bi === 0) {                                                          // 最里一道的外沿：一缕淡虹彩
-      ctx.save(); ctx.globalCompositeOperation = "screen"; ctx.filter = "blur(2.5px)"; ctx.lineWidth = 2.2;
-      ([[[255, 130, 140], 0.62], [[255, 230, 160], 0.56], [[170, 236, 255], 0.5]] as [number[], number][]).forEach(([col, u]) => { ctx.strokeStyle = conic(B, col, O.crest); ctx.stroke(pathOf(B, u, ph)); });
-      ctx.restore();
-    }
   });
   // 外缘柔和地消失（画布边不留硬边）
   ctx.save(); ctx.globalCompositeOperation = "destination-in"; const fg = ctx.createRadialGradient(cx, cy, r0 * 2.3, cx, cy, S / 2); fg.addColorStop(0, "rgba(0,0,0,1)"); fg.addColorStop(1, "rgba(0,0,0,0)"); ctx.fillStyle = fg; ctx.fillRect(0, 0, S, S); ctx.restore();
+  // D110：抖一点（±1.5 / 255），淡淡的光晕和光带在 8 位色深下不出一圈圈的台阶
+  { const im = ctx.getImageData(0, 0, c.width, c.height); const d = im.data; for (let i = 0; i < d.length; i += 4) { if (!d[i + 3]) continue; const n = (r.next() - 0.5) * 3; d[i] += n; d[i + 1] += n; d[i + 2] += n; d[i + 3] = Math.max(0, d[i + 3] + n); } ctx.putImageData(im, 0, 0); }
   return c;
 }
 
