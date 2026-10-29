@@ -500,9 +500,12 @@ export class GlobeView {
     // 小人：站在地面上，脸朝镜头，屏幕上约 110 像素高
     if (this.heroAt) {
       const P = ll2v(this.heroAt[0], this.heroAt[1], R); let N = P.clone().normalize();
-      if (this.heroAtHome) {   // 站在小房子右边一点，不挡房子
+      if (this.heroAtHome) {   // 站在小房子旁边一点，不挡房子
         const right = new THREE.Vector3().setFromMatrixColumn(this.camera.matrixWorld, 0); right.sub(N.clone().multiplyScalar(right.dot(N))).normalize();
-        P.addScaledVector(right, pxWorld(P) * 30).normalize().multiplyScalar(R); N = P.clone().normalize();
+        // D110：站在离最近那面旗远的一边（上海的家、关西的旗：原来总站在右边，正好挡住关西那面旗）
+        let side = 1, best = Infinity;
+        for (const b of this.books) { const d = haversineKm(b.center, this.heroAt); if (d < best && d < 3000) { best = d; side = ll2v(b.center[0], b.center[1], R).sub(P).dot(right) > 0 ? -1 : 1; } }
+        P.addScaledVector(right, side * pxWorld(P) * 30).normalize().multiplyScalar(R); N = P.clone().normalize();
       }
       // D109：书里露出来的只有按钮和抽屉之间那一条，小人最多占它的四分之一，不再顶出画面被裁掉
       const strip = Math.max(80, this.h - this.insets.top - this.insets.bottom);
