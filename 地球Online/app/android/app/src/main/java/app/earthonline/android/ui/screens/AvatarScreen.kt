@@ -33,6 +33,7 @@ import app.earthonline.android.gen.Shared
 import app.earthonline.android.gen.Tokens
 import app.earthonline.android.i18n.LocalI18n
 import app.earthonline.android.model.Avatar
+import app.earthonline.android.model.AvatarPreset
 import app.earthonline.android.model.PersistedState
 import app.earthonline.android.ui.components.Chip
 import app.earthonline.android.ui.components.EoTextField
@@ -42,7 +43,7 @@ import app.earthonline.android.ui.components.Segmented
 import app.earthonline.android.ui.theme.LocalEo
 import app.earthonline.android.ui.theme.Metrics
 
-/** 捏人：名字、形态（AVATAR_FORMS）、发型、帽子、五排色块（Tokens.SkinColors … ShoesColors，与 shared/world/hero.ts 同一份）、行李箱的样式。世界里的小人实时变（set-avatar） */
+/** 捏人：名字、默认形象（AvatarPreset，D101）、形态（AVATAR_FORMS）、发型、帽子、五排色块（Tokens.SkinColors … ShoesColors，与 shared/world/hero.ts 同一份）、眼镜、行李箱的样式。世界里的小人实时变（set-avatar） */
 @Composable
 fun AvatarScreen(model: AppModel, state: PersistedState) {
     val i18n = LocalI18n.current
@@ -56,6 +57,17 @@ fun AvatarScreen(model: AppModel, state: PersistedState) {
             name = v.take(12)
             save(a.copy(name = name.trim().ifEmpty { i18n.t("avatar.defaultName") }))
         }, i18n.t("avatar.name"), modifier = Modifier.fillMaxWidth())
+
+        // 默认形象（D101）：点一下整套换上，下面的选项还能再细调
+        SectionHeader(i18n.t("avatar.presets"))
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            AvatarPreset.all.forEach { p ->
+                Chip(p.avatar.name, selected = false) {
+                    name = p.avatar.name
+                    save(p.appliedTo(a))
+                }
+            }
+        }
 
         SectionHeader(i18n.t("avatar.form"))
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -80,6 +92,10 @@ fun AvatarScreen(model: AppModel, state: PersistedState) {
         SwatchRow(i18n.t("avatar.dress"), Tokens.DressColors, a.dress) { save(a.copy(dress = it)) }
         SwatchRow(i18n.t("avatar.hatColor"), Tokens.HatColors, a.hatColor) { save(a.copy(hatColor = it)) }
         SwatchRow(i18n.t("avatar.shoes"), Tokens.ShoesColors, a.shoes) { save(a.copy(shoes = it)) }
+        SectionHeader(i18n.t("avatar.glasses"))
+        Segmented(listOf(false to i18n.t("avatar.hatNone"), true to i18n.t("avatar.glassesOn")), a.glasses == true) {
+            save(a.copy(glasses = if (it) true else null))
+        }
 
         SectionHeader(i18n.t("case.styleLabel"))
         Segmented(Shared.SUITCASE_STYLES.map { it to i18n.t("case.style.$it") }, a.suitcase ?: "sand") {
